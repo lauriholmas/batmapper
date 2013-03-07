@@ -57,3 +57,17 @@ Requested features.
 	
 Any questions, bugs, feedback?
 	Send glaurung a tell.
+	
+	
+	----------------------------------------------------------------------------------------------------------
+	Completed for 1.3 version ADD THESE
+
+- when putting empty name for exit, it will delete it
+- when resizing mapwindow, notes panel will also adjust in length
+- batmapfiles will be from now on saved under batclient/conf/batMapAreas/ the plugin will migrate the files to the new location and cleanup the old directory
+- make batmapper window save size and position, done, it saves under batclient/conf 
+- buttons for dragging map and making selection-window have been reversed, mainbutton drags, rightbutton draws selectionwindow
+- adding a script which can be used to reload plugin after it has been closed
+- add toolstips for various windows on what they contain
+- add a builtin manual
+- Add some way to color rooms
