@@ -1,0 +1,59 @@
+Welcome to batMap.
+
+
+Installation
+	Get the plugin from: http://glauri.lucid.fi/batmap/uber-batMap-1.2.jar
+	Place the uber-batmap-1.2.jar into your batclient/plugins/ folder. On windows7/8 machines it might be c:\users\username\batclient\plugins
+
+How to start
+	Once you have the plugin in place, restart your batclient, there should be a new window with the contents of the mapper. Run into an area and watch the map appear in the mapwindow. If you don't like the placement of the rooms, feel free to move them about, the exits between rooms will adjust accordingly.
+	
+Saving maps
+	The map will save when you exit the area, or when you type save. ( well, actually, when "SAVED." appears as a new line). If you run into an area you haven't mapped before, and quit the batclient before exiting/saving, your map will be lost.
+	
+	The room layout is saved as well, so feel free to adjust to your liking.
+
+The layout
+	The big part is the mapper, the right side has the room descs and exits. The lowest part is for your notes, if you wish to add them. To add notes, just click onthe room you want to add the notes to, and write in the lowermost box. 
+	The green rooms are outside rooms, the grey rooms are inside.
+	A red star in a room means that there is some non-compass-dir exit, ie, up, down, enter fireplace.
+	Only exits you use will be added into the map as links between rooms. Exits used and exits visible in "exits" will be drawn into the room icon.
+	
+Controls
+	White rim around a room is the selected one, click on another room to change selection.
+	Red rim around a room is where you currently are, move to another room to change this.
+	If you have selected the room you are in ( ie, white and red rims) the selection will move with you.
+
+	- Doubleclicking on an exit between rooms will allow you to change it, ie: from enter -> enter fireplace
+	- Doubleclicking on the black background will toggle between only map and map+descs. 
+	- Clicking and dragging a room will move that room around, the exits will adjust. 
+	- Rightclicking on the background and dragging will allow you to move the whole map around. 
+	- Mouse scrolling will zoom in and out
+	- Click and drag ( left click ) on the background will allow you to make a selection of rooms, these can then be moved around together.
+	- Hold control down while starting to drag a room will add a new exit between the startroom and the room you release the button over, a dialog will pop up about what the exit shall be.
+	
+Common WTF?!?!?!?!
+	Only room in compassdirs can be placed sensibly, therefore exits with u,d,enter fireplace, float northwest etc are placed badly by the mapper. You should move them to a place which makes sense to you before continuing onward in the area. 
+	
+	Sometimes rooms will be placed ontop of eachother, the program notices, and places them partially ontop of eachother, you should be able to figure out where the rooms shall go and move them there.
+	
+	In some area ( arelium, skeep, tyr farwyn) everything ends up getting messed up. This is a feature, I'm sorry about this. Once a proper fix is figured out, something will probably be done about it.
+	
+	Aww damn I messed up my map, its a messy garble, I'd rather start from scratch! - Its fine, just move away from the area, find the mapfile in your filesystem, and delete it. The .batmap files are placed in a directory called batMapArea, they are named by some ingame name for the area. The directory is created in the place where batclient is run from, ie same place where the shortcut you use to start it is.
+	
+	
+
+Known issues
+
+	Yes, tyr farwyn, arelium are known issues, will try to figure out something to do about it.
+	
+
+Requested features.
+	Some of these are under consideration, some under implementation. If you feel something in this list is something you would need/want, let me know about it, it raises the odds of it getting done. Be prepared for a discussion when asking for new features, If I don't understand it, I can't implement it.
+	
+	- Add a button to programatically place the rooms again, incase I have accidentally messed up. 
+	- Add some way to color rooms, the notes is great, but running around its slow to read notes, I'd like to be able to put a see by a glance if I'm about to run into a room with a dester for instance.
+	
+	
+Any questions, bugs, feedback?
+	Send glaurung a tell.
