@@ -1,0 +1,15 @@
+SCRIPT_NAME="batMapReload";
+SCRIPT_DESC = "Reloads batMap after some silly person closed it.";
+SCRIPT_OFF = true;
+import com.mythicscape.batclient.interfaces.BatClientPlugin;
+
+void reload(){
+	for(BatClientPlugin plugin : pluginManager.getPlugins()){
+		if(plugin.getName().equals("batMap")){
+			plugin.loadPlugin();
+		}	
+	}
+}
+void ImSorryIClosedItIPromiseNeverToDoItAgainPleasePleasePleaseWithCherryOnTop(){
+	reload();
+}
