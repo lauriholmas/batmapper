@@ -1,30 +1,17 @@
 
 Requested
 - do something about the exit tags, they are not visible enough, maybe
-- put scrolling or "hissit" in the notes window so its easier to use, maybe
-- Add a button to programatically place the rooms again, incase I have accidentally messed up, maybe
-- make special exits a different color perhaps, sure why not
+- Add a button to programatically place the rooms again, incase I have accidentally messed up, maybe(redo layout thing)
+- make special exits a different color perhaps, sure why not, maybe up and down arrows or something?
 - make minimize button work, same as realm map, need to investigate
 - make it save zoomlevel too
 - make the manual better, html or rst or something better
-
-These will be coming in 1.4 version
 - make some way to search through areas for desc
 - would be nice to look at areas
 
 Buggy things or areas to check out
 - crack
-- batclient starting from startmenu in windows 7 -> will be fixed with new data location
 ------------------------------------------------------------------------------------
-Completed for 1.3 version ( next release to be)
+Completed for 1.4 version ( next release to be)
 
-- when putting empty name for exit, it will delete it
-- when resizing mapwindow, notes panel will also adjust in length
-- batmapfiles will be from now on saved under batclient/conf/batMapAreas/ the plugin will migrate the files to the new location and cleanup the old directory
-- make batmapper window save size and position, done, it saves under batclient/conf 
-- buttons for dragging map and making selection-window have been reversed, mainbutton drags, rightbutton draws selectionwindow
-- adding a script which can be used to reload plugin after it has been closed
-- add toolstips for various windows on what they contain
-- add a builtin manual
-- Add some way to color rooms
 
