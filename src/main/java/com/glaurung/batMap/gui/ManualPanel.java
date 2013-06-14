@@ -10,6 +10,7 @@ import java.io.InputStream;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 
 import org.apache.commons.io.IOUtils;
 
@@ -28,6 +29,7 @@ public class ManualPanel  extends JPanel implements ComponentListener{
 		this.addComponentListener(this);
 		this.setLayout(null);
 		manualTextArea.setWrapStyleWord(true);
+
 		manualTextArea.setText(readManual());
 		manualTextArea.setEditable(false);
 		scrollPane = new JScrollPane(manualTextArea);
@@ -37,6 +39,7 @@ public class ManualPanel  extends JPanel implements ComponentListener{
 		this.setBackground(BG_COLOR);
 		manualTextArea.setForeground(TEXT_COLOR);
 		manualTextArea.setBackground(BG_COLOR);
+		manualTextArea.setLineWrap(true);
 		this.add(scrollPane);
 	}
 	

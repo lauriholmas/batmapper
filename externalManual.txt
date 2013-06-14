@@ -1,0 +1,7 @@
+Installation
+	Get the plugin from: http://glauri.lucid.fi/batmap/uber-batMap-1.2.jar
+	Place the uber-batmap-1.2.jar into your batclient/plugins/ folder. On windows7/8 machines it might be c:\users\username\batclient\plugins
+
+How to start
+	Once you have the plugin in place, restart your batclient, there should be a new window with the contents of the mapper. Run into an area and watch the map appear in the mapwindow. If you don't like the placement of the rooms, feel free to move them about, the exits between rooms will adjust accordingly.
+	

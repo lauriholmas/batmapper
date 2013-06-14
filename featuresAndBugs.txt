@@ -6,6 +6,7 @@ Requested
 - make special exits a different color perhaps, sure why not
 - make minimize button work, same as realm map, need to investigate
 - make it save zoomlevel too
+- make the manual better, html or rst or something better
 
 These will be coming in 1.4 version
 - make some way to search through areas for desc

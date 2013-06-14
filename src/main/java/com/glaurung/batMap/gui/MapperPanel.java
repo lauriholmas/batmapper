@@ -60,8 +60,6 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 	
 	private boolean visibleDescs=true;
 	
-	
-	private JButton redraw;
 	private JComboBox roomColor;
 	MapperEngine engine;
 	
@@ -130,12 +128,6 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 		descPanel.add(roomExits);
 		roomExits.setToolTipText("This lists room exits");
 			
-		redraw = new JButton("REDRAW");
-		descPanel.add(redraw);
-		redraw.setFont(font);
-		redraw.addActionListener(this);
-		redraw.setBounds(0, SHORT_DESC_HEIGHT+BORDERLINE+LONG_DESC_HEIGHT+BORDERLINE+EXITS_HEIGHT+BORDERLINE, BUTTON_WIDTH, BUTTON_HEIGHT);
-		redraw.setToolTipText("This button will realign the rooms, careful now!");
 		roomColor = new JComboBox(RoomColors.getColorNames());
 		descPanel.add(roomColor);
 		roomColor.setFont(font);
@@ -171,17 +163,11 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 
 	@Override
 	public void componentMoved(ComponentEvent e) {
-//		if(this.batWindow != null){
-//			GuiDataPersister.save(this.batWindow.getLocation(), this.batWindow.getSize());
-//		}
 		
 	}
 
 	@Override
 	public void componentResized(ComponentEvent e) {
-//		if(this.batWindow != null){
-//			System.out.println("\n\n\n\n\n\n\n\n\n\n"+batWindow.getLocation()+" "+batWindow.getSize());
-//		}
 
 		if(visibleDescs){
 			vv.setBounds(7, 7, this.getWidth()-(DESC_WIDTH+32), this.getHeight()-14);
@@ -254,10 +240,7 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getSource().equals(redraw)){
-			this.engine.redraw();
-//			System.out.println("redraw and scaling in: "+this.engine.getScaler().getIn()+" and out: "+this.engine.getScaler().getOut());
-		}else if(e.getSource().equals(roomColor)){
+		if(e.getSource().equals(roomColor)){
 			this.engine.changeRoomColor(RoomColors.getColors()[roomColor.getSelectedIndex()]);
 		}
 		

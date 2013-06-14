@@ -1,5 +1,3 @@
-Stuff to do for release:
+Stuff to do for next release:
 
-- add new features to manual.txt
-- remove nonworking redraw button
 - add scrollbars for notes window/screen
