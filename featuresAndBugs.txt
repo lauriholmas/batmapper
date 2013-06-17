@@ -1,3 +1,7 @@
+Stuff to fix for 1.3:
+
+doubleclick on exit, esc to exit ( ie, dont do changes) will delete the exit, should not delete it
+
 
 Requested
 - do something about the exit tags, they are not visible enough, maybe
@@ -11,6 +15,10 @@ Requested
 
 Buggy things or areas to check out
 - crack
+- horsehead mountain
+
+
+
 ------------------------------------------------------------------------------------
 Completed for 1.4 version ( next release to be)
 
