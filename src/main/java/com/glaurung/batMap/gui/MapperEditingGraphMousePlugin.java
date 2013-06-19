@@ -64,7 +64,6 @@ public class MapperEditingGraphMousePlugin extends EditingGraphMousePlugin<Room,
 			    	vv.getRenderer().renderVertex(vv.getRenderContext(), vv.getGraphLayout(), room);
 			    	vv.repaint();
 			    }else if (exitDir != null && exitDir.equals("")){
-			    	System.out.println("empoty for delete esc|"+exitDir+"|");
 			    	Room room = this.engine.getGraph().getEndpoints(exit).getFirst();
 			    	if(room.getExits().contains(exit.getExit())){
 			    		room.getExits().remove(exit.getExit());
