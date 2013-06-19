@@ -1,7 +1,10 @@
 Welcome to batMap.
 
 
-	Changes in new version:
+	Hotfix version 1.31:
+- Doubleclick on exit to edit name and pressing esc to cancel no longer deletes the exit.
+
+	Changes in 1.3 version:
 
 - Removing exits, doubleclick on an exit to rename, empty name will remove it.
 - Resizing mapwindow will also resize notes window.
