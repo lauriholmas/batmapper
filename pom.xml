@@ -4,7 +4,7 @@
 
   <groupId>com.glaurung</groupId>
   <artifactId>batMap</artifactId>
-  <version>1.3.1</version>
+  <version>1.4-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>batMap</name>
