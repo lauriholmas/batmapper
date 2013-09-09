@@ -21,6 +21,9 @@ import com.mythicscape.batclient.interfaces.ParsedResult;
 
 public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrigger, ActionListener, BatClientPluginUtil{
 
+	private static final String MAKERIPACTION = "rip_action set";
+	private static final String RIPACTION_OFF = "rip_action off";
+	private static final String RIPACTION_ON = "rip_action on";
 	private MapperEngine engine;
 	private final String CHANNEL_PREFIX="BAT_MAPPER";
 	//batMap;areaname;roomUID;exitUsed;indoor boolean;shortDesc;longDesc;exits
@@ -58,7 +61,7 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
 		
 		clientWin.newTab("manual", new ManualPanel());
 		
-		clientWin.newTab("Corpses", new CorpsePanel(BASEDIR));
+		clientWin.newTab("Corpses", new CorpsePanel(BASEDIR, this));
 		clientWin.setVisible(true);
 		this.getPluginManager().addProtocolListener(this);
 		AreaDataPersister.migrateFilesToNewLocation(BASEDIR);
@@ -126,6 +129,23 @@ event data amount: 9
 	@Override
 	public void clientExit() {
 		this.engine.save();
+		
+	}
+
+	public void saveRipAction(String ripString) {
+		this.getClientGUI().doCommand(MAKERIPACTION+ripString);
+		// TODO Auto-generated method stub
+	}
+	public void toggleRipAction(boolean mode){
+		if(mode){
+			this.getClientGUI().doCommand(RIPACTION_ON);
+		}else{
+			this.getClientGUI().doCommand(RIPACTION_OFF);
+		}
+	}
+
+	public void doCommand(String string) {
+		this.getClientGUI().doCommand(string);
 		
 	}
 

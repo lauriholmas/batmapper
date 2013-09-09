@@ -18,14 +18,16 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
 
+import com.glaurung.batMap.controller.MapperPlugin;
 import com.glaurung.batMap.io.CorpseHandlerDataPersister;
 
 public class CorpsePanel extends JPanel implements ActionListener{
 
 	private CorpseModel model = new CorpseModel();
 	private String BASEDIR;
+	private MapperPlugin plugin;
 
-	public CorpsePanel(String BASEDIR) {
+	public CorpsePanel(String BASEDIR, MapperPlugin plugin) {
 		this.BASEDIR=BASEDIR;
 		this.model = CorpseHandlerDataPersister.load(BASEDIR);
 		if(model == null){
@@ -33,6 +35,8 @@ public class CorpsePanel extends JPanel implements ActionListener{
 		}else{
 			loadFromModel();
 		}
+		this.plugin = plugin;
+		//TODO: next up, the whole damn layout... somehow....
 		
 	}
 
@@ -99,8 +103,34 @@ public class CorpsePanel extends JPanel implements ActionListener{
 		this.model.setMountHandle(mount.getSelectedText());
 		this.model.setDelim(delim.getText());
 		this.model.setLootList(createStringLootList());
-		
-		//TODO:also all the fucking checkboxes...
+		this.model.lichdrain = lichdrain.isSelected();
+		this.model.kharimsoul = kharimsoul.isSelected();
+		this.model.kharimSoulCorpse = kharimSoulCorpse.isSelected();
+		this.model.tsaraksoul = tsaraksoul.isSelected();
+		this.model.ripSoulToKatana=ripSoulToKatana.isSelected();
+		this.model.arkemile = arkemile.isSelected();
+		this.model.gac = gac.isSelected();
+		this.model.ga =ga.isSelected();
+		this.model.eatCorpse = eatCorpse.isSelected();
+		this.model.donate = donate.isSelected();
+		this.model.lootCorpse = lootCorpse.isSelected();
+		this.model.lootGround = lootGround.isSelected();
+		this.model.barbarianBurn = barbarianBurn.isSelected();
+		this.model.feedCorpseTo = feedCorpseTo.isSelected();
+		this.model.beheading = beheading.isSelected();
+		this.model.desecrateGround=desecrateGround.isSelected();
+		this.model.burialCere=burialCere.isSelected();
+		this.model.wakeCorpse=wakeCorpse.isSelected();
+		this.model.dig = dig.isSelected();
+		this.model.wakeFollow=wakeFollow.isSelected();
+		this.model.wakeAgro=wakeAgro.isSelected();
+		this.model.wakeTalk=wakeTalk.isSelected();
+		this.model.wakeStatic=wakeStatic.isSelected();
+		this.model.lichWake = lichWake.isSelected();
+		this.model.vampireWake=vampireWake.isSelected();
+		this.model.skeletonWake=skeletonWake.isSelected();
+		this.model.zombieWake=zombieWake.isSelected();
+		CorpseHandlerDataPersister.save(BASEDIR, this.model);
 		
 	}
 	private List<String> createStringLootList() {
@@ -119,20 +149,67 @@ public class CorpsePanel extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
-			//TODO: whatever button or thing we click, we update model and update rip_action anyway
-		
-		
-			//TODO: specialcases, so clicking new selection clears some old
-		
-		
-			//1 soul affecting at a time
-		
-			//1 corpse affecting at a time
-		
-			//1 waketype at a time ( maybe none)
-		
-			
-		CorpseHandlerDataPersister.save(BASEDIR, model);
+			Object source = event.getSource();
+			if(source == on){
+				this.plugin.toggleRipAction(true);
+			}else if(source == off){
+				this.plugin.toggleRipAction(false);
+			}else if (source == kharimSoulCorpse){
+				this.plugin.doCommand("kharim set corpseDest foobar");
+			}else if(source == lichdrain){
+				turnOff(kharimsoul,kharimsoul,ripSoulToKatana,arkemile);
+			}else if(source == kharimsoul){
+				turnOff(lichdrain,tsaraksoul,ripSoulToKatana,arkemile);
+			}else if(source == tsaraksoul){
+				turnOff(lichdrain,kharimsoul,ripSoulToKatana,arkemile);
+			}else if(source == ripSoulToKatana){
+				turnOff(lichdrain,kharimsoul,tsaraksoul,arkemile);
+			}else if(source == arkemile){
+				turnOff(lichdrain,kharimsoul,tsaraksoul,ripSoulToKatana, eatCorpse, barbarianBurn, feedCorpseTo, 
+						beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, zombieWake);
+			}else if(source == eatCorpse){
+				turnOff(arkemile,eatCorpse, ripSoulToKatana, barbarianBurn, feedCorpseTo,beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, zombieWake);
+			}else if(source == barbarianBurn){
+				turnOff(arkemile, eatCorpse,ripSoulToKatana, feedCorpseTo,beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, zombieWake);
+			}else if(source == feedCorpseTo){
+				turnOff(arkemile,eatCorpse, ripSoulToKatana, barbarianBurn,beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, zombieWake);
+			}else if(source == beheading){
+				turnOff(arkemile,eatCorpse, ripSoulToKatana, barbarianBurn, feedCorpseTo, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, zombieWake);
+			}else if(source == desecrateGround){
+				turnOff(arkemile, eatCorpse,ripSoulToKatana, barbarianBurn, feedCorpseTo,beheading,burialCere, lichWake, skeletonWake, vampireWake, zombieWake);
+			}else if(source == burialCere){
+				turnOff(arkemile,eatCorpse, ripSoulToKatana, barbarianBurn, feedCorpseTo,beheading, desecrateGround,  lichWake, skeletonWake, vampireWake, zombieWake);
+			}else if(source == lichWake){
+				turnOff(arkemile, eatCorpse,ripSoulToKatana, barbarianBurn, feedCorpseTo,beheading, desecrateGround, burialCere, skeletonWake, vampireWake, zombieWake);
+			}else if(source == vampireWake){
+				turnOff(arkemile, eatCorpse,ripSoulToKatana, barbarianBurn, feedCorpseTo,beheading, desecrateGround, burialCere, lichWake, skeletonWake, zombieWake);
+			}else if(source == skeletonWake){
+				turnOff(arkemile,eatCorpse, ripSoulToKatana, barbarianBurn, feedCorpseTo,beheading, desecrateGround, burialCere, lichWake,  vampireWake, zombieWake);
+			}else if(source == zombieWake){
+				turnOff(arkemile,eatCorpse, ripSoulToKatana, barbarianBurn, feedCorpseTo,beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake);
+			}else if (source == wakeFollow){
+				turnOff( wakeAgro, wakeTalk, wakeStatic);
+			}else if (source == wakeAgro){
+				turnOff(wakeFollow,  wakeTalk, wakeStatic);
+			}else if (source == wakeTalk){
+				turnOff(wakeFollow, wakeAgro,  wakeStatic);
+			}else if (source == wakeStatic){
+				turnOff(wakeFollow, wakeAgro, wakeTalk);
+			}
+
+			saveToModel();
+			plugin.saveRipAction(makeRipString());
+	}
+
+	private void turnOff(CorpseCheckBox ... boxes){
+		for(CorpseCheckBox box : boxes){
+			box.setSelected(false);
+		}
+	}
+
+	private String makeRipString() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	
