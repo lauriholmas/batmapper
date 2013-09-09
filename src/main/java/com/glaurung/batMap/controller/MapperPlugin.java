@@ -6,7 +6,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import com.glaurung.batMap.gui.ManualPanel;
+import com.glaurung.batMap.gui.corpses.CorpsePanel;
 import com.glaurung.batMap.io.AreaDataPersister;
+import com.glaurung.batMap.io.CorpseHandlerDataPersister;
 import com.glaurung.batMap.io.GuiDataPersister;
 import com.glaurung.batMap.vo.GuiData;
 import com.mythicscape.batclient.interfaces.BatClientPlugin;
@@ -41,6 +43,7 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
 	public void loadPlugin() {
 		BASEDIR = this.getBaseDirectory();
 		GuiData guiData = GuiDataPersister.load(BASEDIR);
+		
 		BatWindow clientWin;
 		if(guiData != null){
 			clientWin = this.getClientGUI().createBatWindow("Mapper", guiData.getX(), guiData.getY(),guiData.getWidth(), guiData.getHeight());
@@ -54,6 +57,8 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
 		clientWin.newTab("batMap", engine.getPanel());
 		
 		clientWin.newTab("manual", new ManualPanel());
+		
+		clientWin.newTab("Corpses", new CorpsePanel(BASEDIR));
 		clientWin.setVisible(true);
 		this.getPluginManager().addProtocolListener(this);
 		AreaDataPersister.migrateFilesToNewLocation(BASEDIR);
