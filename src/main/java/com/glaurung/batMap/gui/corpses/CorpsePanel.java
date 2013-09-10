@@ -37,9 +37,13 @@ public class CorpsePanel extends JPanel implements ActionListener{
 		}
 		this.plugin = plugin;
 		//TODO: next up, the whole damn layout... somehow....
-		
+		delim.addActionListener(this);
+//		lootLists.addC
+		//TODO: add listener for the textfields and lootlists to update the effects on the checkboxes that rely on them
 	}
 
+	//TODO: also add aelena familiar drain corpse and aelena fam fetch organ
+	
 	private CorpseCheckBox lichdrain = 			new CorpseCheckBox("lich drain soul",false,"lich drain",this);
 	private CorpseCheckBox kharimsoul = 		new CorpseCheckBox("kharim drain soul",false,"kharim drain",this);
 	private CorpseCheckBox kharimSoulCorpse=	new CorpseCheckBox("kharim dest corpse",false,null,this);
@@ -76,7 +80,6 @@ public class CorpsePanel extends JPanel implements ActionListener{
 	private JRadioButton off =	new JRadioButton("Off");
 	private JTextField delim = 	new JTextField(";;");
 	private JTextField mount = new JTextField("mountName");
-	
 	private JButton clear = 		new JButton("Clear!");
 	private JList lootLists = 	new JList();
 	
@@ -94,13 +97,13 @@ public class CorpsePanel extends JPanel implements ActionListener{
 	private String getLootString() {
 		String loots = "";
 		for (String lootItem : model.getLootList()){
-			loots+=lootItem+getDelim();
+			loots+=lootItem+",";
 		}
-		return loots.substring(0, loots.length()-1);
+		return loots.substring(0, loots.length());
 	}
 
 	private void saveToModel(){
-		this.model.setMountHandle(mount.getSelectedText());
+		this.model.setMountHandle(mount.getText());
 		this.model.setDelim(delim.getText());
 		this.model.setLootList(createStringLootList());
 		this.model.lichdrain = lichdrain.isSelected();
@@ -142,9 +145,40 @@ public class CorpsePanel extends JPanel implements ActionListener{
 		return list;
 	}
 
-
 	private void loadFromModel(){
-		//TODO: we populate all the crap basedon the model then
+		
+		
+		lichdrain.setSelected(this.model.lichdrain);
+		kharimsoul.setSelected(this.model.kharimsoul);
+		kharimSoulCorpse.setSelected(this.model.kharimSoulCorpse);
+		tsaraksoul.setSelected(this.model.tsaraksoul);
+		ripSoulToKatana.setSelected(this.model.ripSoulToKatana);
+		arkemile.setSelected(this.model.arkemile);
+		gac.setSelected(this.model.gac);
+		ga.setSelected(this.model.ga);
+		eatCorpse.setSelected(this.model.eatCorpse);
+		donate.setSelected(this.model.donate);
+		lootCorpse.setSelected(this.model.lootCorpse);
+		lootGround.setSelected(this.model.lootGround);
+		barbarianBurn.setSelected(this.model.barbarianBurn);
+		feedCorpseTo.setSelected(this.model.feedCorpseTo);
+		beheading.setSelected(this.model.beheading);
+		desecrateGround.setSelected(this.model.desecrateGround);
+		burialCere.setSelected(this.model.burialCere);
+		wakeCorpse.setSelected(this.model.wakeCorpse);
+		dig.setSelected(this.model.dig);
+		wakeFollow.setSelected(this.model.wakeFollow);
+		wakeAgro.setSelected(this.model.wakeAgro);
+		wakeTalk.setSelected(this.model.wakeTalk);
+		wakeStatic.setSelected(this.model.wakeStatic);
+		lichWake.setSelected(this.model.lichWake);
+		vampireWake.setSelected(this.model.vampireWake);
+		skeletonWake.setSelected(this.model.skeletonWake);
+		zombieWake.setSelected(this.model.zombieWake);
+		
+		mount.setText(this.model.getMountHandle());
+		delim.setText(this.model.getDelim());
+		lootLists.setListData(this.model.getLootList().toArray());
 	}
 
 	@Override
@@ -208,6 +242,90 @@ public class CorpsePanel extends JPanel implements ActionListener{
 	}
 
 	private String makeRipString() {
+		String rip = "";
+		
+		if(lichdrain.isSelected()){
+			rip+=lichdrain.getEffect()+this.model.getDelim();
+		}
+		if(kharimsoul.isSelected()){
+			rip+=kharimsoul.getEffect()+this.model.getDelim();
+		}
+		if(kharimSoulCorpse.isSelected()){
+			rip+=kharimSoulCorpse.getEffect()+this.model.getDelim();
+		}
+		if(tsaraksoul.isSelected()){
+			rip+=tsaraksoul.getEffect()+this.model.getDelim();
+		}
+		if(ripSoulToKatana.isSelected()){
+			rip+=ripSoulToKatana.getEffect()+this.model.getDelim();
+		}
+		if(arkemile.isSelected()){
+			rip+=arkemile.getEffect()+this.model.getDelim();
+		}
+		if(gac.isSelected()){
+			rip+=gac.getEffect()+this.model.getDelim();
+		}
+		if(ga.isSelected()){
+			rip+=ga.getEffect()+this.model.getDelim();
+		}
+		if(eatCorpse.isSelected()){
+			rip+=eatCorpse.getEffect()+this.model.getDelim();
+		}
+		if(donate.isSelected()){
+			rip+=donate.getEffect()+this.model.getDelim();
+		}
+		if(lootCorpse.isSelected()){
+			rip+=lootCorpse.getEffect()+this.model.getDelim();
+		}
+		if(lootGround.isSelected()){
+			rip+=lootGround.getEffect()+this.model.getDelim();
+		}
+		if(barbarianBurn.isSelected()){
+			rip+=barbarianBurn.getEffect()+this.model.getDelim();
+		}
+		if(feedCorpseTo.isSelected()){
+			rip+=feedCorpseTo.getEffect()+this.model.getDelim();
+		}
+		if(beheading.isSelected()){
+			rip+=beheading.getEffect()+this.model.getDelim();
+		}
+		if(desecrateGround.isSelected()){
+			rip+=desecrateGround.getEffect()+this.model.getDelim();
+		}
+		if(burialCere.isSelected()){
+			rip+=burialCere.getEffect()+this.model.getDelim();
+		}
+		if(wakeCorpse.isSelected()){
+			rip+=wakeCorpse.getEffect()+this.model.getDelim();
+		}
+		if(dig.isSelected()){
+			rip+=dig.getEffect()+this.model.getDelim();
+		}
+		if(wakeFollow.isSelected()){
+			rip+=wakeFollow.getEffect()+this.model.getDelim();
+		}
+		if(wakeAgro.isSelected()){
+			rip+=wakeAgro.getEffect()+this.model.getDelim();
+		}
+		if(wakeTalk.isSelected()){
+			rip+=wakeTalk.getEffect()+this.model.getDelim();
+		}
+		if(wakeStatic.isSelected()){
+			rip+=wakeStatic.getEffect()+this.model.getDelim();
+		}
+		if(lichWake.isSelected()){
+			rip+=lichWake.getEffect()+this.model.getDelim();
+		}
+		if(vampireWake.isSelected()){
+			rip+=vampireWake.getEffect()+this.model.getDelim();
+		}
+		if(skeletonWake.isSelected()){
+			rip+=skeletonWake.getEffect()+this.model.getDelim();
+		}
+		if(zombieWake.isSelected()){
+			rip+=zombieWake.getEffect()+this.model.getDelim();
+		}
+		
 		// TODO Auto-generated method stub
 		return null;
 	}
