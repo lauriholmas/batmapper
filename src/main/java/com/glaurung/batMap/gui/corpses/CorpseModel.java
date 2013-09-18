@@ -27,7 +27,7 @@ public class CorpseModel implements Serializable{
 	public boolean lootCorpse = false;
 	public boolean lootGround = false;
 	
-	//corpse = 7
+	//corpse = 9
 	public boolean barbarianBurn = false;
 	public boolean feedCorpseTo = false;
 	public boolean beheading = false;
@@ -35,6 +35,8 @@ public class CorpseModel implements Serializable{
 	public boolean burialCere=false;
 	public boolean wakeCorpse=false;
 	public boolean dig = false;
+	public boolean aelenaOrgan=false;
+	public boolean aelenaFam = false;
 	
 	//fucking undead wakes = 8
 	public boolean wakeFollow=false;
@@ -49,41 +51,8 @@ public class CorpseModel implements Serializable{
 	private String delim=";";
 	private String mountHandle="snowman";
 	private List<String> lootList = new LinkedList<String>();
-
-	public void updateModel(boolean[] modes, String delim, String mount, List<String> lootList){
-		if (modes.length == 27){
-			lichdrain = modes[0];
-			kharimsoul = modes[1];
-			kharimSoulCorpse = modes[2];
-			tsaraksoul = modes[3];
-			ripSoulToKatana=modes[4];
-			arkemile = modes[5];
-			gac = modes[6];
-			ga = modes[7];
-			eatCorpse = modes[8];
-			donate = modes[9];
-			lootCorpse = modes[10];
-			lootGround = modes[11];
-			barbarianBurn = modes[12];
-			feedCorpseTo = modes[13];
-			beheading = modes[14];
-			desecrateGround=modes[15];
-			burialCere=modes[16];
-			wakeCorpse=modes[17];
-			dig = modes[18];
-			wakeFollow=modes[19];
-			wakeAgro=modes[20];
-			wakeTalk=modes[21];
-			wakeStatic=modes[22];
-			lichWake = modes[23];
-			vampireWake=modes[24];
-			skeletonWake=modes[25];
-			zombieWake=modes[26];
-		}
-		this.delim=delim;
-		this.mountHandle=mount;
-		this.setLootList(lootList);
-	}
+	private String organ1="";
+	private String organ2="";
 
 	public String getDelim() {
 		return delim;
@@ -107,6 +76,62 @@ public class CorpseModel implements Serializable{
 
 	public void setLootList(List<String> lootList) {
 		this.lootList = lootList;
+	}
+
+	public void clear() {
+		lichdrain = false;
+		kharimsoul = false;
+		kharimSoulCorpse = false;
+		tsaraksoul = false;
+		ripSoulToKatana=false;
+		arkemile = false;
+		gac = false;
+		ga = false;
+		eatCorpse = false;
+		donate = false;
+		lootCorpse = false;
+		lootGround = false;
+		barbarianBurn = false;
+		feedCorpseTo = false;
+		beheading = false;
+		desecrateGround=false;
+		burialCere=false;
+		wakeCorpse=false;
+		dig = false;
+		wakeFollow=false;
+		wakeAgro=false;
+		wakeTalk=false;
+		wakeStatic=false;
+		lichWake = false;
+		vampireWake=false;
+		skeletonWake=false;
+		zombieWake=false;
+		aelenaFam=false;
+		aelenaOrgan=false;
+		
+		delim="";
+		mountHandle="";
+		lootList = new LinkedList<String>();
+		organ1="";
+		organ2="";
+		
+	}
+
+	public String getOrgan1() {
+		return organ1;
+	}
+
+	public String getOrgan2() {
+		return organ2;
+	}
+
+	public void setOrgan1(String organ) {
+		this.organ1=organ;	
+	}
+
+	public void setOrgan2(String organ) {
+		this.organ2=organ;
+
 	}
 	
 }

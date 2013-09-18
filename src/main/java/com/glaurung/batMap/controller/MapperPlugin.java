@@ -134,7 +134,6 @@ event data amount: 9
 
 	public void saveRipAction(String ripString) {
 		this.getClientGUI().doCommand(MAKERIPACTION+ripString);
-		// TODO Auto-generated method stub
 	}
 	public void toggleRipAction(boolean mode){
 		if(mode){
