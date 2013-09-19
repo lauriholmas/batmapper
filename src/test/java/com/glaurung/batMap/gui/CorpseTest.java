@@ -14,8 +14,8 @@ public class CorpseTest{
     	frame.setLayout(new FlowLayout());
     	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     	frame.getContentPane().add(new CorpsePanel("", new MockPlugin()));
-
-    	frame.pack();
+    	frame.setSize(1200, 800);
+//    	frame.pack();
     	frame.setVisible(true);
 
     }

@@ -1,6 +1,8 @@
 package com.glaurung.batMap.gui.corpses;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -8,12 +10,17 @@ import java.awt.event.ComponentListener;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 
 import com.glaurung.batMap.controller.MapperPlugin;
 import com.glaurung.batMap.io.CorpseHandlerDataPersister;
@@ -26,6 +33,12 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 	private final Color TEXT_COLOR = Color.LIGHT_GRAY;
 	private final Color BG_COLOR = Color.BLACK;
 	private final int BORDERLINE=7;
+	private final int TOP_BORDER=20;
+	private Font font = new Font("Consolas",Font.PLAIN,14);
+	private final int CB_WIDTH=200;
+	private final int BUTTON_WIDTH=70;
+	private final int LABEL_WIDTH=100;
+	private final int CB_HEIGHT=25;
 	
 	
 
@@ -38,54 +51,76 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 			loadFromModel();
 		}
 		this.plugin = plugin;
-		
+		this.setPreferredSize(new Dimension(1200, 800));
 		this.redoLayout();
 		
 		this.delim.addActionListener(this);
 		//TODO: add listener for  lootlists to update the effects on the checkboxes that rely on them
+		//TODO: also make lootlists editable and scrollable etc
+		
 		this.mount.addActionListener(this);
 		this.setBackground(BG_COLOR);
+		on.addActionListener(this);
+		off.addActionListener(this);
+		clear.addActionListener(this);
 	}
 
-	private CorpseCheckBox lichdrain = 			new CorpseCheckBox("lich drain soul",false,"lich drain",this);
-	private CorpseCheckBox kharimsoul = 		new CorpseCheckBox("kharim drain soul",false,"kharim drain",this);
-	private CorpseCheckBox kharimSoulCorpse=	new CorpseCheckBox("kharim dest corpse",false,null,this);
-	private CorpseCheckBox tsaraksoul = 		new CorpseCheckBox("tzarak drain soul",false,"tzarak drain soul",this);
-	private CorpseCheckBox ripSoulToKatana=		new CorpseCheckBox("shitKatana rip soul",false,"rip soul from corpse",this);
-	private CorpseCheckBox arkemile = 			new CorpseCheckBox("necrostaff arkemile",false,"say arkemile",this);
-	private CorpseCheckBox gac = 				new CorpseCheckBox("get all from corpse",false,"get all from corpse",this);
-	private CorpseCheckBox ga = 				new CorpseCheckBox("get all",false,"get all",this);
-	private CorpseCheckBox eatCorpse = 			new CorpseCheckBox("get and eat corpse",false,"get corpse"+getDelim()+"eat corpse",this);
-	private CorpseCheckBox donate = 			new CorpseCheckBox("donate noeq and drop rest",false,"get all from corpse"+getDelim()+"donate noeq"+getDelim()+"drop noeq",this);
-	private CorpseCheckBox lootCorpse = 		new CorpseCheckBox("get loot from corpse",false,"get "+getLootString()+" from corpse",this);
-	private CorpseCheckBox lootGround = 		new CorpseCheckBox("get loot from ground",false,"get "+getLootString(),this);
-	private CorpseCheckBox barbarianBurn = 		new CorpseCheckBox("barbarian burn corpse",false,"barbburn",this);
-	private CorpseCheckBox feedCorpseTo = 		new CorpseCheckBox("feed corpse to mount",false,"get corpse"+getDelim()+"feed corpse to "+getMountName(),this);
-	private CorpseCheckBox beheading = 			new CorpseCheckBox("kharim behead corpse",false,"use beheading of departed",this);
-	private CorpseCheckBox desecrateGround=		new CorpseCheckBox("desecrate ground",false,"use desecrate ground",this);
-	private CorpseCheckBox burialCere=			new CorpseCheckBox("burial ceremony",false,"use burial ceremony",this);
-	private CorpseCheckBox dig = 				new CorpseCheckBox("dig grave",false,"dig grave",this);
-	private CorpseCheckBox wakeFollow=			new CorpseCheckBox("follow",false," follow",this);
-	private CorpseCheckBox wakeAgro=			new CorpseCheckBox("agro",false," agro",this);
-	private CorpseCheckBox wakeTalk=			new CorpseCheckBox("talk",false," talk",this);
-	private CorpseCheckBox wakeStatic=			new CorpseCheckBox("static",false," static",this);
-	private CorpseCheckBox lichWake = 			new CorpseCheckBox("lich wake corpse",false,"lick wake corpse",this);
-	private CorpseCheckBox vampireWake=			new CorpseCheckBox("vampire wake corpse",false,"vampire wake corpse",this);
-	private CorpseCheckBox skeletonWake=		new CorpseCheckBox("skeleton wake corpse",false,"skeleton wake corpse",this);
-	private CorpseCheckBox zombieWake=			new CorpseCheckBox("zombie wake corpse",false,"zombie wake corpse",this);
-	private CorpseCheckBox aelenaOrgan=			new CorpseCheckBox("aelena extract organ",false,"familiar harvest ",this);
-	private CorpseCheckBox aelenaFam=			new CorpseCheckBox("aelena fam consume corpse",false,"familiar consume corpse",this);
+	private CorpseCheckBox lichdrain = 			new CorpseCheckBox("lich drain soul",false,"lich drain",this, font);
+	private CorpseCheckBox kharimsoul = 		new CorpseCheckBox("kharim drain soul",false,"kharim drain",this, font);
+	private CorpseCheckBox kharimSoulCorpse=	new CorpseCheckBox("kharim dest corpse",false,null,this, font);
+	private CorpseCheckBox tsaraksoul = 		new CorpseCheckBox("tzarak drain soul",false,"tzarak drain soul",this, font);
+	private CorpseCheckBox ripSoulToKatana=		new CorpseCheckBox("shitKatana rip soul",false,"rip soul from corpse",this, font);
+	private CorpseCheckBox arkemile = 			new CorpseCheckBox("necrostaff arkemile",false,"say arkemile",this, font);
+	private CorpseCheckBox gac = 				new CorpseCheckBox("get all from corpse",false,"get all from corpse",this, font);
+	private CorpseCheckBox ga = 				new CorpseCheckBox("get all",false,"get all",this, font);
+	private CorpseCheckBox eatCorpse = 			new CorpseCheckBox("get and eat corpse",false,"get corpse"+getDelim()+"eat corpse",this, font);
+	private CorpseCheckBox donate = 			new CorpseCheckBox("donate noeq and drop rest",false,"get all from corpse"+getDelim()+"donate noeq"+getDelim()+"drop noeq",this, font);
+	private CorpseCheckBox lootCorpse = 		new CorpseCheckBox("get loot from corpse",false,"get "+getLootString()+" from corpse",this, font);
+	private CorpseCheckBox lootGround = 		new CorpseCheckBox("get loot from ground",false,"get "+getLootString(),this, font);
+	private CorpseCheckBox barbarianBurn = 		new CorpseCheckBox("barbarian burn corpse",false,"barbburn",this, font);
+	private CorpseCheckBox feedCorpseTo = 		new CorpseCheckBox("feed corpse to mount",false,"get corpse"+getDelim()+"feed corpse to "+getMountName(),this, font);
+	private CorpseCheckBox beheading = 			new CorpseCheckBox("kharim behead corpse",false,"use beheading of departed",this, font);
+	private CorpseCheckBox desecrateGround=		new CorpseCheckBox("desecrate ground",false,"use desecrate ground",this, font);
+	private CorpseCheckBox burialCere=			new CorpseCheckBox("burial ceremony",false,"use burial ceremony",this, font);
+	private CorpseCheckBox dig = 				new CorpseCheckBox("dig grave",false,"dig grave",this, font);
+	private CorpseCheckBox wakeFollow=			new CorpseCheckBox("follow",false," follow",this, font);
+	private CorpseCheckBox wakeAgro=			new CorpseCheckBox("agro",false," agro",this, font);
+	private CorpseCheckBox wakeTalk=			new CorpseCheckBox("talk",false," talk",this, font);
+	private CorpseCheckBox wakeStatic=			new CorpseCheckBox("static",false," static",this, font);
+	private CorpseCheckBox lichWake = 			new CorpseCheckBox("lich wake corpse",false,"lick wake corpse",this, font);
+	private CorpseCheckBox vampireWake=			new CorpseCheckBox("vampire wake corpse",false,"vampire wake corpse",this, font);
+	private CorpseCheckBox skeletonWake=		new CorpseCheckBox("skeleton wake corpse",false,"skeleton wake corpse",this, font);
+	private CorpseCheckBox zombieWake=			new CorpseCheckBox("zombie wake corpse",false,"zombie wake corpse",this, font);
+	private CorpseCheckBox aelenaOrgan=			new CorpseCheckBox("aelena extract organ",false,"familiar harvest ",this, font);
+	private CorpseCheckBox aelenaFam=			new CorpseCheckBox("aelena fam consume corpse",false,"familiar consume corpse",this, font);
 	
 	
 	private static final long serialVersionUID = 1L;
-	private JRadioButton on = 	new JRadioButton("On!"); 
-	private JRadioButton off =	new JRadioButton("Off");
-	private JTextField delim = 	new JTextField(";;");
-	private JTextField mount = new JTextField("mountName");
+	private JCheckBox on = 	new JCheckBox("On!"); 
+	private JCheckBox off =	new JCheckBox("Off");
+	private JTextField delim = 	new JTextField("");
+	private JTextField mount = new JTextField("");
 	private JButton clear = 		new JButton("Clear!");
 	private JList lootLists = 	new JList();
 	private JTextField organ1 = new JTextField("");
 	private JTextField organ2 = new JTextField("");
+	
+	
+	private Border whiteline = BorderFactory.createLineBorder(Color.white);
+	private JPanel soulPanel =new JPanel();
+	private JPanel listPanel =new JPanel();
+	private JPanel controlPanel =new JPanel();
+	private JPanel wakePanel =new JPanel();
+	private JPanel lootPanel =new JPanel();
+	private JPanel corpsePanel = new JPanel();
+	private JLabel delimLabel= new JLabel("delimeter:");
+	private JLabel mountLabel= new JLabel("mount name:");
+	private JLabel organ1Label= new JLabel("first organ:");
+	private JLabel organ2Label= new JLabel("second organ:");
+	
+	
+	//new JPanel(BorderFactory.createTitledBorder(whiteline, "Souls"));
+//	private JPane corpsePanel = new JP
 	
 	
 	private String getDelim(){
@@ -193,10 +228,16 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
+		
+		//TODO: click through all and make sure everything is hooked up ( dig fails?)
 			Object source = event.getSource();
 			if(source == on){
+				on.setSelected(true);
+				off.setSelected(false);
 				this.plugin.toggleRipAction(true);
 			}else if(source == off){
+				on.setSelected(false);
+				off.setSelected(true);
 				this.plugin.toggleRipAction(false);
 			}else if (source == kharimSoulCorpse){
 				this.plugin.doCommand("kharim set corpseDest foobar");
@@ -244,8 +285,13 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 			}else if (source == wakeStatic){
 				turnOff(wakeFollow, wakeAgro, wakeTalk);
 			}else if (source == clear){
-				this.model.clear();
-				this.loadFromModel();
+
+				int confirmation = JOptionPane.showConfirmDialog(null, "Sure you want to clear everything?");
+				if(confirmation==0){
+					this.model.clear();
+					this.loadFromModel();
+				}
+	
 			}
 
 			saveToModel();
@@ -375,15 +421,138 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 	}
 	
 	private void redoLayout() {
-		//add stuff into sensible boxes
-		//add boxes into this
+		this.setLayout(null);
+//		private Border whiteline = BorderFactory.createLineBorder(Color.white);
+		soulPanel.setBorder(BorderFactory.createTitledBorder(whiteline, "Souls", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, font, TEXT_COLOR));
+		soulPanel.setBackground(Color.BLACK);
+		listPanel.setBorder(BorderFactory.createTitledBorder(whiteline, "Items to loot", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, font, TEXT_COLOR));
+		listPanel.setBackground(Color.BLACK);
+		controlPanel.setBorder(BorderFactory.createTitledBorder(whiteline, "Controls", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, font, TEXT_COLOR));
+		controlPanel.setBackground(Color.BLACK);
+		wakePanel.setBorder(BorderFactory.createTitledBorder(whiteline, "Wake up corpse!", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, font, TEXT_COLOR));
+		wakePanel.setBackground(Color.BLACK);
+		lootPanel.setBorder(BorderFactory.createTitledBorder(whiteline, "Looting", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, font, TEXT_COLOR));
+		lootPanel.setBackground(Color.BLACK);
+		corpsePanel.setBorder(BorderFactory.createTitledBorder(whiteline, "Carcasses", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, font, TEXT_COLOR));
+		corpsePanel.setBackground(Color.BLACK);
 		
-		//maybe soulhandling into one, with a label
+		soulPanel.setBounds(BORDERLINE*2, BORDERLINE*2, (CB_WIDTH*2)+(2*TOP_BORDER) , (CB_HEIGHT*4));
+			soulPanel.setLayout(null);
+			kharimsoul.setBounds(BORDERLINE,TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			kharimSoulCorpse.setBounds(CB_WIDTH+BORDERLINE,TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			lichdrain.setBounds(BORDERLINE,CB_HEIGHT+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			tsaraksoul.setBounds(CB_WIDTH+BORDERLINE,CB_HEIGHT+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			ripSoulToKatana.setBounds(BORDERLINE,(CB_HEIGHT*2)+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			arkemile.setBounds(CB_WIDTH+BORDERLINE,(CB_HEIGHT*2)+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			soulPanel.add(kharimsoul);
+			soulPanel.add(kharimSoulCorpse);
+			soulPanel.add(lichdrain);
+			soulPanel.add(tsaraksoul);
+			soulPanel.add(ripSoulToKatana);
+			soulPanel.add(arkemile);
+		this.add(soulPanel);
 		
-		//corpses handling into one with a label
+		corpsePanel.setBounds(BORDERLINE*2, soulPanel.getHeight()+(BORDERLINE*4), (CB_WIDTH*2)+(2*TOP_BORDER) , (CB_HEIGHT*5));
+		corpsePanel.setLayout(null);
+			barbarianBurn.setBounds(BORDERLINE, TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			feedCorpseTo.setBounds(CB_WIDTH+BORDERLINE, TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			beheading.setBounds(BORDERLINE, CB_HEIGHT+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			desecrateGround.setBounds(CB_WIDTH+BORDERLINE, CB_HEIGHT+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			burialCere.setBounds(BORDERLINE, (CB_HEIGHT*2)+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			dig.setBounds(CB_WIDTH+BORDERLINE, (CB_HEIGHT*2)+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			aelenaOrgan.setBounds(BORDERLINE, (CB_HEIGHT*3)+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			aelenaFam.setBounds(CB_WIDTH+BORDERLINE, (CB_HEIGHT*3)+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			corpsePanel.add(barbarianBurn);
+			corpsePanel.add(feedCorpseTo);
+			corpsePanel.add(beheading);
+			corpsePanel.add(desecrateGround);
+			corpsePanel.add(burialCere);
+			corpsePanel.add(dig);
+			corpsePanel.add(aelenaOrgan);
+			corpsePanel.add(aelenaFam);
+			
+		this.add(corpsePanel);
 		
-		//waking into one with a label etc
-		//TODO: well, obviously, handle the damn layout!
+		wakePanel.setBounds(BORDERLINE*2, corpsePanel.getHeight()+soulPanel.getHeight()+(BORDERLINE*6), (CB_WIDTH*2)+(2*TOP_BORDER) , (CB_HEIGHT*5));
+		wakePanel.setLayout(null);
+			lichWake.setBounds(BORDERLINE,TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			skeletonWake.setBounds(BORDERLINE,CB_HEIGHT+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			zombieWake.setBounds(BORDERLINE,(CB_HEIGHT*2)+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			vampireWake.setBounds(BORDERLINE,(CB_HEIGHT*3)+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			wakeFollow.setBounds(CB_WIDTH+BORDERLINE,TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			wakeAgro.setBounds(CB_WIDTH+BORDERLINE,CB_HEIGHT+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			wakeTalk.setBounds(CB_WIDTH+BORDERLINE,(CB_HEIGHT*2)+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			wakeStatic.setBounds(CB_WIDTH+BORDERLINE,(CB_HEIGHT*3)+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			wakePanel.add(wakeFollow);
+			wakePanel.add(wakeAgro);
+			wakePanel.add(wakeTalk);
+			wakePanel.add(wakeStatic);
+			wakePanel.add(lichWake);
+			wakePanel.add(vampireWake);
+			wakePanel.add(skeletonWake);
+			wakePanel.add(zombieWake);
+		this.add(wakePanel);
+
+		lootPanel.setBounds(BORDERLINE*2, wakePanel.getHeight()+corpsePanel.getHeight()+soulPanel.getHeight()+(BORDERLINE*8), (CB_WIDTH*2)+(2*TOP_BORDER) , (CB_HEIGHT*5));
+		lootPanel.setLayout(null);
+			gac.setBounds(BORDERLINE,TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			ga.setBounds(BORDERLINE,CB_HEIGHT+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			eatCorpse.setBounds(BORDERLINE,(CB_HEIGHT*2)+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			donate.setBounds(BORDERLINE,(CB_HEIGHT*3)+TOP_BORDER, CB_WIDTH*2, CB_HEIGHT);
+			lootCorpse.setBounds(CB_WIDTH+BORDERLINE,TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			lootGround.setBounds(CB_WIDTH+BORDERLINE,CB_HEIGHT+TOP_BORDER, CB_WIDTH, CB_HEIGHT);
+			lootPanel.add(gac);
+			lootPanel.add(ga);
+			lootPanel.add(eatCorpse);
+			lootPanel.add(donate);
+			lootPanel.add(lootCorpse);
+			lootPanel.add(lootGround);
+		
+		this.add(lootPanel);
+
+		controlPanel.setBounds((BORDERLINE*4)+lootPanel.getWidth(),BORDERLINE*2, (LABEL_WIDTH*2)+(2*TOP_BORDER) , (CB_HEIGHT*9) );
+		controlPanel.setLayout(null);
+			
+		
+			on.setBounds(BORDERLINE,TOP_BORDER, BUTTON_WIDTH, CB_HEIGHT);
+			on.setBackground(BG_COLOR);
+			on.setForeground(TEXT_COLOR);
+			off.setBounds(BORDERLINE,CB_HEIGHT+TOP_BORDER, BUTTON_WIDTH, CB_HEIGHT);
+			off.setBackground(BG_COLOR);
+			off.setForeground(TEXT_COLOR);
+			delimLabel.setBounds(BORDERLINE, (CB_HEIGHT*3)+TOP_BORDER, LABEL_WIDTH, CB_HEIGHT);
+			delimLabel.setForeground(TEXT_COLOR);
+			delim.setBounds(LABEL_WIDTH+BORDERLINE, (CB_HEIGHT*3)+TOP_BORDER, LABEL_WIDTH, CB_HEIGHT);
+			mountLabel.setBounds(BORDERLINE, (CB_HEIGHT*4)+TOP_BORDER, LABEL_WIDTH, CB_HEIGHT);
+			mountLabel.setForeground(TEXT_COLOR);
+			mount.setBounds(LABEL_WIDTH+BORDERLINE, (CB_HEIGHT*4)+TOP_BORDER, LABEL_WIDTH, CB_HEIGHT);
+			organ1Label.setBounds(BORDERLINE, (CB_HEIGHT*5)+TOP_BORDER, LABEL_WIDTH, CB_HEIGHT);
+			organ1Label.setForeground(TEXT_COLOR);
+			organ1.setBounds(LABEL_WIDTH+BORDERLINE, (CB_HEIGHT*5)+TOP_BORDER, LABEL_WIDTH, CB_HEIGHT);
+			organ2Label.setBounds(BORDERLINE, (CB_HEIGHT*6)+TOP_BORDER, LABEL_WIDTH, CB_HEIGHT);
+			organ2Label.setForeground(TEXT_COLOR);
+			organ2.setBounds(LABEL_WIDTH+BORDERLINE, (CB_HEIGHT*6)+TOP_BORDER, LABEL_WIDTH, CB_HEIGHT);
+			clear.setBounds((5*BORDERLINE)+LABEL_WIDTH, TOP_BORDER, BUTTON_WIDTH, CB_HEIGHT);
+			controlPanel.add(on);
+			controlPanel.add(off);
+			controlPanel.add(delim);
+			controlPanel.add(mount);
+			controlPanel.add(clear);
+			controlPanel.add(organ1);
+			controlPanel.add(organ2);
+			controlPanel.add(delimLabel);
+			controlPanel.add(mountLabel);
+			controlPanel.add(organ1Label);
+			controlPanel.add(organ2Label);
+			controlPanel.add(clear);
+		this.add(controlPanel);
+
+		listPanel.setBounds((BORDERLINE*4)+lootPanel.getWidth(), controlPanel.getHeight()+(BORDERLINE*4), (LABEL_WIDTH*2)+(2*TOP_BORDER), (CB_HEIGHT*11));
+		listPanel.setLayout(null);
+			lootLists.setBounds(BORDERLINE*2, TOP_BORDER, listPanel.getWidth()-(4*BORDERLINE) , listPanel.getHeight()-(2*TOP_BORDER));
+			listPanel.add(lootLists);
+		this.add(listPanel);
+
 	}
 	
 }
