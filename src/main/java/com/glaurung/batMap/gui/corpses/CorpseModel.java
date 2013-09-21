@@ -19,15 +19,15 @@ public class CorpseModel implements Serializable{
 	public boolean ripSoulToKatana=false; // rip soul from corpse
 	public boolean arkemile = false; // soul AND corpse actually
 	
-	//loot = 6
+	//loot = 5
 	public boolean gac = false;
 	public boolean ga = false;
-	public boolean eatCorpse = false;
 	public boolean donate = false;
 	public boolean lootCorpse = false;
 	public boolean lootGround = false;
 	
-	//corpse = 9
+	//corpse = 11
+	public boolean eatCorpse = false;
 	public boolean barbarianBurn = false;
 	public boolean feedCorpseTo = false;
 	public boolean beheading = false;
@@ -37,6 +37,7 @@ public class CorpseModel implements Serializable{
 	public boolean dig = false;
 	public boolean aelenaOrgan=false;
 	public boolean aelenaFam = false;
+	public boolean dissect = false;
 	
 	//fucking undead wakes = 8
 	public boolean wakeFollow=false;
@@ -51,8 +52,9 @@ public class CorpseModel implements Serializable{
 	private String delim=";";
 	private String mountHandle="snowman";
 	private List<String> lootList = new LinkedList<String>();
-	private String organ1="";
-	private String organ2="";
+	private String organ1="antenna";
+	private String organ2="antenna";
+
 
 	public String getDelim() {
 		return delim;
@@ -112,8 +114,8 @@ public class CorpseModel implements Serializable{
 		delim="";
 		mountHandle="";
 		lootList = new LinkedList<String>();
-		organ1="";
-		organ2="";
+		organ1="antenna";
+		organ2="antenna";
 		
 	}
 
