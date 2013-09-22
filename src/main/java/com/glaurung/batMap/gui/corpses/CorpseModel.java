@@ -26,7 +26,7 @@ public class CorpseModel implements Serializable{
 	public boolean lootCorpse = false;
 	public boolean lootGround = false;
 	
-	//corpse = 11
+	//corpse = 12
 	public boolean eatCorpse = false;
 	public boolean barbarianBurn = false;
 	public boolean feedCorpseTo = false;
@@ -38,6 +38,7 @@ public class CorpseModel implements Serializable{
 	public boolean aelenaOrgan=false;
 	public boolean aelenaFam = false;
 	public boolean dissect = false;
+	public boolean tin = false;
 	
 	//fucking undead wakes = 8
 	public boolean wakeFollow=false;
@@ -110,6 +111,7 @@ public class CorpseModel implements Serializable{
 		zombieWake=false;
 		aelenaFam=false;
 		aelenaOrgan=false;
+		tin = false;
 		
 		delim="";
 		mountHandle="";
