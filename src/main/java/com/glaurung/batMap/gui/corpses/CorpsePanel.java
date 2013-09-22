@@ -26,11 +26,13 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import com.glaurung.batMap.controller.MapperPlugin;
 import com.glaurung.batMap.io.CorpseHandlerDataPersister;
 
-public class CorpsePanel extends JPanel implements ActionListener, ComponentListener, KeyListener{
+public class CorpsePanel extends JPanel implements ActionListener, ComponentListener, KeyListener, DocumentListener{
 
 	private CorpseModel model = new CorpseModel();
 	private String BASEDIR;
@@ -76,9 +78,10 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 		organ2.addActionListener(this);
 		doIt.addActionListener(this);
 		delim.addActionListener(this);
-		mount.addActionListener(this);	
+		delim.getDocument().addDocumentListener(this);
+		mount.getDocument().addDocumentListener(this);
 	}
-
+	DefaultListModel listModel = 	new DefaultListModel();
 	private CorpseCheckBox lichdrain = 			new CorpseCheckBox("lich drain soul",false,"lich drain",this, font);
 	private CorpseCheckBox kharimsoul = 		new CorpseCheckBox("kharim drain soul",false,"kharim drain",this, font);
 	private CorpseCheckBox kharimSoulCorpse=	new CorpseCheckBox("kharim dest corpse",false,null,this, font);
@@ -118,7 +121,6 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 	private JTextField mount = 		new JTextField("");
 	private JButton clear = 		new JButton("Clear!");
 	private JButton doIt = 			new JButton("Do it!");
-	DefaultListModel listModel = 	new DefaultListModel();
 	private JList lootLists = 		new JList(listModel);
 	private JScrollPane listPane = 	new JScrollPane(lootLists);
 //	private JTextField organ1 = new JTextField("");
@@ -164,11 +166,14 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 
 
 	private String getLootString() {
-		String loots = "grep -q -v \"There is no\"get ";
-		for (String lootItem : model.getLootList()){
-			loots+=lootItem+",";
+		String loots = "grep -q -v \"There is no\" get ";
+		if(listModel.size()<1){
+			return "";
 		}
-		return loots.substring(0, loots.length());
+		for (Object lootItem : listModel.toArray()){
+			loots+=(String)lootItem+",";
+		}
+		return loots.substring(0, loots.length()-1);
 		
 		
 		/**
@@ -279,15 +284,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 	public void actionPerformed(ActionEvent event) {
 		
 			Object source = event.getSource();
-			if(source == on){
-				on.setSelected(true);
-				off.setSelected(false);
-				this.plugin.toggleRipAction(true);
-			}else if(source == off){
-				on.setSelected(false);
-				off.setSelected(true);
-				this.plugin.toggleRipAction(false);
-			}else if (source == kharimSoulCorpse){
+			if (source == kharimSoulCorpse){
 				this.plugin.doCommand("kharim set corpseDest foobar");
 			}else if(source == lichdrain){
 				turnOff(kharimsoul,kharimsoul,ripSoulToKatana,arkemile);
@@ -359,25 +356,43 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 			}else if(source == del && lootLists.getSelectedIndex() > -1){
 				listModel.remove(lootLists.getSelectedIndex());
 				updateLoots();
-			}else if(source == doIt){
-				plugin.doCommand(makeRipString());
-			}else if(source == delim){
-				donate.setEffect("get all from corpse"+getDelim()+"donate noeq"+getDelim()+"drop noeq");
-				eatCorpse.setEffect("get corpse"+getDelim()+"eat corpse");
-				feedCorpseTo.setEffect("get corpse"+getDelim()+"feed corpse to "+getMountName());
-			}else if(source == mount){
-				feedCorpseTo.setEffect("get corpse"+getDelim()+"feed corpse to "+getMountName());
+			}else if(source == organ1){
+				dissect.setEffect("use dissection at corpse try "+organ1.getSelectedItem()+" "+organ2.getSelectedItem());
+				aelenaOrgan.setEffect("familiar harvest "+organ1.getSelectedItem()+" "+organ2.getSelectedItem());
+			}else if(source == organ2){
+				dissect.setEffect("use dissection at corpse try "+organ1.getSelectedItem()+" "+organ2.getSelectedItem());
+				aelenaOrgan.setEffect("familiar harvest "+organ1.getSelectedItem()+" "+organ2.getSelectedItem());
 			}
 
-			saveToModel();
-			plugin.saveRipAction(makeRipString());
+			if(source == doIt){
+				plugin.doCommand(makeRipString());
+			}else if(source == on){
+				on.setSelected(true);
+				off.setSelected(false);
+				this.plugin.toggleRipAction(true);
+			}else if(source == off){
+				on.setSelected(false);
+				off.setSelected(true);
+				this.plugin.toggleRipAction(false);
+			}else {
+				//TODO: uncomment
+			//	saveToModel();
+				plugin.saveRipAction(makeRipString());	
+			}
+
 	}
 
 
 
 	private void updateLoots() {
-		lootCorpse.setEffect(getLootString()+" from corpse");
-		lootGround.setEffect(getLootString());	
+		if(getLootString().equals("")){
+			lootCorpse.setEffect("");
+			lootGround.setEffect("");
+		}else{
+			lootCorpse.setEffect(getLootString()+" from corpse");
+			lootGround.setEffect(getLootString());	
+		}
+		
 	}
 
 
@@ -472,18 +487,20 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 			rip+=aelenaFam.getEffect()+this.model.getDelim();
 		}
 		if(aelenaOrgan.isSelected()){
-			rip+=aelenaOrgan.getEffect()+" "+this.model.getOrgan1()+" "+this.model.getOrgan2()+this.model.getDelim();
+			rip+=aelenaOrgan.getEffect()+this.model.getDelim();
 		}
 		if(dissect.isSelected()){
-			rip+=dissect.getEffect()+" "+this.model.getOrgan1()+" "+this.model.getOrgan2()+this.model.getDelim();
+			rip+=dissect.getEffect()+this.model.getDelim();
 		}
 		if(tin.isSelected()){
 			rip+=tin.getEffect()+this.model.getDelim();
 		}
 		
 		
+		if(rip.length()>this.model.getDelim().length()){
+			rip = rip.substring(0, rip.length()-this.model.getDelim().length());
+		}
 		
-		rip = rip.substring(0, rip.length()-this.model.getDelim().length());
 		return rip;
 	}
 	
@@ -664,6 +681,8 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 			if(lootLists.getSelectedIndex() > -1){
 				if(e.getKeyCode() == KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_BACK_SPACE){
 					listModel.remove(lootLists.getSelectedIndex());
+					updateLoots();
+					plugin.saveRipAction(makeRipString());
 				}
 			}
 		}
@@ -677,6 +696,39 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 
 	@Override
 	public void keyTyped(KeyEvent e) {
+	}
+
+
+	@Override
+	public void changedUpdate(DocumentEvent e) {
+			donate.setEffect("get all from corpse"+getDelim()+"donate noeq"+getDelim()+"drop noeq");
+			eatCorpse.setEffect("get corpse"+getDelim()+"eat corpse");
+			feedCorpseTo.setEffect("get corpse"+getDelim()+"feed corpse to "+mount.getText());
+			this.model.setDelim(delim.getText());
+			this.model.setMountHandle(mount.getText());
+			plugin.saveRipAction(makeRipString());
+	}
+
+
+	@Override
+	public void insertUpdate(DocumentEvent arg0) {
+		donate.setEffect("get all from corpse"+getDelim()+"donate noeq"+getDelim()+"drop noeq");
+		eatCorpse.setEffect("get corpse"+getDelim()+"eat corpse");
+		feedCorpseTo.setEffect("get corpse"+getDelim()+"feed corpse to "+mount.getText());
+		this.model.setDelim(delim.getText());
+		this.model.setMountHandle(mount.getText());
+		plugin.saveRipAction(makeRipString());
+	}
+
+
+	@Override
+	public void removeUpdate(DocumentEvent arg0) {
+		donate.setEffect("get all from corpse"+getDelim()+"donate noeq"+getDelim()+"drop noeq");
+		eatCorpse.setEffect("get corpse"+getDelim()+"eat corpse");
+		feedCorpseTo.setEffect("get corpse"+getDelim()+"feed corpse to "+mount.getText());
+		this.model.setDelim(delim.getText());
+		this.model.setMountHandle(mount.getText());
+		plugin.saveRipAction(makeRipString());
 	}
 
 

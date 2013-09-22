@@ -8,4 +8,14 @@ public class MockPlugin extends MapperPlugin {
 		super();
 	}
 	
+	@Override
+	public void saveRipAction(String ripString) {
+		System.out.println(super.MAKERIPACTION+ripString);
+	}
+	
+	@Override
+	public void toggleRipAction(boolean mode) {
+		System.out.println(mode);
+	}
+	
 }

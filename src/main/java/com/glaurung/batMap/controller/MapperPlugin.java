@@ -21,9 +21,9 @@ import com.mythicscape.batclient.interfaces.ParsedResult;
 
 public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrigger, ActionListener, BatClientPluginUtil{
 
-	private static final String MAKERIPACTION = "rip_action set";
-	private static final String RIPACTION_OFF = "rip_action off";
-	private static final String RIPACTION_ON = "rip_action on";
+	protected static final String MAKERIPACTION = "rip_action set ";
+	protected static final String RIPACTION_OFF = "rip_action off";
+	protected static final String RIPACTION_ON = "rip_action on";
 	private MapperEngine engine;
 	private final String CHANNEL_PREFIX="BAT_MAPPER";
 	//batMap;areaname;roomUID;exitUsed;indoor boolean;shortDesc;longDesc;exits
