@@ -80,6 +80,9 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 		delim.addActionListener(this);
 		delim.getDocument().addDocumentListener(this);
 		mount.getDocument().addDocumentListener(this);
+		lootLists.setToolTipText("These items will be picked up by loot commands");
+		lootCorpse.setToolTipText("Control looted items in the list");
+		lootGround.setToolTipText("Control looted items in the list");
 	}
 	DefaultListModel listModel = 	new DefaultListModel();
 	private CorpseCheckBox lichdrain = 			new CorpseCheckBox("lich drain soul",false,"lich drain",this, font);
@@ -177,8 +180,6 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 		this.model.setMountHandle(mount.getText());
 		this.model.setDelim(delim.getText());
 		this.model.setLootList(createStringLootList());
-//		this.model.setOrgan1(organ1.getText());
-//		this.model.setOrgan2(organ2.getText());
 		this.model.setOrgan1((String)organ1.getSelectedItem());
 		this.model.setOrgan2((String)organ2.getSelectedItem());
 		this.model.lichdrain = lichdrain.isSelected();
@@ -260,12 +261,14 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 		delim.setText(this.model.getDelim());
 		organ1.setSelectedItem(this.model.getOrgan1());
 		organ2.setSelectedItem(this.model.getOrgan2());
-//		organ1.setText(this.model.getOrgan1());
-//		organ2.setText(this.model.getOrgan2());
 		listModel.clear();
 		for( String item : this.model.getLootList()){
 			listModel.addElement(item);
 		}
+		updateLoots();
+		updateDelimAndMountAffected();
+		updateOrganAffected();
+//		plugin.saveRipAction(makeRipString());
 
 	}
 
@@ -346,11 +349,9 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 				listModel.remove(lootLists.getSelectedIndex());
 				updateLoots();
 			}else if(source == organ1){
-				dissect.setEffect("use dissection at corpse try "+organ1.getSelectedItem()+" "+organ2.getSelectedItem());
-				aelenaOrgan.setEffect("familiar harvest "+organ1.getSelectedItem()+" "+organ2.getSelectedItem());
+				updateOrganAffected();
 			}else if(source == organ2){
-				dissect.setEffect("use dissection at corpse try "+organ1.getSelectedItem()+" "+organ2.getSelectedItem());
-				aelenaOrgan.setEffect("familiar harvest "+organ1.getSelectedItem()+" "+organ2.getSelectedItem());
+				updateOrganAffected();
 			}
 
 			if(source == doIt){
@@ -367,6 +368,13 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 				persistAndUpdate();	
 			}
 
+	}
+
+
+
+	private void updateOrganAffected() {
+		dissect.setEffect("use dissection at corpse try "+organ1.getSelectedItem()+" "+organ2.getSelectedItem());
+		aelenaOrgan.setEffect("familiar harvest "+organ1.getSelectedItem()+" "+organ2.getSelectedItem());
 	}
 
 
@@ -649,7 +657,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 			controlPanel.add(clear);
 		this.add(controlPanel);
 
-		listPanel.setBounds((BORDERLINE*4)+lootPanel.getWidth(), controlPanel.getHeight()+(BORDERLINE*4), (LABEL_WIDTH*2)+(2*TOP_BORDER), (CB_HEIGHT*11));
+		listPanel.setBounds((BORDERLINE*4)+lootPanel.getWidth(), controlPanel.getHeight()+(BORDERLINE*4), (LABEL_WIDTH*2)+(2*TOP_BORDER), (CB_HEIGHT*12)+3);
 		listPanel.setLayout(null);
 			listPane.setBounds(BORDERLINE*2, TOP_BORDER, listPanel.getWidth()-(4*BORDERLINE) , listPanel.getHeight()-((2*TOP_BORDER)+CB_HEIGHT));
 			add.setBounds(BORDERLINE*2,listPane.getHeight()+CB_HEIGHT,BUTTON_WIDTH, CB_HEIGHT);
@@ -690,9 +698,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 
 	@Override
 	public void changedUpdate(DocumentEvent e) {
-			donate.setEffect("get all from corpse"+getDelim()+"donate noeq"+getDelim()+"drop noeq");
-			eatCorpse.setEffect("get corpse"+getDelim()+"eat corpse");
-			feedCorpseTo.setEffect("get corpse"+getDelim()+"feed corpse to "+mount.getText());
+			updateDelimAndMountAffected();
 			this.model.setDelim(delim.getText());
 			this.model.setMountHandle(mount.getText());
 			persistAndUpdate();
@@ -703,9 +709,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 	public void insertUpdate(DocumentEvent arg0) {
 		this.model.setDelim(delim.getText());
 		this.model.setMountHandle(mount.getText());
-		donate.setEffect("get all from corpse"+getDelim()+"donate noeq"+getDelim()+"drop noeq");
-		eatCorpse.setEffect("get corpse"+getDelim()+"eat corpse");
-		feedCorpseTo.setEffect("get corpse"+getDelim()+"feed corpse to "+mount.getText());
+		updateDelimAndMountAffected();
 		persistAndUpdate();
 	}
 
@@ -714,10 +718,16 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 	public void removeUpdate(DocumentEvent arg0) {
 		this.model.setDelim(delim.getText());
 		this.model.setMountHandle(mount.getText());
+		updateDelimAndMountAffected();
+		persistAndUpdate();
+	}
+
+
+
+	private void updateDelimAndMountAffected() {
 		donate.setEffect("get all from corpse"+getDelim()+"donate noeq"+getDelim()+"drop noeq");
 		eatCorpse.setEffect("get corpse"+getDelim()+"eat corpse");
 		feedCorpseTo.setEffect("get corpse"+getDelim()+"feed corpse to "+mount.getText());
-		persistAndUpdate();
 	}
 
 
