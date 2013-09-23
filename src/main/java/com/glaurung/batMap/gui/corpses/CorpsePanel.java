@@ -96,19 +96,19 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 	private CorpseCheckBox lootGround = 		new CorpseCheckBox("get loot from ground",false,"get "+getLootString(),this, font);
 	private CorpseCheckBox barbarianBurn = 		new CorpseCheckBox("barbarian burn corpse",false,"barbburn",this, font);
 	private CorpseCheckBox feedCorpseTo = 		new CorpseCheckBox("feed corpse to mount",false,"get corpse"+getDelim()+"feed corpse to "+getMountName(),this, font);
-	private CorpseCheckBox beheading = 			new CorpseCheckBox("kharim behead corpse",false,"use beheading of departed",this, font);
+	private CorpseCheckBox beheading = 			new CorpseCheckBox("kharim behead corpse",false,"use beheading of departed at corpse",this, font);
 	private CorpseCheckBox desecrateGround=		new CorpseCheckBox("desecrate ground",false,"use desecrate ground",this, font);
 	private CorpseCheckBox burialCere=			new CorpseCheckBox("burial ceremony",false,"use burial ceremony",this, font);
 	private CorpseCheckBox dig = 				new CorpseCheckBox("dig grave",false,"dig grave",this, font);
 	private CorpseCheckBox wakeFollow=			new CorpseCheckBox("follow",false," follow",this, font);
 	private CorpseCheckBox wakeAgro=			new CorpseCheckBox("agro",false," agro",this, font);
 	private CorpseCheckBox wakeTalk=			new CorpseCheckBox("talk",false," talk",this, font);
-	private CorpseCheckBox wakeStatic=			new CorpseCheckBox("static",false," static",this, font);
-	private CorpseCheckBox lichWake = 			new CorpseCheckBox("lich wake corpse",false,"lick wake corpse",this, font);
+	private CorpseCheckBox wakeStatic=			new CorpseCheckBox("static",false,"",this, font);
+	private CorpseCheckBox lichWake = 			new CorpseCheckBox("lich wake corpse",false,"lich wake corpse",this, font);
 	private CorpseCheckBox vampireWake=			new CorpseCheckBox("vampire wake corpse",false,"vampire wake corpse",this, font);
 	private CorpseCheckBox skeletonWake=		new CorpseCheckBox("skeleton wake corpse",false,"skeleton wake corpse",this, font);
 	private CorpseCheckBox zombieWake=			new CorpseCheckBox("zombie wake corpse",false,"zombie wake corpse",this, font);
-	private CorpseCheckBox aelenaOrgan=			new CorpseCheckBox("aelena extract organ",false,"familiar harvest ",this, font);
+	private CorpseCheckBox aelenaOrgan=			new CorpseCheckBox("aelena extract organ",false,"familiar harvest antenna antenna",this, font);
 	private CorpseCheckBox aelenaFam=			new CorpseCheckBox("aelena fam consume corpse",false,"familiar consume corpse",this, font);
 	private CorpseCheckBox dissect=				new CorpseCheckBox("dissection",false,"use dissection at corpse try ",this, font);
 	private CorpseCheckBox tin = 				new CorpseCheckBox("tin corpse", false, "tin corpse", this, font);
@@ -117,14 +117,12 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 	private static final long serialVersionUID = 1L;
 	private JCheckBox on = 			new JCheckBox("On!"); 
 	private JCheckBox off =			new JCheckBox("Off");
-	private JTextField delim = 		new JTextField("");
+	private JTextField delim = 		new JTextField(";");
 	private JTextField mount = 		new JTextField("");
 	private JButton clear = 		new JButton("Clear!");
 	private JButton doIt = 			new JButton("Do it!");
 	private JList lootLists = 		new JList(listModel);
 	private JScrollPane listPane = 	new JScrollPane(lootLists);
-//	private JTextField organ1 = new JTextField("");
-//	private JTextField organ2 = new JTextField("");
 	
 	
 	private Border whiteline = BorderFactory.createLineBorder(Color.white);
@@ -148,16 +146,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 	private String getDelim(){
 		return model.getDelim();
 	}
-	
 
-	private String getOrgan2() {
-		return this.model.getOrgan1();
-	}
-
-
-	private String getOrgan1() {
-		return this.model.getOrgan2();
-	}
 
 
 	private String getMountName() {
@@ -375,9 +364,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 				off.setSelected(true);
 				this.plugin.toggleRipAction(false);
 			}else {
-				//TODO: uncomment
-			//	saveToModel();
-				plugin.saveRipAction(makeRipString());	
+				persistAndUpdate();	
 			}
 
 	}
@@ -459,29 +446,17 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 		if(dig.isSelected()){
 			rip+=dig.getEffect()+this.model.getDelim();
 		}
-		if(wakeFollow.isSelected()){
-			rip+=wakeFollow.getEffect()+this.model.getDelim();
-		}
-		if(wakeAgro.isSelected()){
-			rip+=wakeAgro.getEffect()+this.model.getDelim();
-		}
-		if(wakeTalk.isSelected()){
-			rip+=wakeTalk.getEffect()+this.model.getDelim();
-		}
-		if(wakeStatic.isSelected()){
-			rip+=wakeStatic.getEffect()+this.model.getDelim();
-		}
 		if(lichWake.isSelected()){
-			rip+=lichWake.getEffect()+this.model.getDelim();
+			rip+=lichWake.getEffect()+getWakeMode()+this.model.getDelim();
 		}
 		if(vampireWake.isSelected()){
-			rip+=vampireWake.getEffect()+this.model.getDelim();
+			rip+=vampireWake.getEffect()+getWakeMode()+this.model.getDelim();
 		}
 		if(skeletonWake.isSelected()){
-			rip+=skeletonWake.getEffect()+this.model.getDelim();
+			rip+=skeletonWake.getEffect()+getWakeMode()+this.model.getDelim();
 		}
 		if(zombieWake.isSelected()){
-			rip+=zombieWake.getEffect()+this.model.getDelim();
+			rip+=zombieWake.getEffect()+getWakeMode()+this.model.getDelim();
 		}
 		if(aelenaFam.isSelected()){
 			rip+=aelenaFam.getEffect()+this.model.getDelim();
@@ -505,6 +480,20 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 	}
 	
 
+	private String getWakeMode(){
+		if(wakeFollow.isSelected()){
+			return wakeFollow.getEffect();
+		}
+		if(wakeAgro.isSelected()){
+			return wakeAgro.getEffect();
+		}
+		if(wakeTalk.isSelected()){
+			return wakeTalk.getEffect();
+		}
+		//else no effect:
+		return wakeStatic.getEffect();
+
+	}
 
 	@Override
 	public void componentHidden(ComponentEvent arg0) {
@@ -682,7 +671,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 				if(e.getKeyCode() == KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_BACK_SPACE){
 					listModel.remove(lootLists.getSelectedIndex());
 					updateLoots();
-					plugin.saveRipAction(makeRipString());
+					persistAndUpdate();
 				}
 			}
 		}
@@ -706,28 +695,35 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 			feedCorpseTo.setEffect("get corpse"+getDelim()+"feed corpse to "+mount.getText());
 			this.model.setDelim(delim.getText());
 			this.model.setMountHandle(mount.getText());
-			plugin.saveRipAction(makeRipString());
+			persistAndUpdate();
 	}
 
 
 	@Override
 	public void insertUpdate(DocumentEvent arg0) {
+		this.model.setDelim(delim.getText());
+		this.model.setMountHandle(mount.getText());
 		donate.setEffect("get all from corpse"+getDelim()+"donate noeq"+getDelim()+"drop noeq");
 		eatCorpse.setEffect("get corpse"+getDelim()+"eat corpse");
 		feedCorpseTo.setEffect("get corpse"+getDelim()+"feed corpse to "+mount.getText());
-		this.model.setDelim(delim.getText());
-		this.model.setMountHandle(mount.getText());
-		plugin.saveRipAction(makeRipString());
+		persistAndUpdate();
 	}
 
 
 	@Override
 	public void removeUpdate(DocumentEvent arg0) {
+		this.model.setDelim(delim.getText());
+		this.model.setMountHandle(mount.getText());
 		donate.setEffect("get all from corpse"+getDelim()+"donate noeq"+getDelim()+"drop noeq");
 		eatCorpse.setEffect("get corpse"+getDelim()+"eat corpse");
 		feedCorpseTo.setEffect("get corpse"+getDelim()+"feed corpse to "+mount.getText());
-		this.model.setDelim(delim.getText());
-		this.model.setMountHandle(mount.getText());
+		persistAndUpdate();
+	}
+
+
+
+	private void persistAndUpdate() {
+		saveToModel();
 		plugin.saveRipAction(makeRipString());
 	}
 

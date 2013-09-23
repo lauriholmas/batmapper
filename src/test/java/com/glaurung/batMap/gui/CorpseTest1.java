@@ -6,7 +6,7 @@ import javax.swing.JFrame;
 
 import com.glaurung.batMap.gui.corpses.CorpsePanel;
 
-public class CorpseTest{
+public class CorpseTest1{
 
     public static void main(String[] args) {
 
