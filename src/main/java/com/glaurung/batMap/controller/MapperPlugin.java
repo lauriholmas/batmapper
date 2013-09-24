@@ -58,10 +58,8 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
 		engine.setBatWindow(clientWin);
 		clientWin.removeTabAt(0);
 		clientWin.newTab("batMap", engine.getPanel());
-		
-		clientWin.newTab("manual", new ManualPanel());
-		
 		clientWin.newTab("Corpses", new CorpsePanel(BASEDIR, this));
+		clientWin.newTab("manual", new ManualPanel());
 		clientWin.setVisible(true);
 		this.getPluginManager().addProtocolListener(this);
 		AreaDataPersister.migrateFilesToNewLocation(BASEDIR);
