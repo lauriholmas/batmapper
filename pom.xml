@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.glaurung</groupId>
-  <artifactId>batMap</artifactId>
-  <version>1.4</version>
+  <artifactId>batUtils</artifactId>
+  <version>1.0</version>
   <packaging>jar</packaging>
 
   <name>batMap</name>

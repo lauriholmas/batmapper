@@ -1,4 +1,8 @@
-Welcome to batMap.
+Welcome to batUtils.
+
+	Version 1.0 Bat Utils. 
+- batMapper plugin has been renamed to batUtils to better reflect the current and future status of it. I will be using this same plugin to put in more functionality in the future. 
+- All data/notes below is still accurate and the versions are there for historical reasons.
 
 	Version 1.4: Corpsehandler
 - Click on Corpses tab to access the new corpsehandler. Basically what it does is it sets up your rip_action command. 
