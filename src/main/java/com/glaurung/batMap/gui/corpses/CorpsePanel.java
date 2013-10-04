@@ -399,7 +399,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 
 	private String makeRipString() {
 		String rip = "";
-		
+		//first souls
 		if(lichdrain.isSelected()){
 			rip+=lichdrain.getEffect()+this.model.getDelim();
 		}
@@ -415,26 +415,21 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 		if(ripSoulToKatana.isSelected()){
 			rip+=ripSoulToKatana.getEffect()+this.model.getDelim();
 		}
-		if(arkemile.isSelected()){
-			rip+=arkemile.getEffect()+this.model.getDelim();
-		}
+
 		if(gac.isSelected()){
 			rip+=gac.getEffect()+this.model.getDelim();
 		}
-		if(ga.isSelected()){
-			rip+=ga.getEffect()+this.model.getDelim();
+		if(lootCorpse.isSelected()){
+			rip+=lootCorpse.getEffect()+this.model.getDelim();
+		}
+		if(arkemile.isSelected()){
+			rip+=arkemile.getEffect()+this.model.getDelim();
 		}
 		if(eatCorpse.isSelected()){
 			rip+=eatCorpse.getEffect()+this.model.getDelim();
 		}
 		if(donate.isSelected()){
 			rip+=donate.getEffect()+this.model.getDelim();
-		}
-		if(lootCorpse.isSelected()){
-			rip+=lootCorpse.getEffect()+this.model.getDelim();
-		}
-		if(lootGround.isSelected()){
-			rip+=lootGround.getEffect()+this.model.getDelim();
 		}
 		if(barbarianBurn.isSelected()){
 			rip+=barbarianBurn.getEffect()+this.model.getDelim();
@@ -477,6 +472,12 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
 		}
 		if(tin.isSelected()){
 			rip+=tin.getEffect()+this.model.getDelim();
+		}
+		if(ga.isSelected()){
+			rip+=ga.getEffect()+this.model.getDelim();
+		}
+		if(lootGround.isSelected()){
+			rip+=lootGround.getEffect()+this.model.getDelim();
 		}
 		
 		
