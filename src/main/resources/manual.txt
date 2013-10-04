@@ -1,5 +1,10 @@
 Welcome to batMap.
 
+	Version 1.4: Corpsehandler
+- Click on Corpses tab to access the new corpsehandler. Basically what it does is it sets up your rip_action command. 
+- The list in the lower right corner is a list of things that will be picked up from corpse or ground with the 'loot' selections. You can put for instance 'all gem' on on line to pick up all gems or gold,platinum on another line to pick up those. 
+- Rest should be pretty self-evident, feel free to ask Glaurung for help if there is trouble related to it.
+
 
 	Hotfix version 1.31:
 - Doubleclick on exit to edit name and pressing esc to cancel no longer deletes the exit.

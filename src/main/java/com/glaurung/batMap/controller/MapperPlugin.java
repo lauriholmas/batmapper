@@ -6,7 +6,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import com.glaurung.batMap.gui.ManualPanel;
+import com.glaurung.batMap.gui.corpses.CorpsePanel;
 import com.glaurung.batMap.io.AreaDataPersister;
+import com.glaurung.batMap.io.CorpseHandlerDataPersister;
 import com.glaurung.batMap.io.GuiDataPersister;
 import com.glaurung.batMap.vo.GuiData;
 import com.mythicscape.batclient.interfaces.BatClientPlugin;
@@ -19,6 +21,9 @@ import com.mythicscape.batclient.interfaces.ParsedResult;
 
 public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrigger, ActionListener, BatClientPluginUtil{
 
+	protected static final String MAKERIPACTION = "rip_action set ";
+	protected static final String RIPACTION_OFF = "rip_action off";
+	protected static final String RIPACTION_ON = "rip_action on";
 	private MapperEngine engine;
 	private final String CHANNEL_PREFIX="BAT_MAPPER";
 	//batMap;areaname;roomUID;exitUsed;indoor boolean;shortDesc;longDesc;exits
@@ -41,6 +46,7 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
 	public void loadPlugin() {
 		BASEDIR = this.getBaseDirectory();
 		GuiData guiData = GuiDataPersister.load(BASEDIR);
+		
 		BatWindow clientWin;
 		if(guiData != null){
 			clientWin = this.getClientGUI().createBatWindow("Mapper", guiData.getX(), guiData.getY(),guiData.getWidth(), guiData.getHeight());
@@ -52,7 +58,7 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
 		engine.setBatWindow(clientWin);
 		clientWin.removeTabAt(0);
 		clientWin.newTab("batMap", engine.getPanel());
-		
+		clientWin.newTab("Corpses", new CorpsePanel(BASEDIR, this));
 		clientWin.newTab("manual", new ManualPanel());
 		clientWin.setVisible(true);
 		this.getPluginManager().addProtocolListener(this);
@@ -121,6 +127,22 @@ event data amount: 9
 	@Override
 	public void clientExit() {
 		this.engine.save();
+		
+	}
+
+	public void saveRipAction(String ripString) {
+		this.getClientGUI().doCommand(MAKERIPACTION+ripString);
+	}
+	public void toggleRipAction(boolean mode){
+		if(mode){
+			this.getClientGUI().doCommand(RIPACTION_ON);
+		}else{
+			this.getClientGUI().doCommand(RIPACTION_OFF);
+		}
+	}
+
+	public void doCommand(String string) {
+		this.getClientGUI().doCommand(string);
 		
 	}
 
