@@ -7,7 +7,7 @@
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>batMap</name>
+  <name>batUtils</name>
   <url>http://maven.apache.org</url>
 
   <properties>
