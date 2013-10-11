@@ -450,7 +450,9 @@ public class MapperEngine implements ItemListener, ComponentListener{
 
 	public void setBaseDir(String baseDir) {
 		this.baseDir = baseDir;
-		
+	}
+	public String getBaseDir(){
+		return this.baseDir;
 	}
 
 

@@ -7,6 +7,7 @@ import java.util.HashSet;
 
 import com.glaurung.batMap.gui.ManualPanel;
 import com.glaurung.batMap.gui.corpses.CorpsePanel;
+import com.glaurung.batMap.gui.search.SearchPanel;
 import com.glaurung.batMap.io.AreaDataPersister;
 import com.glaurung.batMap.io.CorpseHandlerDataPersister;
 import com.glaurung.batMap.io.GuiDataPersister;
@@ -25,6 +26,7 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
 	protected static final String RIPACTION_OFF = "rip_action off";
 	protected static final String RIPACTION_ON = "rip_action on";
 	private MapperEngine engine;
+	private SearchEngine searchEngine;
 	private final String CHANNEL_PREFIX="BAT_MAPPER";
 	//batMap;areaname;roomUID;exitUsed;indoor boolean;shortDesc;longDesc;exits
 	private final int PREFIX=0;
@@ -55,15 +57,19 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
 		}
 		
 		engine = new MapperEngine();
+		searchEngine = new SearchEngine();
 		engine.setBatWindow(clientWin);
+		searchEngine.setBatWindow(clientWin);
 		clientWin.removeTabAt(0);
 		clientWin.newTab("batMap", engine.getPanel());
 		clientWin.newTab("Corpses", new CorpsePanel(BASEDIR, this));
 		clientWin.newTab("manual", new ManualPanel());
+		clientWin.newTab("map search", new SearchPanel(searchEngine));
 		clientWin.setVisible(true);
 		this.getPluginManager().addProtocolListener(this);
 		AreaDataPersister.migrateFilesToNewLocation(BASEDIR);
 		engine.setBaseDir(BASEDIR);
+		searchEngine.setBaseDir(BASEDIR);
 		clientWin.addComponentListener(engine);
 		
 
