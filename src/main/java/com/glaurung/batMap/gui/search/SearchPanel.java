@@ -32,6 +32,9 @@ public class SearchPanel extends MapperPanel {
 		this.searchText.addActionListener(this);
 		results.addActionListener(this);
 		this.setLayout(null);
+		this.BORDERLINE=ELEMENT_HEIGHT+14;
+		searchText.setToolTipText("Input desc to search here");
+		results.setToolTipText("Click on a result to see map");
 		
 	}
 
@@ -40,34 +43,37 @@ public class SearchPanel extends MapperPanel {
 	@Override
 	public void componentResized(ComponentEvent e) {
 		super.componentResized(e);
-		searchText.setBounds(20, 20, 200, ELEMENT_HEIGHT);
-		results.setBounds(20+searchText.getWidth()+20, 20, 200, ELEMENT_HEIGHT);
+		searchText.setBounds(20, 7, 120, ELEMENT_HEIGHT);
+		results.setBounds(20+searchText.getWidth()+20, 7, 500, ELEMENT_HEIGHT);
 		this.add(searchText);
+		this.add(results);
 
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		super.actionPerformed(e);
+		
 		if(e.getSource()==searchText){
 			searchForRoomsWith(searchText.getText().trim());
+			return;
 		}else if(e.getSource() == results){
 			SearchResultItem item = (SearchResultItem) this.model.getElementAt(this.results.getSelectedIndex());
 
 			this.engine.moveToRoom(item.getRoom());
+			return;
 		}
+		super.actionPerformed(e);
 	}
 
 
 
 	private void searchForRoomsWith(String text) {
-		model = new DefaultComboBoxModel();
+		model.removeAllElements();
 		if(text.equals("")){
 			return;
 		}
 		//iterate through all areafiles, iterate through all rooms and look for texts, if matches, add to list
 		List<String> areas = AreaDataPersister.listAreaNames(this.engine.getBaseDir());
-		
 		try {
 			for(String areaName : areas){
 				AreaSaveObject aso = AreaDataPersister.loadData(this.engine.getBaseDir(), areaName);

@@ -10,8 +10,9 @@ public class SearchResultItem {
 	
 	private Room room;
 
+	@Override
 	public String toString(){
-		return this.room.getArea()+" - "+this.room.getShortDesc();
+		return this.room.getArea().getName()+" - "+this.room.getShortDesc();
 	}
 	
 	public Room getRoom(){

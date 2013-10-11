@@ -56,11 +56,14 @@ public class AreaDataPersister {
 	}
 	
 	public static List<String> listAreaNames(String basedir){
-		File folder = new File(basedir);
+		File newDir = new File(basedir,NEW_PATH);
+		newDir = new File(newDir,PATH);
+		File folder = newDir;
 		File[] files = folder.listFiles();
 		LinkedList<String> names = new LinkedList<String>();
 		for(File file : files){
 			if(FilenameUtils.getExtension(file.getName()).equals("batmap") ){
+//				System.out.println(FilenameUtils.getBaseName(file.getName()));
 				names.add(FilenameUtils.getBaseName(file.getName()));
 			}		
 		}
@@ -76,7 +79,7 @@ public class AreaDataPersister {
 			locations.put(room, coord);
 		}
 		saveObject.setFileName(getFileNameFrom(basedir,graph.getVertices().iterator().next().getArea().getName()));
-		System.out.println("\n\n+nsaveobjectdone\n\n\n"+saveObject.getFileName());
+//		System.out.println("\n\n+nsaveobjectdone\n\n\n"+saveObject.getFileName());
 		return saveObject;
 	}
 	
