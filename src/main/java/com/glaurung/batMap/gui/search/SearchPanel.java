@@ -29,6 +29,7 @@ public class SearchPanel extends MapperPanel {
 	public SearchPanel(SearchEngine engine) {
 		super(engine);
 		this.engine = engine;
+		this.engine.setPanel(this);
 		this.searchText.addActionListener(this);
 		results.addActionListener(this);
 		this.setLayout(null);

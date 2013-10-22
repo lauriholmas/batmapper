@@ -23,10 +23,9 @@ public class SearchTest1 {
 
 
 		SearchEngine engine = new SearchEngine(graph);
-    	
+		engine.setBaseDir("C:\\Users\\lauri/batclient");
     	frame.getContentPane().add(new SearchPanel(engine));
     	frame.setSize(1200, 800);
-//    	frame.pack();
     	frame.setVisible(true);
 
     }
