@@ -6,6 +6,7 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JOptionPane;
 
+import com.glaurung.batMap.controller.Engine;
 import com.glaurung.batMap.controller.MapperEngine;
 import com.glaurung.batMap.vo.Exit;
 import com.glaurung.batMap.vo.Room;
@@ -24,11 +25,11 @@ import edu.uci.ics.jung.visualization.control.EditingGraphMousePlugin;
  */
 public class MapperEditingGraphMousePlugin extends EditingGraphMousePlugin<Room, Exit> {
 //	private SparseMultigraph<Room, Exit> graph;
-	private MapperEngine engine;
+	private Engine engine;
 
-	public MapperEditingGraphMousePlugin(MapperEngine mapperEngine) {
+	public MapperEditingGraphMousePlugin(Engine engine) {
 		super(null, null);
-		this.engine=mapperEngine;
+		this.engine=engine;
 	}
 	
 	

@@ -18,6 +18,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import com.glaurung.batMap.controller.Engine;
 import com.glaurung.batMap.controller.MapperEngine;
 import com.glaurung.batMap.vo.Exit;
 import com.glaurung.batMap.vo.Room;
@@ -62,11 +63,11 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 	private boolean visibleDescs=true;
 	
 	private JComboBox roomColor;
-	MapperEngine engine;
+	Engine engine;
 	
 
 	
-	public MapperPanel(MapperEngine engine){
+	public MapperPanel(Engine engine){
 		super();
 		roomShortDesc.setWrapStyleWord(true);
 		roomLongDesc.setWrapStyleWord(true);

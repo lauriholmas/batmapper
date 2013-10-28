@@ -10,6 +10,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
+import com.glaurung.batMap.controller.Engine;
 import com.glaurung.batMap.controller.SearchEngine;
 import com.glaurung.batMap.gui.MapperPanel;
 import com.glaurung.batMap.io.AreaDataPersister;
@@ -26,9 +27,9 @@ public class SearchPanel extends MapperPanel {
 	private DefaultComboBoxModel model = new DefaultComboBoxModel();
 	private JComboBox results = new JComboBox(model);
 	
-	public SearchPanel(SearchEngine engine) {
+	public SearchPanel(Engine engine) {
 		super(engine);
-		this.engine = engine;
+		this.engine = (SearchEngine) engine;
 		this.engine.setPanel(this);
 		this.searchText.addActionListener(this);
 		results.addActionListener(this);
