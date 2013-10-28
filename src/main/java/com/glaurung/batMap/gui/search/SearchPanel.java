@@ -53,14 +53,14 @@ public class SearchPanel extends MapperPanel {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		
 		if(e.getSource()==searchText){
 			searchForRoomsWith(searchText.getText().trim());
 			return;
 		}else if(e.getSource() == results){
 			SearchResultItem item = (SearchResultItem) this.model.getElementAt(this.results.getSelectedIndex());
-
-			this.engine.moveToRoom(item.getRoom());
+			if(item != null){
+				this.engine.moveToRoom(item.getRoom());
+			}	
 			return;
 		}
 		super.actionPerformed(e);
@@ -80,7 +80,7 @@ public class SearchPanel extends MapperPanel {
 				AreaSaveObject aso = AreaDataPersister.loadData(this.engine.getBaseDir(), areaName);
 				Collection<Room> areaRooms = aso.getGraph().getVertices();
 				for(Room room: areaRooms){
-					if(room.getLongDesc().contains(text)){
+					if(room.getLongDesc().toLowerCase().contains(text.toLowerCase())){
 						model.addElement(new SearchResultItem(room));
 					}
 				}
