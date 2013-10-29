@@ -113,6 +113,7 @@ event data amount: 9
 			String longDesc = values[LONG_DESC].replaceAll("\n", " ");
 			HashSet<String> exits = new HashSet<String>(Arrays.asList(values[EXITS].split(",")));
 			this.engine.moveToRoom(areaName, roomUID, exitUsed,indoors, shortDesc, longDesc, exits);
+			this.searchEngine.setMapperArea(areaName);
 		}else if(values[PREFIX].equals(CHANNEL_PREFIX) && values.length !=EXIT_AREA_LENGTH){
 //			System.out.println("\n\n\nBROKEN HIDEOUS INPUT\n"+input);
 		}else if(values[PREFIX].equals(CHANNEL_PREFIX) && values.length == EXIT_AREA_LENGTH){

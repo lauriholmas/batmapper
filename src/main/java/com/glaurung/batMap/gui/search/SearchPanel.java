@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
@@ -25,6 +26,7 @@ public class SearchPanel extends MapperPanel {
 	private SearchEngine engine;
 	private DefaultComboBoxModel model = new DefaultComboBoxModel();
 	private JComboBox results = new JComboBox(model);
+	private JButton save = new JButton("Save");
 	
 	public SearchPanel(SearchEngine engine) {
 		super(engine);
@@ -36,6 +38,7 @@ public class SearchPanel extends MapperPanel {
 		this.BORDERLINE=ELEMENT_HEIGHT+14;
 		searchText.setToolTipText("Input desc to search here");
 		results.setToolTipText("Click on a result to see map");
+		save.addActionListener(this);
 		
 	}
 
@@ -46,8 +49,10 @@ public class SearchPanel extends MapperPanel {
 		super.componentResized(e);
 		searchText.setBounds(20, 7, 120, ELEMENT_HEIGHT);
 		results.setBounds(20+searchText.getWidth()+20, 7, 500, ELEMENT_HEIGHT);
+		save.setBounds(20+searchText.getWidth()+20+results.getWidth()+20, 7, 70, ELEMENT_HEIGHT);
 		this.add(searchText);
 		this.add(results);
+		this.add(save);
 
 	}
 	
@@ -62,6 +67,8 @@ public class SearchPanel extends MapperPanel {
 				this.engine.moveToRoom(item.getRoom());
 			}	
 			return;
+		}else if(e.getSource()== save){
+			this.engine.save();
 		}
 		super.actionPerformed(e);
 	}
@@ -90,7 +97,11 @@ public class SearchPanel extends MapperPanel {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-
+	}
+	
+	
+	public void toggleSaveAbility(boolean canSave){
+		save.setEnabled(canSave);
 	}
 
 }

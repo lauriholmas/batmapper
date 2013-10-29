@@ -13,6 +13,10 @@ import edu.uci.ics.jung.graph.SparseMultigraph;
 
 public class SearchEngine extends MapperEngine implements ItemListener{
 
+	private String areaName;
+	private String mapperArea;
+	private boolean savingAlreadyDisabled = false;
+	
 	public SearchEngine(SparseMultigraph<Room, Exit> graph){
 		this();
 		this.graph = graph;
@@ -31,6 +35,7 @@ public class SearchEngine extends MapperEngine implements ItemListener{
 		for(Room aRoom : graph.getVertices()){
 
 			if(aRoom.equals(room)){
+				currentRoom=aRoom;
 				aRoom.setPicked(true);
 				aRoom.setCurrent(true);
 			}else{
@@ -42,7 +47,7 @@ public class SearchEngine extends MapperEngine implements ItemListener{
 		pickedRoom = room;
 		this.panel.setTextForDescs(pickedRoom.getShortDesc(), pickedRoom.getLongDesc(), makeExitsStringFromPickedRoom(), pickedRoom);
 		repaint();
-	
+		moveMapToStayWithCurrentRoom();
 	}
 
 
@@ -63,9 +68,13 @@ public class SearchEngine extends MapperEngine implements ItemListener{
 		} catch (IOException e) {
 			return;
 		}
-		
+		this.areaName = areaName;
 		this.graph = areaSaveObject.getGraph();
 		mapperLayout.displayLoadedData(areaSaveObject);
+		if(!this.areaName.equalsIgnoreCase(this.mapperArea)){
+			savingAlreadyDisabled=false;
+		}
+		checkIfCanSaveMap();
 	}
 
 
@@ -78,5 +87,21 @@ public class SearchEngine extends MapperEngine implements ItemListener{
 		return this.baseDir;
 	}
 
+	public void checkIfCanSaveMap(){
+		if(this.areaName.equalsIgnoreCase(this.mapperArea) || savingAlreadyDisabled){
+			SearchPanel tempPanel = (SearchPanel) this.panel;
+			tempPanel.toggleSaveAbility(false);
+			savingAlreadyDisabled =true;
+		}else{
+			SearchPanel tempPanel = (SearchPanel) this.panel;
+			tempPanel.toggleSaveAbility(true);
+		}
+		
+	}
+
+	public void setMapperArea(String areaName) {
+		this.mapperArea=areaName;
+		checkIfCanSaveMap();
+	}
 	
 }

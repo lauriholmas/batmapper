@@ -405,22 +405,19 @@ protected void repaint() {
 	 * if current room is over away from center by 50% of distance to windowedge
 	 */
 	protected void moveMapToStayWithCurrentRoom(){
-		
+
 		Point2D currentRoomPoint = this.mapperLayout.transform(currentRoom);
+
 		Point2D mapViewCenterPoint = this.panel.getMapperCentralPoint();
 		Point2D viewPoint = vv.getRenderContext().getMultiLayerTransformer().transform(currentRoomPoint);
-		
 		if(needToRelocate(viewPoint, mapViewCenterPoint) ){
 			MutableTransformer modelTransformer = vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT);
 			float dx = (float) (mapViewCenterPoint.getX()-viewPoint.getX());
 			float dy = (float) (mapViewCenterPoint.getY()-viewPoint.getY());
 			modelTransformer.translate(dx, dy);
-
 			repaint();
 		}
-	
 	}
-
 
 	private boolean needToRelocate(Point2D currentRoomPoint, Point2D mapViewCenterPoint) {
 		if(mapViewCenterPoint.getX()*1.5 < currentRoomPoint.getX() || mapViewCenterPoint.getX()*0.5 > currentRoomPoint.getX()){

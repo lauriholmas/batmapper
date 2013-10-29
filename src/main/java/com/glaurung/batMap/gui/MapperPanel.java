@@ -174,12 +174,12 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 	public void componentResized(ComponentEvent e) {
 
 		if(visibleDescs){
-			vv.setBounds(7, BORDERLINE, this.getWidth()-(DESC_WIDTH+32), this.getHeight()-14);
+			vv.setBounds(7, BORDERLINE, this.getWidth()-(DESC_WIDTH+32), this.getHeight()-(BORDERLINE+7));
 //			roomNotes.setBounds(0, SHORT_DESC_HEIGHT+BORDERLINE+LONG_DESC_HEIGHT+BORDERLINE+EXITS_HEIGHT+BORDERLINE+BUTTON_HEIGHT+BORDERLINE, DESC_WIDTH, descPanel.getHeight()-(4*BORDERLINE+LONG_DESC_HEIGHT+EXITS_HEIGHT+SHORT_DESC_HEIGHT+BUTTON_HEIGHT));
 			scrollableNotes.setBounds(0, SHORT_DESC_HEIGHT+BORDERLINE+LONG_DESC_HEIGHT+BORDERLINE+EXITS_HEIGHT+BORDERLINE+BUTTON_HEIGHT+BORDERLINE, DESC_WIDTH, descPanel.getHeight()-(4*BORDERLINE+LONG_DESC_HEIGHT+EXITS_HEIGHT+SHORT_DESC_HEIGHT+BUTTON_HEIGHT));
 			descPanel.setBounds(this.getWidth()-(20+DESC_WIDTH), BORDERLINE, DESC_WIDTH, this.getHeight()-14);
 		}else{
-			vv.setBounds(7, 7, this.getWidth()-(2*BORDERLINE), this.getHeight()-(2*BORDERLINE));
+			vv.setBounds(7, BORDERLINE, this.getWidth()-(2*7), this.getHeight()-(BORDERLINE+7));
 			descPanel.setBounds(0, 0, 0, 0);
 		}
 
