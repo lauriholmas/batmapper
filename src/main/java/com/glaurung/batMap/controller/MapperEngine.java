@@ -47,7 +47,7 @@ import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.picking.PickedState;
 import edu.uci.ics.jung.visualization.transform.MutableTransformer;
 
-public class MapperEngine extends Engine implements ItemListener, ComponentListener{
+public class MapperEngine implements ItemListener, ComponentListener{
 
 
 	SparseMultigraph<Room, Exit> graph;
