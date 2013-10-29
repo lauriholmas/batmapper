@@ -28,13 +28,13 @@ public class SearchEngine extends MapperEngine implements ItemListener{
         panel = new SearchPanel(this);
 	}
 	
-	public void moveToRoom(Room room){
+	public void moveToRoom(Room room, boolean highlight){
 		if(area == null || !area.getName().equals( room.getArea().getName())){
 			moveToArea(room.getArea().getName());			
 		}
 		for(Room aRoom : graph.getVertices()){
 
-			if(aRoom.equals(room)){
+			if(aRoom.equals(room) && highlight){
 				currentRoom=aRoom;
 				aRoom.setPicked(true);
 				aRoom.setCurrent(true);
@@ -59,7 +59,7 @@ public class SearchEngine extends MapperEngine implements ItemListener{
 		this.panel = panel;
 	}
 
-	protected void moveToArea(String areaName){
+	public void moveToArea(String areaName){
 		AreaSaveObject areaSaveObject= null;
 		try {
 			areaSaveObject = AreaDataPersister.loadData(baseDir,areaName);	

@@ -28,6 +28,9 @@ public class SearchPanel extends MapperPanel {
 	private JComboBox results = new JComboBox(model);
 	private JButton save = new JButton("Save");
 	
+	private DefaultComboBoxModel listAllModel = new DefaultComboBoxModel();
+	private JComboBox areaList = new JComboBox(listAllModel);
+	
 	public SearchPanel(SearchEngine engine) {
 		super(engine);
 		this.engine = engine;
@@ -39,21 +42,24 @@ public class SearchPanel extends MapperPanel {
 		searchText.setToolTipText("Input desc to search here");
 		results.setToolTipText("Click on a result to see map");
 		save.addActionListener(this);
-		
+		areaList.addActionListener(this);
+		areaList.setToolTipText("Select area from list to view map");
 	}
 
-	
-	
+
+
 	@Override
 	public void componentResized(ComponentEvent e) {
 		super.componentResized(e);
 		searchText.setBounds(20, 7, 120, ELEMENT_HEIGHT);
-		results.setBounds(20+searchText.getWidth()+20, 7, 500, ELEMENT_HEIGHT);
-		save.setBounds(20+searchText.getWidth()+20+results.getWidth()+20, 7, 70, ELEMENT_HEIGHT);
+		results.setBounds(20+searchText.getWidth()+20, 7, 350, ELEMENT_HEIGHT);
+		areaList.setBounds(20+searchText.getWidth()+20+results.getWidth()+20, 7, 150, ELEMENT_HEIGHT);
+		save.setBounds(20+searchText.getWidth()+20+results.getWidth()+20+areaList.getWidth()+20, 7, 70, ELEMENT_HEIGHT);
 		this.add(searchText);
 		this.add(results);
+		this.add(areaList);
 		this.add(save);
-
+		populateAreaList();
 	}
 	
 	@Override
@@ -64,11 +70,17 @@ public class SearchPanel extends MapperPanel {
 		}else if(e.getSource() == results){
 			SearchResultItem item = (SearchResultItem) this.model.getElementAt(this.results.getSelectedIndex());
 			if(item != null){
-				this.engine.moveToRoom(item.getRoom());
+				this.engine.moveToRoom(item.getRoom(),true);
 			}	
 			return;
 		}else if(e.getSource()== save){
 			this.engine.save();
+		}else if(e.getSource() == areaList){
+			AreaListItem item = (AreaListItem) this.listAllModel.getElementAt(this.areaList.getSelectedIndex());
+			if(item != null){
+
+				this.engine.moveToRoom(item.getRoom(), false);
+			}
 		}
 		super.actionPerformed(e);
 	}
@@ -100,6 +112,25 @@ public class SearchPanel extends MapperPanel {
 		}
 	}
 	
+	private void populateAreaList() {
+		listAllModel.removeAllElements();
+		List<String> areas = AreaDataPersister.listAreaNames(this.engine.getBaseDir());
+		try {
+			for(String areaName: areas){
+				AreaSaveObject aso = AreaDataPersister.loadData(this.engine.getBaseDir(), areaName);
+				Collection<Room> areaRooms = aso.getGraph().getVertices();
+				if(areaRooms.size()> 0){
+					listAllModel.addElement(new AreaListItem(areaRooms.iterator().next()));
+				}
+				
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+	}
 	
 	public void toggleSaveAbility(boolean canSave){
 		save.setEnabled(canSave);
