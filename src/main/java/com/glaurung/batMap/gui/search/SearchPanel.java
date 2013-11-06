@@ -2,6 +2,8 @@ package com.glaurung.batMap.gui.search;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -14,10 +16,11 @@ import javax.swing.JTextField;
 import com.glaurung.batMap.controller.SearchEngine;
 import com.glaurung.batMap.gui.MapperPanel;
 import com.glaurung.batMap.io.AreaDataPersister;
+import com.glaurung.batMap.vo.Area;
 import com.glaurung.batMap.vo.AreaSaveObject;
 import com.glaurung.batMap.vo.Room;
 
-public class SearchPanel extends MapperPanel {
+public class SearchPanel extends MapperPanel implements ItemListener{
 
 	private static final long serialVersionUID = 1L;
 
@@ -36,13 +39,13 @@ public class SearchPanel extends MapperPanel {
 		this.engine = engine;
 		this.engine.setPanel(this);
 		this.searchText.addActionListener(this);
-		results.addActionListener(this);
+		results.addItemListener(this);
 		this.setLayout(null);
 		this.BORDERLINE=ELEMENT_HEIGHT+14;
 		searchText.setToolTipText("Input desc to search here");
 		results.setToolTipText("Click on a result to see map");
 		save.addActionListener(this);
-		areaList.addActionListener(this);
+		areaList.addItemListener(this);
 		areaList.setToolTipText("Select area from list to view map");
 	}
 
@@ -67,20 +70,8 @@ public class SearchPanel extends MapperPanel {
 		if(e.getSource()==searchText){
 			searchForRoomsWith(searchText.getText().trim());
 			return;
-		}else if(e.getSource() == results){
-			SearchResultItem item = (SearchResultItem) this.model.getElementAt(this.results.getSelectedIndex());
-			if(item != null){
-				this.engine.moveToRoom(item.getRoom(),true);
-			}	
-			return;
 		}else if(e.getSource()== save){
 			this.engine.save();
-		}else if(e.getSource() == areaList){
-			AreaListItem item = (AreaListItem) this.listAllModel.getElementAt(this.areaList.getSelectedIndex());
-			if(item != null){
-
-				this.engine.moveToRoom(item.getRoom(), false);
-			}
 		}
 		super.actionPerformed(e);
 	}
@@ -89,6 +80,7 @@ public class SearchPanel extends MapperPanel {
 
 	private void searchForRoomsWith(String text) {
 		model.removeAllElements();
+		model.addElement(new SearchResultItem(new Room("results", "first slot placeholder", new Area("Search"))));
 		if(text.equals("")){
 			return;
 		}
@@ -114,6 +106,7 @@ public class SearchPanel extends MapperPanel {
 	
 	private void populateAreaList() {
 		listAllModel.removeAllElements();
+		listAllModel.addElement(new AreaListItem(new Room("Area", "first slot placeholder", new Area("Areas list"))));
 		List<String> areas = AreaDataPersister.listAreaNames(this.engine.getBaseDir());
 		try {
 			for(String areaName: areas){
@@ -134,6 +127,30 @@ public class SearchPanel extends MapperPanel {
 	
 	public void toggleSaveAbility(boolean canSave){
 		save.setEnabled(canSave);
+	}
+
+
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		if(e.getSource() == results && e.getStateChange() == ItemEvent.SELECTED){
+			if(this.results.getSelectedIndex()== 0){
+				return;
+			}
+			SearchResultItem item = (SearchResultItem) this.model.getElementAt(this.results.getSelectedIndex());
+			if(item != null){
+				this.engine.moveToRoom(item.getRoom(),true);
+			}	
+		}else if(e.getSource() == areaList && e.getStateChange() == ItemEvent.SELECTED){
+			if(this.areaList.getSelectedIndex()== 0){
+				return;
+			}
+			AreaListItem item = (AreaListItem) this.listAllModel.getElementAt(this.areaList.getSelectedIndex());
+			if(item != null){
+				this.engine.moveToRoom(item.getRoom(), false);
+			}
+		}
+	
 	}
 
 }
