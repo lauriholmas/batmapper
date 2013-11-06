@@ -2,6 +2,7 @@ package com.glaurung.batMap.controller;
 
 import java.awt.event.ItemListener;
 import java.io.IOException;
+import java.sql.Savepoint;
 
 import com.glaurung.batMap.gui.search.SearchPanel;
 import com.glaurung.batMap.io.AreaDataPersister;
@@ -50,10 +51,16 @@ public class SearchEngine extends MapperEngine implements ItemListener{
 		moveMapToStayWithCurrentRoom();
 	}
 
-
-	protected void saveCurrentArea(){
-		
+	public void save(){
+		try {
+			if(this.area != null){
+				AreaDataPersister.save(baseDir,graph, mapperLayout);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
+
 
 	public void setPanel(SearchPanel panel) {
 		this.panel = panel;
@@ -70,6 +77,7 @@ public class SearchEngine extends MapperEngine implements ItemListener{
 		}
 		this.areaName = areaName;
 		this.graph = areaSaveObject.getGraph();
+		this.area = this.graph.getVertices().iterator().next().getArea();
 		mapperLayout.displayLoadedData(areaSaveObject);
 		if(!this.areaName.equalsIgnoreCase(this.mapperArea)){
 			savingAlreadyDisabled=false;
