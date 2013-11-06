@@ -138,7 +138,7 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 		roomColor.setToolTipText("Use this to change room color to highlight it");
 		roomColor.setRenderer(new MapperPanelCellRenderer());
 		
-		roomNotes.setBounds(0, BORDERLINE+SHORT_DESC_HEIGHT+BORDERLINE+LONG_DESC_HEIGHT+BORDERLINE+EXITS_HEIGHT+BORDERLINE+BUTTON_HEIGHT+BORDERLINE, DESC_WIDTH, NOTES_HEIGHT);
+//		roomNotes.setBounds(0, BORDERLINE+SHORT_DESC_HEIGHT+BORDERLINE+LONG_DESC_HEIGHT+BORDERLINE+EXITS_HEIGHT+BORDERLINE+BUTTON_HEIGHT+BORDERLINE, DESC_WIDTH, NOTES_HEIGHT);
 		roomNotes.setEditable(true);
 		roomNotes.setColumns(25);
 		roomNotes.setBorder(new LineBorder(BORDER_COLOR));
@@ -150,6 +150,7 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 		
 //		descPanel.add(roomNotes);
 		roomNotes.setToolTipText("Feel free to write your own notes here.");
+		scrollableNotes.setBounds(0, SHORT_DESC_HEIGHT+BORDERLINE+LONG_DESC_HEIGHT+BORDERLINE+EXITS_HEIGHT+BORDERLINE+BUTTON_HEIGHT+BORDERLINE, DESC_WIDTH, descPanel.getHeight()-(4*BORDERLINE+LONG_DESC_HEIGHT+EXITS_HEIGHT+SHORT_DESC_HEIGHT+BUTTON_HEIGHT));
 		descPanel.add(scrollableNotes);
 		
 		
@@ -176,7 +177,7 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 		if(visibleDescs){
 			vv.setBounds(7, BORDERLINE, this.getWidth()-(DESC_WIDTH+32), this.getHeight()-(BORDERLINE+7));
 //			roomNotes.setBounds(0, SHORT_DESC_HEIGHT+BORDERLINE+LONG_DESC_HEIGHT+BORDERLINE+EXITS_HEIGHT+BORDERLINE+BUTTON_HEIGHT+BORDERLINE, DESC_WIDTH, descPanel.getHeight()-(4*BORDERLINE+LONG_DESC_HEIGHT+EXITS_HEIGHT+SHORT_DESC_HEIGHT+BUTTON_HEIGHT));
-			scrollableNotes.setBounds(0, SHORT_DESC_HEIGHT+BORDERLINE+LONG_DESC_HEIGHT+BORDERLINE+EXITS_HEIGHT+BORDERLINE+BUTTON_HEIGHT+BORDERLINE, DESC_WIDTH, descPanel.getHeight()-(4*BORDERLINE+LONG_DESC_HEIGHT+EXITS_HEIGHT+SHORT_DESC_HEIGHT+BUTTON_HEIGHT));
+//			scrollableNotes.setBounds(0, SHORT_DESC_HEIGHT+BORDERLINE+LONG_DESC_HEIGHT+BORDERLINE+EXITS_HEIGHT+BORDERLINE+BUTTON_HEIGHT+BORDERLINE, DESC_WIDTH, descPanel.getHeight()-(4*BORDERLINE+LONG_DESC_HEIGHT+EXITS_HEIGHT+SHORT_DESC_HEIGHT+BUTTON_HEIGHT));
 			descPanel.setBounds(this.getWidth()-(20+DESC_WIDTH), BORDERLINE, DESC_WIDTH, this.getHeight()-14);
 		}else{
 			vv.setBounds(7, BORDERLINE, this.getWidth()-(2*7), this.getHeight()-(BORDERLINE+7));
