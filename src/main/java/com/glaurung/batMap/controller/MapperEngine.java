@@ -32,7 +32,6 @@ import com.glaurung.batMap.vo.Exit;
 import com.glaurung.batMap.vo.Room;
 import com.mythicscape.batclient.interfaces.BatWindow;
 
-import edu.uci.ics.jung.algorithms.layout.GraphElementAccessor;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.graph.util.Pair;
@@ -40,15 +39,12 @@ import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.CrossoverScalingControl;
-import edu.uci.ics.jung.visualization.control.PickingGraphMousePlugin;
 import edu.uci.ics.jung.visualization.control.PluggableGraphMouse;
 import edu.uci.ics.jung.visualization.control.ScalingGraphMousePlugin;
 import edu.uci.ics.jung.visualization.control.TranslatingGraphMousePlugin;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
-import edu.uci.ics.jung.visualization.picking.ClassicPickSupport;
 import edu.uci.ics.jung.visualization.picking.PickedState;
-import edu.uci.ics.jung.visualization.picking.RadiusPickSupport;
 import edu.uci.ics.jung.visualization.transform.MutableTransformer;
 
 public class MapperEngine implements ItemListener, ComponentListener{
@@ -179,10 +175,15 @@ public class MapperEngine implements ItemListener, ComponentListener{
 		}
 
 		refreshRoomGraphicsAndSetAsCurrent(newRoom,longDesc, shortDesc, indoors, exits);
-		vv.repaint();
+		repaint();
 		moveMapToStayWithCurrentRoom();
 		return newRoomAddedToGraph;
 	}
+
+
+protected void repaint() {
+	vv.repaint();
+}
 
 //	private Point2D getValidLocation(Point2D checkThisLocation) {
 //		GraphElementAccessor<Room,Exit> pickSupport = new RadiusPickSupport<Room, Exit>(60);
@@ -215,7 +216,8 @@ public class MapperEngine implements ItemListener, ComponentListener{
 		room.addExits(exits);
 	}
 
-	private void refreshRoomGraphicsAndSetAsCurrent(Room newRoom,String longDesc, String shortDesc, boolean indoors, Set<String> exits) {
+	protected void refreshRoomGraphicsAndSetAsCurrent(Room newRoom,String longDesc, String shortDesc, boolean indoors, Set<String> exits) {
+//System.out.println("newroom: "+newRoom+"\n\tcurrentroom: "+currentRoom+"\n\tpickedRoom: "+pickedRoom);
 		if(currentRoom!= null){
 			currentRoom.setCurrent(false);
 			if(currentRoom.isPicked()){
@@ -233,7 +235,7 @@ public class MapperEngine implements ItemListener, ComponentListener{
 	 * moveToRoom method should be called after this one to know where player is
 	 * @param areaName name for area, or pass null if leaving area into outerworld or such.
 	 */
-	public void moveToArea(String areaName){
+	protected void moveToArea(String areaName){
 		
 		if(areaName==null){
 			clearExtraCurrentAndChosenValuesFromRooms();
@@ -282,7 +284,7 @@ public class MapperEngine implements ItemListener, ComponentListener{
 			 */
 		}
 
-		vv.repaint();
+		repaint();
 	}
 
 
@@ -295,7 +297,7 @@ public class MapperEngine implements ItemListener, ComponentListener{
 	}
 
 
-	private void saveCurrentArea(){
+	protected void saveCurrentArea(){
 		try {
 			if(this.area != null){
 				AreaDataPersister.save(baseDir,graph, mapperLayout);
@@ -328,7 +330,7 @@ public class MapperEngine implements ItemListener, ComponentListener{
 			Room tempRoom = (Room)subject;
 			if(pickedState.isPicked(tempRoom)){
 				thisRoomIsPicked(tempRoom);
-				vv.repaint();		
+				repaint();		
 			}
 		}
 		
@@ -337,28 +339,31 @@ public class MapperEngine implements ItemListener, ComponentListener{
 	public void changeRoomColor(Color color){
 		if(this.pickedRoom!= null){
 			this.pickedRoom.setColor(color);
-			vv.repaint();
+			repaint();
 		}
 		
 	}
 
 
-	private void thisRoomIsPicked(Room tempRoom) {
+	protected void thisRoomIsPicked(Room tempRoom) {
 		drawRoomAsPicked(pickedRoom, false);	
 		drawRoomAsPicked(tempRoom,true);
 		pickedRoom = tempRoom;
 		this.panel.setTextForDescs(pickedRoom.getShortDesc(), pickedRoom.getLongDesc(), makeExitsStringFromPickedRoom(), pickedRoom);
 	}
 	
-	private String makeExitsStringFromPickedRoom() {
+	protected String makeExitsStringFromPickedRoom() {
 		Collection<Exit> outExits = graph.getOutEdges(pickedRoom);
 		StringBuilder exitString = new StringBuilder();
-		Iterator<Exit> exitIterator = outExits.iterator();
+		if(outExits != null){
+			Iterator<Exit> exitIterator = outExits.iterator();
 		
-		while(exitIterator.hasNext()){
-			Exit exit = exitIterator.next();
-			pickedRoom.getExits().add(exit.getExit());
+			while(exitIterator.hasNext()){
+				Exit exit = exitIterator.next();
+				pickedRoom.getExits().add(exit.getExit());
+			}
 		}
+		
 		Iterator<String> roomExitIterator = pickedRoom.getExits().iterator();
 		while(roomExitIterator.hasNext()){
 			exitString.append(roomExitIterator.next());
@@ -387,7 +392,7 @@ public class MapperEngine implements ItemListener, ComponentListener{
 	public void setMapperSize(Dimension size){
 		this.mapperLayout.setSize(size);
 		this.vv.setSize(size);
-		this.vv.repaint();
+		repaint();
 	}
 
 	
@@ -399,23 +404,20 @@ public class MapperEngine implements ItemListener, ComponentListener{
 	 * This method refocuses current room into middle of map, 
 	 * if current room is over away from center by 50% of distance to windowedge
 	 */
-	private void moveMapToStayWithCurrentRoom(){
-		
+	protected void moveMapToStayWithCurrentRoom(){
+
 		Point2D currentRoomPoint = this.mapperLayout.transform(currentRoom);
+
 		Point2D mapViewCenterPoint = this.panel.getMapperCentralPoint();
 		Point2D viewPoint = vv.getRenderContext().getMultiLayerTransformer().transform(currentRoomPoint);
-		
 		if(needToRelocate(viewPoint, mapViewCenterPoint) ){
 			MutableTransformer modelTransformer = vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT);
 			float dx = (float) (mapViewCenterPoint.getX()-viewPoint.getX());
 			float dy = (float) (mapViewCenterPoint.getY()-viewPoint.getY());
 			modelTransformer.translate(dx, dy);
-
-			vv.repaint();
+			repaint();
 		}
-	
 	}
-
 
 	private boolean needToRelocate(Point2D currentRoomPoint, Point2D mapViewCenterPoint) {
 		if(mapViewCenterPoint.getX()*1.5 < currentRoomPoint.getX() || mapViewCenterPoint.getX()*0.5 > currentRoomPoint.getX()){
@@ -432,7 +434,7 @@ public class MapperEngine implements ItemListener, ComponentListener{
 
 	public void redraw() {
 		this.mapperLayout.reDrawFromRoom(pickedRoom, this.mapperLayout.transform(pickedRoom));
-		vv.repaint();
+		repaint();
 		
 	}
 
@@ -450,7 +452,9 @@ public class MapperEngine implements ItemListener, ComponentListener{
 
 	public void setBaseDir(String baseDir) {
 		this.baseDir = baseDir;
-		
+	}
+	public String getBaseDir(){
+		return this.baseDir;
 	}
 
 

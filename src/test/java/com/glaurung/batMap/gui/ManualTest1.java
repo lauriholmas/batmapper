@@ -15,7 +15,7 @@ import com.glaurung.batMap.vo.Room;
 
 import edu.uci.ics.jung.graph.SparseMultigraph;
 
-public class GuiTest1{
+public class ManualTest1{
 
     public static void main(String[] args) {
 

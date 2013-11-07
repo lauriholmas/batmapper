@@ -8,9 +8,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import com.glaurung.batMap.vo.AreaSaveObject;
 import com.glaurung.batMap.vo.Exit;
@@ -52,6 +55,21 @@ public class AreaDataPersister {
 		return saveObject;
 	}
 	
+	public static List<String> listAreaNames(String basedir){
+		File newDir = new File(basedir,NEW_PATH);
+		newDir = new File(newDir,PATH);
+		File folder = newDir;
+		File[] files = folder.listFiles();
+		LinkedList<String> names = new LinkedList<String>();
+		for(File file : files){
+			if(FilenameUtils.getExtension(file.getName()).equals("batmap") ){
+//				System.out.println(FilenameUtils.getBaseName(file.getName()));
+				names.add(FilenameUtils.getBaseName(file.getName()));
+			}		
+		}
+		return names;
+	}
+	
 	private static  AreaSaveObject makeSaveObject(String basedir, SparseMultigraph<Room, Exit> graph,Layout<Room, Exit> layout ) throws IOException{
 		AreaSaveObject saveObject = new AreaSaveObject();
 		saveObject.setGraph(graph);
@@ -61,7 +79,7 @@ public class AreaDataPersister {
 			locations.put(room, coord);
 		}
 		saveObject.setFileName(getFileNameFrom(basedir,graph.getVertices().iterator().next().getArea().getName()));
-		System.out.println("\n\n+nsaveobjectdone\n\n\n"+saveObject.getFileName());
+//		System.out.println("\n\n+nsaveobjectdone\n\n\n"+saveObject.getFileName());
 		return saveObject;
 	}
 	

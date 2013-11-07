@@ -15,7 +15,7 @@ import com.glaurung.batMap.vo.Room;
 
 import edu.uci.ics.jung.graph.SparseMultigraph;
 
-public class GuiTest2 implements ActionListener{
+public class MapperTest1 implements ActionListener{
 
 	static JButton button;
 	static JButton sbutton;

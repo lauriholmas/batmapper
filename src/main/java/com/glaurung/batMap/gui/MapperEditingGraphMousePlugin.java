@@ -26,9 +26,9 @@ public class MapperEditingGraphMousePlugin extends EditingGraphMousePlugin<Room,
 //	private SparseMultigraph<Room, Exit> graph;
 	private MapperEngine engine;
 
-	public MapperEditingGraphMousePlugin(MapperEngine mapperEngine) {
+	public MapperEditingGraphMousePlugin(MapperEngine engine) {
 		super(null, null);
-		this.engine=mapperEngine;
+		this.engine=engine;
 	}
 	
 	

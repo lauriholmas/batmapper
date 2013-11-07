@@ -189,7 +189,6 @@ public class RoomIconTransformer implements Transformer<Room, Icon>{
 	}
 	
 	private BufferedImage assembleImageBasedOn(Room room){
-//		System.out.println("drawing room "+room.getExits()+" "+room.getShortDesc());
 		Image[][] walls = null;
 		Image[][] exits = null;
 		boolean[][] sectionHasExit = getExitGrid(room.getExits());// x,y going left to right, up to down
