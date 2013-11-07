@@ -84,7 +84,7 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 		vv.setBackground(BG_COLOR);
 		vv.setBounds(7, 7, 500, 500);
 		
-		descPanel.setBounds(514, BORDERLINE, DESC_WIDTH, SHORT_DESC_HEIGHT+LONG_DESC_HEIGHT+EXITS_HEIGHT+NOTES_HEIGHT+4*BORDERLINE);
+		descPanel.setBounds(514, BORDERLINE, DESC_WIDTH, SHORT_DESC_HEIGHT+LONG_DESC_HEIGHT+EXITS_HEIGHT+4*BORDERLINE);
 		descPanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		descPanel.setLayout(null);
 		descPanel.setBackground(BG_COLOR);
@@ -150,14 +150,15 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 		
 //		descPanel.add(roomNotes);
 		roomNotes.setToolTipText("Feel free to write your own notes here.");
-		scrollableNotes.setBounds(0, SHORT_DESC_HEIGHT+BORDERLINE+LONG_DESC_HEIGHT+BORDERLINE+EXITS_HEIGHT+BORDERLINE+BUTTON_HEIGHT+BORDERLINE, DESC_WIDTH, descPanel.getHeight()-(4*BORDERLINE+LONG_DESC_HEIGHT+EXITS_HEIGHT+SHORT_DESC_HEIGHT+BUTTON_HEIGHT));
-		descPanel.add(scrollableNotes);
+		scrollableNotes.setBounds(514, SHORT_DESC_HEIGHT+BORDERLINE+LONG_DESC_HEIGHT+BORDERLINE+EXITS_HEIGHT+BORDERLINE+BUTTON_HEIGHT+BORDERLINE, DESC_WIDTH, descPanel.getHeight()-(4*BORDERLINE+LONG_DESC_HEIGHT+EXITS_HEIGHT+SHORT_DESC_HEIGHT+BUTTON_HEIGHT));
+		this.add(scrollableNotes);
 		
 		
 		this.setLayout(null);
 		this.setBorder(new LineBorder(BORDER_COLOR));
 		this.add(vv);
 		this.add(descPanel);
+		this.add(scrollableNotes);
 		this.setVisible(true);
 	}
 	
@@ -176,10 +177,13 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 
 		if(visibleDescs){
 			vv.setBounds(7, BORDERLINE, this.getWidth()-(DESC_WIDTH+21), this.getHeight()-(BORDERLINE+7));
-			descPanel.setBounds(this.getWidth()-(7+DESC_WIDTH), BORDERLINE, DESC_WIDTH, this.getHeight()-(7+BORDERLINE));
+			descPanel.setBounds(this.getWidth()-(7+DESC_WIDTH), BORDERLINE, DESC_WIDTH, SHORT_DESC_HEIGHT+LONG_DESC_HEIGHT+EXITS_HEIGHT+BUTTON_HEIGHT+4*7);
+			scrollableNotes.setBounds(this.getWidth()-(7+DESC_WIDTH), BORDERLINE+descPanel.getHeight()+7, DESC_WIDTH, this.getHeight()-(descPanel.getHeight()+14+BORDERLINE));
+
 		}else{
 			vv.setBounds(7, BORDERLINE, this.getWidth()-(2*7), this.getHeight()-(BORDERLINE+7));
 			descPanel.setBounds(0, 0, 0, 0);
+			scrollableNotes.setBounds(0, 0, 0, 0);
 		}
 
 	}
