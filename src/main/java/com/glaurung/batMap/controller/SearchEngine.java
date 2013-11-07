@@ -14,7 +14,7 @@ import edu.uci.ics.jung.graph.SparseMultigraph;
 
 public class SearchEngine extends MapperEngine implements ItemListener{
 
-	private String areaName;
+	private String areaName = "";
 	private String mapperArea;
 	private boolean savingAlreadyDisabled = false;
 	
