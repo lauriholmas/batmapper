@@ -41,7 +41,7 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 	private final int SHORT_DESC_HEIGHT=40;
 	private final int LONG_DESC_HEIGHT=270;
 	private final int EXITS_HEIGHT=40;
-	private final int NOTES_HEIGHT=140;
+	protected int NOTES_HEIGHT=140;
 	protected int BORDERLINE=7;
 	private final int BUTTON_HEIGHT=25;
 	private final int BUTTON_WIDTH=100;
@@ -84,7 +84,7 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 		vv.setBackground(BG_COLOR);
 		vv.setBounds(7, 7, 500, 500);
 		
-		descPanel.setBounds(514, 7, DESC_WIDTH, SHORT_DESC_HEIGHT+LONG_DESC_HEIGHT+EXITS_HEIGHT+NOTES_HEIGHT+4*BORDERLINE);
+		descPanel.setBounds(514, BORDERLINE, DESC_WIDTH, SHORT_DESC_HEIGHT+LONG_DESC_HEIGHT+EXITS_HEIGHT+NOTES_HEIGHT+4*BORDERLINE);
 		descPanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		descPanel.setLayout(null);
 		descPanel.setBackground(BG_COLOR);
@@ -175,10 +175,8 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 	public void componentResized(ComponentEvent e) {
 
 		if(visibleDescs){
-			vv.setBounds(7, BORDERLINE, this.getWidth()-(DESC_WIDTH+32), this.getHeight()-(BORDERLINE+7));
-//			roomNotes.setBounds(0, SHORT_DESC_HEIGHT+BORDERLINE+LONG_DESC_HEIGHT+BORDERLINE+EXITS_HEIGHT+BORDERLINE+BUTTON_HEIGHT+BORDERLINE, DESC_WIDTH, descPanel.getHeight()-(4*BORDERLINE+LONG_DESC_HEIGHT+EXITS_HEIGHT+SHORT_DESC_HEIGHT+BUTTON_HEIGHT));
-//			scrollableNotes.setBounds(0, SHORT_DESC_HEIGHT+BORDERLINE+LONG_DESC_HEIGHT+BORDERLINE+EXITS_HEIGHT+BORDERLINE+BUTTON_HEIGHT+BORDERLINE, DESC_WIDTH, descPanel.getHeight()-(4*BORDERLINE+LONG_DESC_HEIGHT+EXITS_HEIGHT+SHORT_DESC_HEIGHT+BUTTON_HEIGHT));
-			descPanel.setBounds(this.getWidth()-(20+DESC_WIDTH), BORDERLINE, DESC_WIDTH, this.getHeight()-14);
+			vv.setBounds(7, BORDERLINE, this.getWidth()-(DESC_WIDTH+21), this.getHeight()-(BORDERLINE+7));
+			descPanel.setBounds(this.getWidth()-(7+DESC_WIDTH), BORDERLINE, DESC_WIDTH, this.getHeight()-(7+BORDERLINE));
 		}else{
 			vv.setBounds(7, BORDERLINE, this.getWidth()-(2*7), this.getHeight()-(BORDERLINE+7));
 			descPanel.setBounds(0, 0, 0, 0);
