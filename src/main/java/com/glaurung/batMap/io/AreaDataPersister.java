@@ -86,6 +86,7 @@ public class AreaDataPersister {
 	private static String getFileNameFrom(String basedir,String areaName) throws IOException{
 		
 		areaName = areaName.replaceAll("'", "");
+		areaName = areaName.replaceAll("/", "");
 		areaName = areaName+SUFFIX;
 		File newDir = new File(basedir,NEW_PATH);
 		newDir = new File(newDir,PATH);
