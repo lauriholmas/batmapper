@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 import com.glaurung.batMap.controller.MapperEngine;
+import com.glaurung.batMap.gui.manual.ManualPanel;
 import com.glaurung.batMap.vo.Exit;
 import com.glaurung.batMap.vo.Room;
 

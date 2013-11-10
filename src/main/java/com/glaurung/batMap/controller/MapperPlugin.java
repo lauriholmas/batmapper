@@ -5,11 +5,10 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import com.glaurung.batMap.gui.ManualPanel;
 import com.glaurung.batMap.gui.corpses.CorpsePanel;
+import com.glaurung.batMap.gui.manual.ManualPanel;
 import com.glaurung.batMap.gui.search.SearchPanel;
 import com.glaurung.batMap.io.AreaDataPersister;
-import com.glaurung.batMap.io.CorpseHandlerDataPersister;
 import com.glaurung.batMap.io.GuiDataPersister;
 import com.glaurung.batMap.vo.GuiData;
 import com.mythicscape.batclient.interfaces.BatClientPlugin;

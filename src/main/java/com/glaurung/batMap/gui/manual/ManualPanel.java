@@ -1,4 +1,4 @@
-package com.glaurung.batMap.gui;
+package com.glaurung.batMap.gui.manual;
 
 import java.awt.Color;
 import java.awt.Dimension;
