@@ -13,6 +13,9 @@ public class GraphUtils {
  * @return
  */
 	public static boolean canAddExit(Collection<Exit> outEdges, String exitDir) {
+		if(outEdges == null){
+			return true;
+		}
     	for(Exit exit: outEdges){
     		if(exit.getExit().equalsIgnoreCase(exitDir)){
     			return false;
