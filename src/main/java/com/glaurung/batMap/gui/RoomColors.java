@@ -9,15 +9,20 @@ public class RoomColors {
 	public static Color YELLOW = new Color(255,255,0);
 	public static Color BLUE = new Color(0,0,255);
 	public static Color PINK = new Color(255,0,255);
+	public static Color PURPLE = new Color(160,32,240);
+	public static Color ORANGE = new Color(255,165,0);
+	public static Color BROWN = new Color(139,69,19);
+	public static Color TURQUOISE = new Color(64,224,208);
+	public static Color IVORY = new Color(255,255,240);
 
 	
 	public static String[] getColorNames(){
-		String[] colorList = {"normal","red","yellow","blue", "pink"};
+		String[] colorList = {"normal","red","yellow","blue", "pink","purple","orange","brown","turquoise","ivory"};
 		return colorList;
 	}
 	
 	public static Color[] getColors(){
-		Color[] colorList = {NORMAL,RED,YELLOW,BLUE,PINK};
+		Color[] colorList = {NORMAL,RED,YELLOW,BLUE,PINK, PURPLE, ORANGE, BROWN, TURQUOISE, IVORY};
 		return colorList;
 	}
 	
@@ -33,6 +38,16 @@ public class RoomColors {
 			return 3;
 		}else if(color == PINK){
 			return 4;
+		}else if(color == PURPLE){
+			return 5;
+		}else if(color == ORANGE){
+			return 6;
+		}else if(color == BROWN){
+			return 7;
+		}else if(color == TURQUOISE){
+			return 8;
+		}else if(color == IVORY){
+			return 9;
 		}else{
 			return 1000;
 		}

@@ -84,6 +84,21 @@ public class RoomIconTransformer implements Transformer<Room, Icon>{
 	
 	private Image[][] pinkWalls= new Image[3][3];
 	private Image[][] pinkExits= new Image[3][3];
+
+	private Image[][] purpleWalls= new Image[3][3];
+	private Image[][] purpleExits= new Image[3][3];
+	
+	private Image[][] orangeWalls= new Image[3][3];
+	private Image[][] orangeExits= new Image[3][3];
+	
+	private Image[][] brownWalls= new Image[3][3];
+	private Image[][] brownExits= new Image[3][3];
+	
+	private Image[][] turquoiseWalls= new Image[3][3];
+	private Image[][] turquoiseExits= new Image[3][3];
+	
+	private Image[][] ivoryWalls= new Image[3][3];
+	private Image[][] ivoryExits= new Image[3][3];
 	
 	public RoomIconTransformer(){
 		nExitIn = loadAndRotateImage("nIn.gif",null,null);
@@ -132,12 +147,19 @@ public class RoomIconTransformer implements Transformer<Room, Icon>{
 		middleOut = loadImage("middleOut.gif");
 		middleSpecialOut = loadImage("middlespecialOut.gif");
 		
+//		"normal","red","yellow","blue", "pink","purple","orange","brown","turquoise","ivory"
 		loadIndoors();
 		loadOutdoors();
 		loadRed();
 		loadColoredIcons(yellowWalls, yellowExits, RoomColors.YELLOW);
 		loadColoredIcons(blueWalls, blueExits, RoomColors.BLUE);
 		loadColoredIcons(pinkWalls, pinkExits, RoomColors.PINK);
+		loadColoredIcons(purpleWalls, purpleExits, RoomColors.PURPLE);
+		loadColoredIcons(orangeWalls, orangeExits, RoomColors.ORANGE);
+		loadColoredIcons(brownWalls, brownExits, RoomColors.BROWN);
+		loadColoredIcons(turquoiseWalls, turquoiseExits, RoomColors.TURQUOISE);
+		loadColoredIcons(ivoryWalls, ivoryExits, RoomColors.IVORY);
+		
 		
 
 	}
@@ -205,6 +227,21 @@ public class RoomIconTransformer implements Transformer<Room, Icon>{
 			}else if(room.getColor().equals(RoomColors.PINK)){
 				walls = pinkWalls;
 				exits = pinkExits;
+			}else if(room.getColor().equals(RoomColors.PURPLE)){
+				walls = purpleWalls;
+				exits = purpleExits;
+			}else if(room.getColor().equals(RoomColors.ORANGE)){
+				walls = orangeWalls;
+				exits = orangeExits;
+			}else if(room.getColor().equals(RoomColors.BROWN)){
+				walls = brownWalls;
+				exits = brownExits;
+			}else if(room.getColor().equals(RoomColors.TURQUOISE)){
+				walls = turquoiseWalls;
+				exits = turquoiseExits;
+			}else if(room.getColor().equals(RoomColors.IVORY)){
+				walls = ivoryWalls;
+				exits = ivoryExits;
 			}
 
 		}else{
