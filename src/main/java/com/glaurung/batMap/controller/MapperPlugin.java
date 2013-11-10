@@ -104,7 +104,7 @@ event data amount: 9
 		String input = event.getActionCommand();
 		String[] values = input.split(";;",-1);
 		if(values[PREFIX].equals(CHANNEL_PREFIX) && values.length == MESSAGE_LENGTH){
-//			System.out.println("\n\n\nvalid input\n"+input);
+//			System.out.println("\n\n\nvalid input: " +input);
 			String areaName = values[AREA_NAME];
 			String roomUID = values[ROOM_ID];
 			String exitUsed = values[EXIT_USED];
@@ -115,10 +115,12 @@ event data amount: 9
 			this.engine.moveToRoom(areaName, roomUID, exitUsed,indoors, shortDesc, longDesc, exits);
 			this.searchEngine.setMapperArea(areaName);
 		}else if(values[PREFIX].equals(CHANNEL_PREFIX) && values.length !=EXIT_AREA_LENGTH){
-//			System.out.println("\n\n\nBROKEN HIDEOUS INPUT\n"+input);
+//			System.out.println("\n\n\nBROKEN HIDEOUS INPUT: "+input);
 		}else if(values[PREFIX].equals(CHANNEL_PREFIX) && values.length == EXIT_AREA_LENGTH){
+//			System.out.println("\n\n\nexiting area: "+input);
 			if(values[AREA_NAME].equals(EXIT_AREA_MESSAGE)){
 				this.engine.moveToArea(null);
+				this.searchEngine.setMapperArea(null);
 			}
 		}
 		

@@ -30,9 +30,8 @@ public class SearchEngine extends MapperEngine implements ItemListener{
 	}
 	
 	public void moveToRoom(Room room, boolean highlight){
-		if(area == null || !area.getName().equals( room.getArea().getName())){
-			moveToArea(room.getArea().getName());			
-		}
+		moveToArea(room.getArea().getName());			
+
 		for(Room aRoom : graph.getVertices()){
 
 			if(aRoom.equals(room) && highlight){
