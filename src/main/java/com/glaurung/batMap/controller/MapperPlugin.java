@@ -54,7 +54,7 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
 		}else{
 			clientWin = this.getClientGUI().createBatWindow("Mapper", 300, 300,820, 550);
 		}
-		
+
 		engine = new MapperEngine();
 		searchEngine = new SearchEngine();
 		engine.setBatWindow(clientWin);
@@ -70,7 +70,6 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
 		engine.setBaseDir(BASEDIR);
 		searchEngine.setBaseDir(BASEDIR);
 		clientWin.addComponentListener(engine);
-		
 
 	}
 
@@ -99,7 +98,7 @@ event data amount: 9
 
 		 */
 		
-		//batMap;areaname;roomUID;exitUsed;indoor boolean;shortDesc;longDesc;exits
+		//cMapper;areaname;roomUID;exitUsed;indoor boolean;shortDesc;longDesc;exits
 		String input = event.getActionCommand();
 		String[] values = input.split(";;",-1);
 		if(values[PREFIX].equals(CHANNEL_PREFIX) && values.length == MESSAGE_LENGTH){

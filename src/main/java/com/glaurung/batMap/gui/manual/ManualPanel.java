@@ -10,11 +10,10 @@ import java.io.InputStream;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 
 import org.apache.commons.io.IOUtils;
 
-public class ManualPanel  extends JPanel implements ComponentListener{
+public class ManualPanel extends JPanel implements ComponentListener{
 
 	private static final long serialVersionUID = 8922764153155463898L;
 	private JTextArea manualTextArea = new JTextArea();
