@@ -11,23 +11,20 @@ import com.glaurung.batMap.vo.Room;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.visualization.decorators.AbstractVertexShapeTransformer;
 
-public class RoomShape extends AbstractVertexShapeTransformer<Room> implements Transformer<Room, Shape>{
+public class RoomShape extends AbstractVertexShapeTransformer<Room> implements Transformer<Room, Shape> {
 
-    public RoomShape(SparseMultigraph<Room, Exit> graph) {
-	}
+    public RoomShape( SparseMultigraph<Room, Exit> graph ) {
+    }
 
-	public Shape transform(Room room)
-    {
+    public Shape transform( Room room ) {
 
-        setSizeTransformer(new Transformer<Room, Integer>()
-        {
-            public Integer transform(Room room)
-            {
+        setSizeTransformer( new Transformer<Room, Integer>() {
+            public Integer transform( Room room ) {
                 return DrawingUtils.ROOM_SIZE;
             }
-        });
+        } );
 
-        Area roomGfx = new Area(factory.getRectangle(room));
+        Area roomGfx = new Area( factory.getRectangle( room ) );
         return roomGfx;
     }
 

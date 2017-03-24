@@ -13,50 +13,50 @@ import edu.uci.ics.jung.visualization.renderers.DefaultEdgeLabelRenderer;
 
 /**
  * currently used for coloring edgelabels based on selected or not
- * @author lauri
  *
+ * @author lauri
  */
 public class ExitLabelRenderer extends DefaultEdgeLabelRenderer {
 
 
-	private static final long serialVersionUID = -7389656600818368218L;
-	
-	protected Color pickedEdgeLabelColor = Color.blue;
-	
-	protected Color unPickedEdgeLabelColor = Color.red;
+    private static final long serialVersionUID = - 7389656600818368218L;
 
-	public ExitLabelRenderer(Color pickedEdgeLabelColor, boolean rotateEdgeLabels) {
-		super(pickedEdgeLabelColor, rotateEdgeLabels);
-	}
-	
-	
+    protected Color pickedEdgeLabelColor = Color.blue;
+
+    protected Color unPickedEdgeLabelColor = Color.red;
+
+    public ExitLabelRenderer( Color pickedEdgeLabelColor, boolean rotateEdgeLabels ) {
+        super( pickedEdgeLabelColor, rotateEdgeLabels );
+    }
+
+
     public ExitLabelRenderer() {
-    	super(Color.black, false);
-	}
+        super( Color.black, false );
+    }
 
 
-	public <E> Component getEdgeLabelRendererComponent(JComponent vv, Object value,Font font, boolean isSelected, E edge) {
-        
-    	super.setForeground(vv.getForeground());
-    	if(edge instanceof Exit){
-    		Exit exit = (Exit)edge;
-    		if(exit.isCurrentExit()){
-    			setForeground(pickedEdgeLabelColor);
-    		}else{
-    			setForeground(unPickedEdgeLabelColor);
-    		}
-    	}
+    public <E> Component getEdgeLabelRendererComponent( JComponent vv, Object value, Font font, boolean isSelected, E edge ) {
 
-        super.setBackground(vv.getBackground());
-        
-        if(font != null) {
-            setFont(font);
-        } else {
-            setFont(vv.getFont());
+        super.setForeground( vv.getForeground() );
+        if (edge instanceof Exit) {
+            Exit exit = (Exit) edge;
+            if (exit.isCurrentExit()) {
+                setForeground( pickedEdgeLabelColor );
+            } else {
+                setForeground( unPickedEdgeLabelColor );
+            }
         }
-        setIcon(null);
-        setBorder(noFocusBorder);
-        setValue(value); 
+
+        super.setBackground( vv.getBackground() );
+
+        if (font != null) {
+            setFont( font );
+        } else {
+            setFont( vv.getFont() );
+        }
+        setIcon( null );
+        setBorder( noFocusBorder );
+        setValue( value );
         return this;
     }
 

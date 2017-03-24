@@ -6,32 +6,32 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBox;
 
-public class CorpseCheckBox extends JCheckBox{
+public class CorpseCheckBox extends JCheckBox {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private String effect;
-	
-	
-	public CorpseCheckBox(String label, boolean defaultMode, String effect, ActionListener listener, Font font){
-		super(label, defaultMode);
-		this.setEffect(effect);
-		this.addActionListener(listener);
-		this.setBackground(Color.BLACK);
-		this.setForeground(Color.LIGHT_GRAY);
-		this.setFont(font);
-	}
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private String effect;
 
 
-	public String getEffect() {
-		return effect;
-	}
+    public CorpseCheckBox( String label, boolean defaultMode, String effect, ActionListener listener, Font font ) {
+        super( label, defaultMode );
+        this.setEffect( effect );
+        this.addActionListener( listener );
+        this.setBackground( Color.BLACK );
+        this.setForeground( Color.LIGHT_GRAY );
+        this.setFont( font );
+    }
 
 
-	public void setEffect(String effect) {
-		this.effect = effect;
-	}
-	
+    public String getEffect() {
+        return effect;
+    }
+
+
+    public void setEffect( String effect ) {
+        this.effect = effect;
+    }
+
 }
