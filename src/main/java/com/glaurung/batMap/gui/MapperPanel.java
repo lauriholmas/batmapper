@@ -41,7 +41,6 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 	private final int SHORT_DESC_HEIGHT=40;
 	private final int LONG_DESC_HEIGHT=270;
 	private final int EXITS_HEIGHT=40;
-	protected int NOTES_HEIGHT=140;
 	protected int BORDERLINE=7;
 	private final int BUTTON_HEIGHT=25;
 	private final int BUTTON_WIDTH=100;
