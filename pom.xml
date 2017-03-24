@@ -4,7 +4,7 @@
 
     <groupId>com.glaurung</groupId>
     <artifactId>batUtils</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
     <packaging>jar</packaging>
 
     <name>batUtils</name>
@@ -97,6 +97,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -106,7 +107,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <finalName>uber-${artifactId}-${version}</finalName>
+                    <finalName>${project.artifactId}-${project.version}-full</finalName>
                     <filters>
                         <filter>
                             <artifact>*:*</artifact>
@@ -123,6 +124,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
 
                 <configuration>
                     <archive>
