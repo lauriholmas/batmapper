@@ -18,7 +18,7 @@ import com.glaurung.batMap.vo.Room;
 
 public class RoomIconTransformer implements Transformer<Room, Icon> {
 
-    private final Color PICKED = Color.WHITE;
+    private final Color PICKED = Color.CYAN;
     private final Color CURRENT = Color.RED;
 
 

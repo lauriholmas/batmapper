@@ -17,7 +17,6 @@ import javax.swing.JComponent;
 
 import com.glaurung.batMap.vo.Exit;
 import com.glaurung.batMap.vo.Room;
-
 import edu.uci.ics.jung.algorithms.layout.GraphElementAccessor;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.visualization.Layer;
@@ -36,7 +35,7 @@ import edu.uci.ics.jung.visualization.picking.PickedState;
  *
  * @author Tom Nelson
  */
-public class MapperPickingGraphMousePlugin<Room, Exit> extends AbstractGraphMousePlugin
+public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
         implements MouseListener, MouseMotionListener {
 
     /**
@@ -98,7 +97,7 @@ public class MapperPickingGraphMousePlugin<Room, Exit> extends AbstractGraphMous
      * @param selectionModifiers      for primary selection
      * @param addToSelectionModifiers for additional selection
      */
-    public MapperPickingGraphMousePlugin( int selectionModifiers, int addToSelectionModifiers ) {
+    public MapperPickingGraphMousePlugin(int selectionModifiers, int addToSelectionModifiers) {
         super( selectionModifiers );
         this.addToSelectionModifiers = addToSelectionModifiers;
         this.lensPaintable = new LensPaintable();
@@ -335,13 +334,26 @@ public class MapperPickingGraphMousePlugin<Room, Exit> extends AbstractGraphMous
             GraphElementAccessor<Room, Exit> pickSupport = vv.getPickSupport();
 
             Collection<Room> picked = pickSupport.getVertices( layout, pickRectangle );
-            for (Room v : picked) {
-                pickedVertexState.pick( v, true );
+            for (Room pickedRoom : picked) {
+                pickedRoom.setPicked(true);
+                pickedVertexState.pick( pickedRoom, true );
             }
         }
     }
 
     public void mouseClicked( MouseEvent e ) {
+        VisualizationViewer<Room, Exit> vv = (VisualizationViewer) e.getSource();
+        PickedState<Room> pickedState = vv.getPickedVertexState();
+
+        Rectangle2D pickRectangle = new Rectangle2D.Double();
+        pickRectangle.setFrameFromDiagonal( e.getPoint(), e.getPoint() );
+        Room clickedRoom = vv.getPickSupport().getVertex(vv.getGraphLayout(), e.getX(), e.getY());
+        for(Room room: pickedState.getPicked()){
+                room.setPicked(false);
+        }
+        clickedRoom.setPicked(true);
+        pickedState.clear();
+        pickedState.pick(clickedRoom, true);
     }
 
     public void mouseEntered( MouseEvent e ) {
