@@ -16,7 +16,6 @@ import com.glaurung.batMap.gui.DrawingUtils;
 import com.glaurung.batMap.gui.ExitLabelRenderer;
 import com.glaurung.batMap.gui.ExitPaintTransformer;
 import com.glaurung.batMap.gui.GraphUtils;
-import com.glaurung.batMap.gui.MapperEditingGraphMousePlugin;
 import com.glaurung.batMap.gui.MapperLayout;
 import com.glaurung.batMap.gui.MapperPanel;
 import com.glaurung.batMap.gui.MapperPickingGraphMousePlugin;
@@ -54,7 +53,6 @@ public class MapperEngine implements ItemListener, ComponentListener {
     Room currentRoom = null;
     Area area = null;
     MapperPanel panel;
-    MapperEditingGraphMousePlugin mousePlugin;
 
     PickedState<Room> pickedState;
     String baseDir;
@@ -94,8 +92,6 @@ public class MapperEngine implements ItemListener, ComponentListener {
         pgm.add( new TranslatingGraphMousePlugin( MouseEvent.BUTTON1_MASK ) );
         scaler = new ScalingGraphMousePlugin( new CrossoverScalingControl(), 0, 1 / 1.1f, 1.1f );
         pgm.add( scaler );
-        mousePlugin = new MapperEditingGraphMousePlugin( this );
-        pgm.add( mousePlugin );
         vv.setGraphMouse( pgm );
         panel = new MapperPanel( this );
     }

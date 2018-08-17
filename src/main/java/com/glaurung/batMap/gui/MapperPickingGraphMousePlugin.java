@@ -1,10 +1,6 @@
 package com.glaurung.batMap.gui;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -13,7 +9,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 
-import javax.swing.JComponent;
+import javax.swing.*;
 
 import com.glaurung.batMap.vo.Exit;
 import com.glaurung.batMap.vo.Room;
@@ -30,7 +26,7 @@ import edu.uci.ics.jung.visualization.picking.PickedState;
  * with the mouse. MouseButtonOne picks a single vertex
  * or edge, and MouseButtonTwo adds to the set of selected Vertices
  * or EdgeType. If a Vertex is selected and the mouse is dragged while
- * on the selected Vertex, then that Vertex will be repositioned to
+ * on the seected Vertex, then that Vertex will be repositioned to
  * follow the mouse until the button is released.
  *
  * @author Tom Nelson
@@ -204,25 +200,7 @@ public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
                 rect.setFrameFromDiagonal( down, down );
                 Point2D ip = e.getPoint();
                 room = pickSupport.getVertex( layout, ip.getX(), ip.getY() );
-//                if(room != null) {
-//                    boolean wasThere = pickedVertexState.pick(room, !pickedVertexState.isPicked(room));
-//                    if(wasThere) {
-//                    	System.out.println("wasThere!");
-//                    	room = null;
-//                    } else {
-//                    	System.out.println("wasNOOOOOTThere!");
-//                        // layout.getLocation applies the layout transformer so
-//                        // q is transformed by the layout transformer only
-//                        Point2D q = layout.transform(room);
-//                        // translate mouse point to graph coord system
-//                        Point2D gp = vv.getRenderContext().getMultiLayerTransformer().inverseTransform(Layer.LAYOUT, ip);
-//
-//                        offsetx = (float) (gp.getX()-q.getX());
-//                        offsety = (float) (gp.getY()-q.getY());
-//                    }
-//                } else if((exit = pickSupport.getEdge(layout, ip.getX(), ip.getY())) != null) {
-//                    pickedEdgeState.pick(exit, !pickedEdgeState.isPicked(exit));
-//                }
+
             }
         }
         if (room != null) e.consume();
@@ -341,19 +319,54 @@ public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
         }
     }
 
+    /**
+     * If clicking on room, it will select it
+     *
+     * if shift, clicking, it will add/remove it from multiselection
+     *
+     * if right clicking, open deletion
+     *
+     *
+     * @param e
+     */
     public void mouseClicked( MouseEvent e ) {
         VisualizationViewer<Room, Exit> vv = (VisualizationViewer) e.getSource();
         PickedState<Room> pickedState = vv.getPickedVertexState();
-
-        Rectangle2D pickRectangle = new Rectangle2D.Double();
-        pickRectangle.setFrameFromDiagonal( e.getPoint(), e.getPoint() );
         Room clickedRoom = vv.getPickSupport().getVertex(vv.getGraphLayout(), e.getX(), e.getY());
-        for(Room room: pickedState.getPicked()){
-                room.setPicked(false);
+
+        if(e.getModifiers() == MouseEvent.BUTTON3_MASK){
+
+            int response =  JOptionPane.showConfirmDialog(vv,"Do you wish to delete "+pickedState.getPicked().size()+" rooms?","Room deletion confirmation", JOptionPane.YES_NO_OPTION);
+            if( response == JOptionPane.YES_OPTION){
+                for(Room deletedRoom: pickedState.getPicked()){
+                    vv.getGraphLayout().getGraph().removeVertex(deletedRoom);
+
+                }
+                pickedState.clear();
+            }
+            return;
         }
-        clickedRoom.setPicked(true);
-        pickedState.clear();
-        pickedState.pick(clickedRoom, true);
+
+        if(e.getModifiersEx() == MouseEvent.SHIFT_DOWN_MASK){
+            if(clickedRoom != null){
+                if(pickedState.isPicked(clickedRoom)){
+                    clickedRoom.setPicked(false);
+                    pickedState.pick(clickedRoom, false);
+                }else{
+                    clickedRoom.setPicked(true);
+                    pickedState.pick(clickedRoom, true);
+                }
+            }
+        }else{
+            for(Room room: pickedState.getPicked()){
+                room.setPicked(false);
+            }
+            pickedState.clear();
+            if(clickedRoom != null){
+                clickedRoom.setPicked(true);
+                pickedState.pick(clickedRoom, true);
+            }
+        }
     }
 
     public void mouseEntered( MouseEvent e ) {
