@@ -10,15 +10,12 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import com.glaurung.batMap.gui.DrawingUtils;
 import com.glaurung.batMap.gui.ExitLabelRenderer;
 import com.glaurung.batMap.gui.ExitPaintTransformer;
 import com.glaurung.batMap.gui.GraphUtils;
-import com.glaurung.batMap.gui.MapperEditingGraphMousePlugin;
 import com.glaurung.batMap.gui.MapperLayout;
 import com.glaurung.batMap.gui.MapperPanel;
 import com.glaurung.batMap.gui.MapperPickingGraphMousePlugin;
@@ -54,10 +51,8 @@ public class MapperEngine implements ItemListener, ComponentListener {
     VisualizationViewer<Room, Exit> vv;
     MapperLayout mapperLayout;
     Room currentRoom = null;
-    Room pickedRoom = null;
     Area area = null;
     MapperPanel panel;
-    MapperEditingGraphMousePlugin mousePlugin;
 
     PickedState<Room> pickedState;
     String baseDir;
@@ -93,12 +88,10 @@ public class MapperEngine implements ItemListener, ComponentListener {
         vv.getRenderContext().setLabelOffset( 5 );
 
         PluggableGraphMouse pgm = new PluggableGraphMouse();
-        pgm.add( new MapperPickingGraphMousePlugin<Room, Exit>( MouseEvent.BUTTON1_MASK, MouseEvent.BUTTON3_MASK ) );
+        pgm.add( new MapperPickingGraphMousePlugin( MouseEvent.BUTTON1_MASK, MouseEvent.BUTTON3_MASK ));
         pgm.add( new TranslatingGraphMousePlugin( MouseEvent.BUTTON1_MASK ) );
         scaler = new ScalingGraphMousePlugin( new CrossoverScalingControl(), 0, 1 / 1.1f, 1.1f );
         pgm.add( scaler );
-        mousePlugin = new MapperEditingGraphMousePlugin( this );
-        pgm.add( mousePlugin );
         vv.setGraphMouse( pgm );
         panel = new MapperPanel( this );
     }
@@ -182,7 +175,7 @@ public class MapperEngine implements ItemListener, ComponentListener {
     }
 
 
-    protected void repaint() {
+    public void repaint() {
         vv.repaint();
     }
 
@@ -214,7 +207,7 @@ public class MapperEngine implements ItemListener, ComponentListener {
             currentRoom.setCurrent( false );
             if (currentRoom.isPicked()) {
                 setRoomDescsForRoom( newRoom, longDesc, shortDesc, indoors, exits );
-                thisRoomIsPicked( newRoom );
+                singleRoomPicked( newRoom );
 
             }
         }
@@ -235,7 +228,8 @@ public class MapperEngine implements ItemListener, ComponentListener {
             saveCurrentArea();
             this.area = null;
             currentRoom = null;
-            pickedRoom = null;
+
+            pickedState.clear();
             this.graph = new SparseMultigraph<Room, Exit>();
             mapperLayout.setGraph( graph );
             Room nullRoom = null;
@@ -322,61 +316,65 @@ public class MapperEngine implements ItemListener, ComponentListener {
         Object subject = e.getItem();
         if (subject instanceof Room) {
             Room tempRoom = (Room) subject;
-            if (pickedState.isPicked( tempRoom )) {
-                thisRoomIsPicked( tempRoom );
-                repaint();
+            if(e.getStateChange() == ItemEvent.SELECTED){
+                pickedState.pick(tempRoom, true);
+                tempRoom.setPicked(true);
+
+            }else if(e.getStateChange() == ItemEvent.DESELECTED){
+                pickedState.pick(tempRoom, false);
+                tempRoom.setPicked(false);
             }
+            repaint();
+        }
+        if(pickedState.getPicked().size() == 1){
+            singleRoomPicked(pickedState.getPicked().iterator().next());
+        }else{
+            this.panel.setTextForDescs( "", "", "", null );
         }
 
     }
 
     public void changeRoomColor( Color color ) {
-        if (this.pickedRoom != null) {
-            this.pickedRoom.setColor( color );
-            repaint();
+        for(Room room: pickedState.getPicked()){
+            room.setColor(color);
         }
+        repaint();
 
     }
 
 
-    protected void thisRoomIsPicked( Room tempRoom ) {
-        drawRoomAsPicked( pickedRoom, false );
-        drawRoomAsPicked( tempRoom, true );
-        pickedRoom = tempRoom;
-        this.panel.setTextForDescs( pickedRoom.getShortDesc(), pickedRoom.getLongDesc(), makeExitsStringFromPickedRoom(), pickedRoom );
+    protected void singleRoomPicked( Room room ) {
+        this.panel.setTextForDescs( room.getShortDesc(), room.getLongDesc(), makeExitsStringFromPickedRoom(room), room );
+
+
     }
 
-    protected String makeExitsStringFromPickedRoom() {
-        Collection<Exit> outExits = graph.getOutEdges( pickedRoom );
-        StringBuilder exitString = new StringBuilder();
-        if (outExits != null) {
-            Iterator<Exit> exitIterator = outExits.iterator();
+    protected String makeExitsStringFromPickedRoom(Room room) {
 
-            while (exitIterator.hasNext()) {
-                Exit exit = exitIterator.next();
-                pickedRoom.getExits().add( exit.getExit() );
+            Collection<Exit> outExits = graph.getOutEdges(room);
+            StringBuilder exitString = new StringBuilder();
+            if (outExits != null) {
+                Iterator<Exit> exitIterator = outExits.iterator();
+
+                while (exitIterator.hasNext()) {
+                    Exit exit = exitIterator.next();
+                    room.getExits().add(exit.getExit());
+                }
             }
-        }
 
-        Iterator<String> roomExitIterator = pickedRoom.getExits().iterator();
-        while (roomExitIterator.hasNext()) {
-            exitString.append( roomExitIterator.next() );
-            if (roomExitIterator.hasNext()) {
-                exitString.append( ", " );
+            Iterator<String> roomExitIterator = room.getExits().iterator();
+            while (roomExitIterator.hasNext()) {
+                exitString.append(roomExitIterator.next());
+                if (roomExitIterator.hasNext()) {
+                    exitString.append(", ");
+                }
             }
-        }
 
 
-        return exitString.toString();
-    }
-
-
-    private void drawRoomAsPicked( Room room, boolean isPicked ) {
-        if (room != null) {
-            room.setPicked( isPicked );
-        }
+            return exitString.toString();
 
     }
+
 
 
     public VisualizationViewer<Room, Exit> getVV() {
@@ -426,11 +424,11 @@ public class MapperEngine implements ItemListener, ComponentListener {
     }
 
 
-    public void redraw() {
-        this.mapperLayout.reDrawFromRoom( pickedRoom, this.mapperLayout.transform( pickedRoom ) );
-        repaint();
-
-    }
+//    public void redraw() {
+//        this.mapperLayout.reDrawFromRoom( pickedRoom, this.mapperLayout.transform( pickedRoom ) );
+//        repaint();
+//
+//    }
 
 
     public SparseMultigraph<Room, Exit> getGraph() {
