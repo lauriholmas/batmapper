@@ -160,10 +160,10 @@ public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
         PickedState<Room> pickedVertexState = vv.getPickedVertexState();
         PickedState<Exit> pickedEdgeState = vv.getPickedEdgeState();
         if (pickSupport != null && pickedVertexState != null) {
-            if (e.getClickCount() == 2 && ! e.isConsumed() && pickSupport.getVertex( vv.getGraphLayout(), e.getPoint().getX(), e.getPoint().getY() ) != null) {
-                e.consume();
-                System.out.println( "2clicketyclick, maybe on something" );
-            }
+//            if (e.getClickCount() == 2 && ! e.isConsumed() && pickSupport.getVertex( vv.getGraphLayout(), e.getPoint().getX(), e.getPoint().getY() ) != null) {
+//                e.consume();
+//                System.out.println( "2clicketyclick, maybe on something" );
+//            }
 
             Layout<Room, Exit> layout = vv.getGraphLayout();
             if (e.getModifiers() == modifiers) {
@@ -320,29 +320,68 @@ public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
     }
 
     /**
-     * If clicking on room, it will select it
      *
-     * if shift, clicking, it will add/remove it from multiselection
      *
-     * if right clicking, open deletion
+     * Click on room to select
+     * shift-click on room to add/remove to/from selected group
+     * right-click on selected room to ask for deletion
+     *
+     * click on exit to select
+     * right-click on exit to ask for exit change/deletion
      *
      *
      * @param e
      */
     public void mouseClicked( MouseEvent e ) {
+
         VisualizationViewer<Room, Exit> vv = (VisualizationViewer) e.getSource();
         PickedState<Room> pickedState = vv.getPickedVertexState();
         Room clickedRoom = vv.getPickSupport().getVertex(vv.getGraphLayout(), e.getX(), e.getY());
 
+        Exit clickedExit = vv.getPickSupport().getEdge(vv.getGraphLayout(),e.getX(), e.getY());
+
+        if (e.getClickCount() == 2 && ! e.isConsumed() && clickedExit != null && clickedRoom == null) {
+            //double click on exit, invoke edit option
+            String exitDir = (String) JOptionPane.showInputDialog(
+                    vv,
+                    "What do you want to change the exit to?",
+                    "Exit edit",
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    null,
+                    clickedExit.getExit() );
+
+            if (exitDir != null && ! exitDir.equals( "" )) {
+                clickedExit.setExit(exitDir);
+            }
+            vv.getPickedEdgeState().clear();
+            return;
+        }
         if(e.getModifiers() == MouseEvent.BUTTON3_MASK){
-
-            int response =  JOptionPane.showConfirmDialog(vv,"Do you wish to delete "+pickedState.getPicked().size()+" rooms?","Room deletion confirmation", JOptionPane.YES_NO_OPTION);
-            if( response == JOptionPane.YES_OPTION){
-                for(Room deletedRoom: pickedState.getPicked()){
-                    vv.getGraphLayout().getGraph().removeVertex(deletedRoom);
-
+            //right click is for deletion
+            if(clickedRoom != null && pickedState.isPicked(clickedRoom)){
+                //right click on room ask to delete selected
+                String roomdesc = clickedRoom.getShortDesc();
+                if(pickedState.getPicked().size() > 1){
+                    roomdesc = ""+pickedState.getPicked().size()+" rooms";
                 }
+                int response =  JOptionPane.showConfirmDialog(vv,"Do you wish to delete?\n"+roomdesc,"Room delete", JOptionPane.YES_NO_OPTION);
+                if( response == JOptionPane.YES_OPTION){
+                    for(Room deletedRoom: pickedState.getPicked()){
+                        vv.getGraphLayout().getGraph().removeVertex(deletedRoom);
+                    }
+                    pickedState.clear();
+                }
+            }else if(clickedExit != null && clickedRoom == null){
+                //right click on exit, ask to delete
+                vv.getPickedEdgeState().clear();
                 pickedState.clear();
+                vv.getPickedEdgeState().pick(clickedExit, true);
+                int retVal = JOptionPane.showConfirmDialog(vv, "Do you wish to delete this exit?\n"+clickedExit.getExit(), "Exit delete", JOptionPane.YES_NO_OPTION);
+                if(retVal == JOptionPane.YES_OPTION){
+                    vv.getGraphLayout().getGraph().removeEdge(clickedExit);
+                    vv.getPickedEdgeState().clear();
+                }
             }
             return;
         }
