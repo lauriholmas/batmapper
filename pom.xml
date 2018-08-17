@@ -4,7 +4,7 @@
 
     <groupId>com.glaurung</groupId>
     <artifactId>batUtils</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4.1</version>
     <packaging>jar</packaging>
 
     <name>batUtils</name>
