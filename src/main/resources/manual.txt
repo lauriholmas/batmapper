@@ -41,17 +41,18 @@ Only exits you use will be added into the map as links between rooms. Exits used
 	
 	Controls
 	
-White rim around a room is the selected one, click on another room to change selection.
+Cyan rim around a room is the selected one. Shift click on a room to add/remove it to/from selected rooms.
+Right button drag can select an area of rooms.
+Right-click on room to prompt for deletion of selecteds.
+Right click on exit to prompt for deletion.
 Red rim around a room is where you currently are, move to another room to change this.
-If you have selected the room you are in ( ie, white and red rims) the selection will move with you.
+If you have selected the room you are in ( ie, cyan and red rims) the selection will move with you.
 
-- Doubleclicking on an exit between rooms will allow you to change it, ie: from enter -> enter fireplace, empty name will remove it
-- Doubleclicking on the black background will toggle between only map and map+descs. 
+- Doubleclicking on an exit between rooms will allow you to change it, ie: from enter -> enter fireplace.
 - Clicking and dragging a room will move that room around, the exits will adjust. 
 - Dragging the background will allow you to move the whole map around.
 - Mouse scrolling will zoom in and out
 - Click and drag ( rightclick ) on the background will allow you to make a selection of rooms, these can then be moved around together.
-- Hold control down while starting to drag a room will add a new exit between the startroom and the room you release the button over, a dialog will pop up about what the exit shall be.
 - Select a room and change the coloring from the coloring dropdown ( says normal if no color) to change the color of that maproom.
 	
 	Common WTF?!?!?!?!
@@ -64,7 +65,7 @@ In some area ( arelium, skeep, tyr farwyn) everything ends up getting messed up.
 
 Aww damn I messed up my map, its a messy garble, I'd rather start from scratch! - Its fine, just move away from the area, find the mapfile in your filesystem, and delete it. The .batmap files are placed in a directory called batMapArea, they are named by some ingame name for the area. The directory is created under plugins directory under batclient installation.
 
-Hey man, why you update so rarely? come on! - I'm currently very limited in my time with 2 young kids, I also wanna play the game too.
+Hey man, why you update so rarely? come on! - I'm currently very limited in my time with 3 young kids, I also wanna play the game too.
 
 	Known issues
 
