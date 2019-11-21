@@ -1,0 +1,23 @@
+SCRIPT_NAME = "pgiver";
+SCRIPT_DESC = "Count paingiver repu";
+SCRIPT_OFF = false;
+
+void bootup() {
+	triggerManager.newTrigger(
+	"pgiver_counter",
+	"^The Paingiver's runes are glowing eerily: \\[([#]*)([@]*)([\\*]*)([:]*)([.]*)([_]*)\\]$",
+	"$"+SCRIPT_NAME+".count",true,false,false,null,Font.PLAIN);
+}
+
+void count() {
+	int progress=0;
+	String fives=vars.get(1);
+	String fours=vars.get(2);
+	String threes=vars.get(3);
+	String twos=vars.get(4);
+	String ones=vars.get(5);
+	progress=fives.length()*5 + fours.length()*4 + threes.length()*3 + twos.length()*2 + ones.length();
+	clientGUI.printText("general", "The Paingiver's runes are glowing eerily: "+progress+"%\n");
+
+}
+
