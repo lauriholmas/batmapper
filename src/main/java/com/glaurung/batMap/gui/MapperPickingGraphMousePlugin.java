@@ -255,17 +255,19 @@ public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
                 Point2D graphPoint = vv.getRenderContext().getMultiLayerTransformer().inverseTransform( p );
                 Point2D graphDown = vv.getRenderContext().getMultiLayerTransformer().inverseTransform( down );
                 Layout<Room, Exit> layout = vv.getGraphLayout();
-                double dx = graphPoint.getX() - graphDown.getX();
-                double dy = graphPoint.getY() - graphDown.getY();
-                PickedState<Room> ps = vv.getPickedVertexState();
+                double dx = calcAlignedDelta(graphPoint.getX() - graphDown.getX());
+                double dy = calcAlignedDelta(graphPoint.getY() - graphDown.getY());
+                
+                if (dx != 0 || dy != 0) {
+                    PickedState<Room> ps = vv.getPickedVertexState();
 
-                for (Room v : ps.getPicked()) {
-                    Point2D vp = layout.transform( v );
-                    vp.setLocation( vp.getX() + dx, vp.getY() + dy );
-                    layout.setLocation( v, vp );
+                    for (Room v : ps.getPicked()) {
+                        Point2D vp = layout.transform(v);
+                        vp.setLocation(vp.getX() + dx, vp.getY() + dy);
+                        layout.setLocation(v, vp);
+                    }
+                    down = p;
                 }
-                down = p;
-
             } else {
                 Point2D out = e.getPoint();
                 if (e.getModifiers() == this.addToSelectionModifiers ||
@@ -433,5 +435,12 @@ public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
      */
     public void setLocked( boolean locked ) {
         this.locked = locked;
+    }
+
+    /**
+     * Align delta value to be always times of `2 * ROOM_SIZE`
+     */
+    public double calcAlignedDelta(double delta) {
+        return Math.round(delta / (2 * DrawingUtils.ROOM_SIZE)) * 2 * DrawingUtils.ROOM_SIZE;
     }
 }
