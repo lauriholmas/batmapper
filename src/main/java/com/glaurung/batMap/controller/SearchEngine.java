@@ -44,8 +44,9 @@ public class SearchEngine extends MapperEngine implements ItemListener {
             }
         }
 
-        pickedRoom = room;
-        this.panel.setTextForDescs( pickedRoom.getShortDesc(), pickedRoom.getLongDesc(), makeExitsStringFromPickedRoom(), pickedRoom );
+        singleRoomPicked(room);
+//        pickedRoom = room;
+//        this.panel.setTextForDescs( pickedRoom.getShortDesc(), pickedRoom.getLongDesc(), makeExitsStringFromPickedRoom(), pickedRoom );
         repaint();
         moveMapToStayWithCurrentRoom();
     }

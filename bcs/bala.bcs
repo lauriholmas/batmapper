@@ -1,0 +1,72 @@
+
+
+// type '$bala' to check timer
+// type '$bala do' to try to balance sleeves
+// type '$bala chk' to check current diff
+
+SCRIPT_NAME = "bala";
+
+public class BalaThread extends Thread{
+
+    public BalaThread(){
+        this.start();
+    }
+    public void run(){
+        try{
+            sleep(25*60*1000); // 25 minutes as milliseconds
+        }catch(Exception e){
+            clientGUI.printText("general","Some exception in sleeves balance timer thread"+"\n");
+        }
+        clientGUI.printText("general", "Sleeves ready to balance\n");
+    }
+}
+
+    int diff = 666; //just something big enough to block from balancing before getting actual results from sc
+    long balanceTime = 0;
+    int lowerLimit = 250;   //below this limit, won't try to balance
+    int upperLimit = 400;   //aboce this limit, won't try to balance
+    void bootup(){
+        // you probably have to tweak this trig to match your sc
+
+
+        //this trigger is made to match the sc:
+        //Hp:{diffhp}/{colorhp} Sp:{diffsp}/{colorsp}
+        triggerManager.newTrigger("balanceScTrig", "^Hp:[0-9]+/([0-9]+) Sp:[0-9]+/([0-9]+)", "$"+SCRIPT_NAME+".status", false, false, false, null, Font.PLAIN);
+
+
+        //you can replace it with this if your sc matches:
+        //Hp:1777 (1777)  Sp:38 (38)
+        //triggerManager.newTrigger("balanceScTrig", "^Hp:[0-9]+ \\(([0-9]+)\\)  Sp:[0-9]+ \\(([0-9]+)\\)", "$"+SCRIPT_NAME+".status", false, false, false, null, Font.PLAIN);
+
+    }
+
+    void run(){
+        if (argument == null || ("".equals(argument))){
+            if(balanceTime == 0){
+                clientGUI.printText("general", "Haven't balanced since trig reload"+"\n");
+            }else{
+                long now = System.currentTimeMillis()/1000;
+                int secondsSince = (now - balanceTime);
+                clientGUI.printText("general", "Time since last balance "+secondsSince/60+":"+secondsSince%60+"\n");
+            }
+        }else if ("do".equals(argument)){
+            //if you want to change the range on when to actually balance, change t
+            if(diff >= lowerLimit && diff <= upperLimit){
+                net.send("balance");
+                balanceTime = System.currentTimeMillis()/1000;
+                new BalaThread();
+            }else{
+                clientGUI.printText("general", "Difference between hp & sp is "+diff+", not a good time to balance."+"\n");
+            }
+        }else if("chk".equals(argument)){
+            clientGUI.printText("general", "Diff is "+diff+"\n");
+        }
+    }
+
+    void status(){
+        int hp = Integer.parseInt(vars.get(1));
+        int sp = Integer.parseInt(vars.get(2));
+        diff = hp-sp;
+    }
+
+

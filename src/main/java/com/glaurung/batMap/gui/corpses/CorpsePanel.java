@@ -88,7 +88,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
     private CorpseCheckBox lichdrain = new CorpseCheckBox( "lich drain soul", false, "lich drain", this, font );
     private CorpseCheckBox kharimsoul = new CorpseCheckBox( "kharim drain soul", false, "kharim drain", this, font );
     private CorpseCheckBox kharimSoulCorpse = new CorpseCheckBox( "kharim dest corpse", false, null, this, font );
-    private CorpseCheckBox tsaraksoul = new CorpseCheckBox( "tzarak drain soul", false, "tzarak drain soul", this, font );
+    private CorpseCheckBox tsaraksoul = new CorpseCheckBox( "tzarakk chaosfeed", false, "tzarakk chaosfeed corpse", this, font );
     private CorpseCheckBox ripSoulToKatana = new CorpseCheckBox( "shitKatana rip soul", false, "rip soul from corpse", this, font );
     private CorpseCheckBox arkemile = new CorpseCheckBox( "necrostaff arkemile", false, "say arkemile", this, font );
     private CorpseCheckBox gac = new CorpseCheckBox( "get all from corpse", false, "get all from corpse", this, font );
@@ -407,9 +407,6 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
         if (kharimSoulCorpse.isSelected()) {
             rip += kharimSoulCorpse.getEffect() + this.model.getDelim();
         }
-        if (tsaraksoul.isSelected()) {
-            rip += tsaraksoul.getEffect() + this.model.getDelim();
-        }
         if (ripSoulToKatana.isSelected()) {
             rip += ripSoulToKatana.getEffect() + this.model.getDelim();
         }
@@ -419,6 +416,9 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
         }
         if (lootCorpse.isSelected()) {
             rip += lootCorpse.getEffect() + this.model.getDelim();
+        }
+        if (tsaraksoul.isSelected()) {
+            rip += tsaraksoul.getEffect() + this.model.getDelim();
         }
         if (arkemile.isSelected()) {
             rip += arkemile.getEffect() + this.model.getDelim();

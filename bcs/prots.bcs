@@ -1,0 +1,140 @@
+
+
+// type $prots in general to enable/disable party prots window. feel free to resize/move window as necessary. 
+// if you wish you change the frequency of party prots, look for "int seconds = 3" and change the number
+
+
+SCRIPT_NAME = "prots";
+
+import java.util.regex.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.BorderLayout;
+import java.awt.Font;
+
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import com.mythicscape.batclient.interfaces.BatWindow;
+import com.mythicscape.batclient.interfaces.ParsedResult;
+import com.mythicscape.batclient.interfaces.Trigger;
+import com.mythicscape.batclient.interfaces.TriggerManager;
+
+BatWindow clientWin;
+boolean visible=true;
+JTextArea text;
+JPanel panel;
+Trigger start;
+Trigger line1;
+Trigger line2;
+Trigger line3;
+Trigger end;
+
+
+public class ProtsTimerThread extends Thread{
+	int seconds = 3;
+	String command = "party prots";
+	
+	public ProtsTimerThread(){
+		this.start();
+	}
+
+	public void run(){
+	
+		do{
+			try{
+				sleep(seconds*1000);
+			}catch(Exception e){
+				clientGui.printText("general","Some exception in partyprots window thread");
+			}
+			net.send(command);
+		}while(true);
+	}
+}
+
+
+ProtsTimerThread thread;
+
+
+void bootup(){
+
+    trigs = new LinkedList();
+
+    clientWin = clientGUI.createBatWindow( "TEST", 100, 100, 400, 200 );
+    clientWin.removeTabAt( 0 );
+    createPanel();
+    clientWin.newTab( "party prots", panel);
+
+	start = triggerManager.newTrigger("partyProts1", "^[ ]+,[+-]+.$", "$"+SCRIPT_NAME+".start", true, false, false, null, Font.PLAIN );
+	line1 = triggerManager.newTrigger("partyProts2", "^[ ]+([A-Za-z| ])+$", "$"+SCRIPT_NAME+".line", true, false, false, null, Font.PLAIN);
+	line2 = triggerManager.newTrigger("partyProts3", "^,[+-]+$", "$"+SCRIPT_NAME+".line", true, false, false, null, Font.PLAIN);
+	line3 = triggerManager.newTrigger("partyProts4", "^\\|[A-Za-z+ ]+\\|[X: 0-9|]+\\|$", "$"+SCRIPT_NAME+".line", true, false, false, null, Font.PLAIN);
+	end = triggerManager.newTrigger("partyProts5", "^`[+-]+'$", "$"+SCRIPT_NAME+".end", true, false, false, null, Font.PLAIN);
+		
+
+    enable();
+
+}
+
+void start(){
+	text.setText("");
+	text.setText(vars.get(0));
+}
+
+void line(){
+	text.append(vars.get(0));
+}
+
+void end(){
+	text.append(vars.get(0));
+}
+
+void run(){
+
+    if (argument == null || ("".equals(argument))){
+        if(visible){
+        	visible = false;
+        	disable();
+
+        }else{
+        	visible = true;
+        	enable();
+        }
+    }else{
+        text.setText(argument);
+        }
+}
+
+void enable(){
+	clientWin.setVisible( true );
+	start.setActive(true);
+	line1.setActive(true);
+	line2.setActive(true);
+	line3.setActive(true);
+	end.setActive(true);
+	thread = new ProtsTimerThread();
+}
+
+void disable(){
+	clientWin.setVisible( false );
+	start.setActive(false);
+	line1.setActive(false);
+	line2.setActive(false);
+	line3.setActive(false);
+	end.setActive(false);
+	thread.interrupt();
+}
+
+void createPanel(){
+    panel = new JPanel(new BorderLayout());
+    text= new JTextArea();
+    text.setEditable( false );
+    text.setForeground( Color.LIGHT_GRAY );
+    text.setBackground( Color.BLACK );
+    text.setLineWrap( true );
+    text.setFont(new Font( "Monospaced", Font.PLAIN, 12 ));
+    panel.add(text,BorderLayout.CENTER);
+
+}
+
+
