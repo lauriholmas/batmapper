@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JOptionPane;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -274,7 +275,10 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 	    engine.save();
 	} else if (e.getSource().equals( clearButton )) {
 	    System.out.println("pressed clear.");
-	    engine.clearCurrentArea();
+	    int input = JOptionPane.showConfirmDialog(null, "This will clear ALL data and notes associated with this area. Are you sure?");
+	    if (input == JOptionPane.OK_OPTION) {
+		engine.clearCurrentArea();
+	    }
 	}
     }
 
