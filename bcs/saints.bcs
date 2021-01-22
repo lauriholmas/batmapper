@@ -15,13 +15,13 @@ void bootup() {
 
     triggerManager.newTrigger(
         "nunCurrentPatron",
-        "^[ ]+St. ([A-Za-z]+) is today the patron saint of nuns.",
+        "^    St. ([A-Za-z]+) is today the patron saint of nuns.$",
         "$"+SCRIPT_NAME+".echoSaintLogin",
         true,false,false,null,Font.PLAIN);
 
     triggerManager.newTrigger(
         "nunCurrentPatronCheck",
-        "^St. ([A-Za-z]+) is currently the patron saint of all nuns.",
+        "^St. ([A-Za-z]+) is currently the patron saint of all nuns.$",
         "$"+SCRIPT_NAME+".echoSaintLogin",
         true,false,false,null,Font.PLAIN);
 
