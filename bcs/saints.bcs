@@ -51,7 +51,7 @@ void echoSaintList(){
     String fullLine = vars.get(0);
     String saint = vars.get(1);
     String effect = saints.get(saint);
-    clientGUI.printText("general", fullLine+" | "+effect+"\n");
+    clientGUI.printText("general", fullLine+"  | "+effect+"\n");
 }
 
 void initMap(){
