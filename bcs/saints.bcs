@@ -10,29 +10,41 @@ void bootup() {
     triggerManager.newTrigger(
     "nunRestoreBegins",
     "^Sister [A-Za-z]+ begins to restore St. ([A-Za-z]+).$",
-    "$"+SCRIPT_NAME+".echoSaint",
+    "$"+SCRIPT_NAME+".echoSaintRestoreStart",
     true,false,false,null,Font.PLAIN);
 
     triggerManager.newTrigger(
         "nunCurrentPatron",
         "^St. ([A-Za-z]+) is currently the patron saint of all nuns.",
-        "$"+SCRIPT_NAME+".echoSaint",
+        "$"+SCRIPT_NAME+".echoSaintLogin",
         true,false,false,null,Font.PLAIN);
 
     triggerManager.newTrigger(
         "nunRestoreSaintsList",
         "^  \\| St. ([A-Za-z]+).*$",
-        "$"+SCRIPT_NAME+".echoSaint",
+        "$"+SCRIPT_NAME+".echoSaintList",
         true,false,false,null,Font.PLAIN);
 }
 
-
-void echoSaint(){
+void echoSaintRestoreStart(){
     String fullLine = vars.get(0);
     String saint = vars.get(1);
     String effect = saints.get(saint);
-    clientGUI.printText("general", fullLine.trim()+effect+"\n", "FFFFFF");
+    clientGUI.printText("general", fullLine+effect+"\n", "FFFFFF");
+}
 
+void echoSaintLogin(){
+    String fullLine = vars.get(0);
+    String saint = vars.get(1);
+    String effect = saints.get(saint);
+    clientGUI.printText("general", fullLine+effect+"\n")'
+}
+
+void echoSaintList(){
+    String fullLine = vars.get(0);
+    String saint = vars.get(1);
+    String effect = saints.get(saint);
+    clientGUI.printText("general", fullLine+" | "+effect+"\n")'
 }
 
 void initMap(){
