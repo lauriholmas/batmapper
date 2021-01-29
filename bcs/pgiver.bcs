@@ -17,6 +17,6 @@ void count() {
 	String twos=vars.get(5);
 	String ones=vars.get(6);
 	progress=fives.length()*5 + fours.length()*4 + threes.length()*3 + twos.length()*2 + ones.length();
-	clientGUI.printText("general", "The Paingiver's runes are "+vars.get(1)+"": "+progress+"%\n");
+	clientGUI.printText("general", "The Paingiver's runes are "+vars.get(1)+": "+progress+"%\n");
 
 }
