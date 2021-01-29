@@ -5,7 +5,7 @@ SCRIPT_OFF = false;
 void bootup() {
 	triggerManager.newTrigger(
 	"pgiver_counter",
-	"^The Paingiver's runes are glowing eerily: \\[([#]*)([@]*)([\\*]*)([:]*)([.]*)([_]*)\\]$",
+	"^The Paingiver's runes are (glowing eerily|sizzling caustically): \\[([#]*)([@]*)([\\*]*)([:]*)([.]*)([_]*)\\]$",
 	"$"+SCRIPT_NAME+".count",true,false,false,null,Font.PLAIN);
 }
 
@@ -20,4 +20,3 @@ void count() {
 	clientGUI.printText("general", "The Paingiver's runes are glowing eerily: "+progress+"%\n");
 
 }
-
