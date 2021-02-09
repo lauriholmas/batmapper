@@ -30,6 +30,12 @@ void bootup() {
         "^  \\| St. ([A-Za-z]+).*$",
         "$"+SCRIPT_NAME+".echoSaintList",
         true,false,false,null,Font.PLAIN);
+		
+	triggerManager.newTrigger(
+		"nunRestoreSuccess",
+		"^[A-Za-z]+ successfully recites scroll of St. ([A-Za-z]+), recovered by [A-Za-z]+.$",
+		"$"+SCRIPT_NAME+".echoSaintRestoreSuccess",
+		true,false,false,null,Font.PLAIN);
 
 }
 
@@ -37,7 +43,7 @@ void echoSaintRestoreStart(){
     String fullLine = vars.get(0);
     String saint = vars.get(1);
     String effect = saints.get(saint);
-    clientGUI.printText("general", fullLine+effect+"\n", "FFFFFF");
+    clientGUI.printText("general", fullLine+"    "+effect+"\n", "FFFFFF");
 }
 
 void echoSaintLogin(){
@@ -52,6 +58,13 @@ void echoSaintList(){
     String saint = vars.get(1);
     String effect = saints.get(saint);
     clientGUI.printText("general", fullLine+"  | "+effect+"\n");
+}
+
+void echoSaintRestoreSuccess(){
+    String fullLine = vars.get(0);
+    String saint = vars.get(1);
+    String effect = saints.get(saint);
+    clientGUI.printText("general", fullLine+"    "+effect+"\n", "FFFFFF");
 }
 
 void initMap(){
