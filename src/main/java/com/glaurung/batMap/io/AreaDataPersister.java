@@ -37,6 +37,25 @@ public class AreaDataPersister {
 
 
     private static void saveData( AreaSaveObject saveObject ) throws IOException {
+	String baseName = saveObject.getFileName();
+	File baseFile = new File( saveObject.getFileName() );
+	File target = null;
+	long timestamp = Long.MAX_VALUE;
+	if (baseFile.exists()) {
+	    for (int i = 0; i < 5; i++) {
+		File backup = new File ( saveObject.getFileName() + "." + i + ".bk" );
+		if (!backup.exists()) {
+		    target = backup;
+		    break;
+		} else if (backup.lastModified() < timestamp) {
+		    timestamp = backup.lastModified();
+		    target = backup;
+		}
+	    }
+	    System.out.println("Renaming " + baseFile + " to " + target);
+	    baseFile.renameTo(target);
+	}
+	
         FileOutputStream fileOutputStream = new FileOutputStream( new File( saveObject.getFileName() ) );
         ObjectOutputStream objectOutputStream = new ObjectOutputStream( fileOutputStream );
         objectOutputStream.writeObject( saveObject );

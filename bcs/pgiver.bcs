@@ -5,19 +5,18 @@ SCRIPT_OFF = false;
 void bootup() {
 	triggerManager.newTrigger(
 	"pgiver_counter",
-	"^The Paingiver's runes are glowing eerily: \\[([#]*)([@]*)([\\*]*)([:]*)([.]*)([_]*)\\]$",
+	"^The Paingiver's runes are (glowing eerily|sizzling caustically): \\[([#]*)([@]*)([\\*]*)([:]*)([.]*)([_]*)\\]$",
 	"$"+SCRIPT_NAME+".count",true,false,false,null,Font.PLAIN);
 }
 
 void count() {
 	int progress=0;
-	String fives=vars.get(1);
-	String fours=vars.get(2);
-	String threes=vars.get(3);
-	String twos=vars.get(4);
-	String ones=vars.get(5);
+	String fives=vars.get(2);
+	String fours=vars.get(3);
+	String threes=vars.get(4);
+	String twos=vars.get(5);
+	String ones=vars.get(6);
 	progress=fives.length()*5 + fours.length()*4 + threes.length()*3 + twos.length()*2 + ones.length();
-	clientGUI.printText("general", "The Paingiver's runes are glowing eerily: "+progress+"%\n");
+	clientGUI.printText("general", "The Paingiver's runes are "+vars.get(1)+": "+progress+"%\n");
 
 }
-
