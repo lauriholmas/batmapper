@@ -300,6 +300,17 @@ public class MapperEngine implements ItemListener, ComponentListener {
         saveCurrentArea();
     }
 
+    public void clearCurrentArea() {
+	String areaName = area.getName();
+	AreaSaveObject areaSaveObject = new AreaSaveObject();
+	this.graph = areaSaveObject.getGraph();
+	mapperLayout.setGraph( graph );
+	mapperLayout.displayLoadedData( areaSaveObject );
+	this.area = new Area( areaName );
+	this.currentRoom = null;
+	repaint();
+    }
+
     private Room getRoomFromGraph( String uid ) {
         for (Room room : this.graph.getVertices()) {
             if (room.getId().equals( uid )) {
