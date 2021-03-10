@@ -22,7 +22,7 @@ import edu.uci.ics.jung.visualization.picking.RadiusPickSupport;
  */
 public class MapperLayout extends AbstractLayout<Room, Exit> {
 
-    boolean snapMode = false;
+    boolean snapMode = true;
 
     public MapperLayout( Graph<Room, Exit> graph ) {
         super( graph );

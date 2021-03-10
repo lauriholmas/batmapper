@@ -59,7 +59,7 @@ public class MapperEngine implements ItemListener, ComponentListener {
     BatWindow batWindow;
     ScalingGraphMousePlugin scaler;
     MapperPickingGraphMousePlugin mapperPickingGraphMousePlugin;
-    boolean snapMode = false;
+    boolean snapMode = true;
 
     public MapperEngine( SparseMultigraph<Room, Exit> graph ) {
         this();

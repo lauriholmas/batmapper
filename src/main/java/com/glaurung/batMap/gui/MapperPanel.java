@@ -167,6 +167,7 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
         snapToggleButton.setBounds( BUTTON_WIDTH + BORDERLINE+BUTTON_WIDTH + BORDERLINE,
             SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE + BUTTON_HEIGHT + BORDERLINE, BUTTON_WIDTH, BUTTON_HEIGHT );
         snapToggleButton.setToolTipText( "Toggle room location snapping" );
+        snapToggleButton.setSelected(true);
         snapToggleButton.addActionListener( this );
 
 

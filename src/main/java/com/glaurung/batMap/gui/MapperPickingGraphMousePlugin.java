@@ -80,7 +80,7 @@ public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
      */
     protected Color lensColor = Color.cyan;
 
-    private boolean snapmode = false;
+    private boolean snapmode = true;
 
     /**
      * create an instance with default settings
