@@ -22,8 +22,14 @@ import edu.uci.ics.jung.visualization.picking.RadiusPickSupport;
  */
 public class MapperLayout extends AbstractLayout<Room, Exit> {
 
+    boolean snapMode = false;
+
     public MapperLayout( Graph<Room, Exit> graph ) {
         super( graph );
+    }
+
+    public void setSnapMode(boolean snapmode){
+        this.snapMode = snapmode;
     }
 
     @Override
@@ -64,7 +70,7 @@ public class MapperLayout extends AbstractLayout<Room, Exit> {
         Collection<Exit> exits = this.graph.getOutEdges( room );
         for (Exit exit : exits) {
             Room other = getOtherEndOfExit( exit, room );
-            Point2D positionForOtherRoom = DrawingUtils.getRelativePosition( location, exit );
+            Point2D positionForOtherRoom = DrawingUtils.getRelativePosition( location, exit, snapMode);
             positionForOtherRoom = getValidLocation( positionForOtherRoom );
             iterativeDrawing( other, positionForOtherRoom );
         }

@@ -58,6 +58,8 @@ public class MapperEngine implements ItemListener, ComponentListener {
     String baseDir;
     BatWindow batWindow;
     ScalingGraphMousePlugin scaler;
+    MapperPickingGraphMousePlugin mapperPickingGraphMousePlugin;
+    boolean snapMode = false;
 
     public MapperEngine( SparseMultigraph<Room, Exit> graph ) {
         this();
@@ -88,7 +90,8 @@ public class MapperEngine implements ItemListener, ComponentListener {
         vv.getRenderContext().setLabelOffset( 5 );
 
         PluggableGraphMouse pgm = new PluggableGraphMouse();
-        pgm.add( new MapperPickingGraphMousePlugin( MouseEvent.BUTTON1_MASK, MouseEvent.BUTTON3_MASK ));
+        mapperPickingGraphMousePlugin = new MapperPickingGraphMousePlugin( MouseEvent.BUTTON1_MASK, MouseEvent.BUTTON3_MASK );
+        pgm.add( mapperPickingGraphMousePlugin);
         pgm.add( new TranslatingGraphMousePlugin( MouseEvent.BUTTON1_MASK ) );
         scaler = new ScalingGraphMousePlugin( new CrossoverScalingControl(), 0, 1 / 1.1f, 1.1f );
         pgm.add( scaler );
@@ -154,7 +157,7 @@ public class MapperEngine implements ItemListener, ComponentListener {
 
             if (currentRoom != null) {
                 Point2D oldroomLocation = mapperLayout.transform( currentRoom );
-                Point2D relativeLocation = DrawingUtils.getRelativePosition( oldroomLocation, exit );
+                Point2D relativeLocation = DrawingUtils.getRelativePosition( oldroomLocation, exit, this.snapMode );
 //				relativeLocation = getValidLocation(relativeLocation);
                 relativeLocation = mapperLayout.getValidLocation( relativeLocation );
                 vv.getGraphLayout().setLocation( newRoom, relativeLocation );
@@ -282,6 +285,7 @@ public class MapperEngine implements ItemListener, ComponentListener {
         }
 
     }
+
 
 
     protected void saveCurrentArea() {
@@ -502,6 +506,12 @@ public class MapperEngine implements ItemListener, ComponentListener {
 
     public ScalingGraphMousePlugin getScaler() {
         return scaler;
+    }
+
+    public void setRoomSnapping(boolean roomsWillSnapIntoPlaces){
+        this.snapMode = roomsWillSnapIntoPlaces;
+        mapperPickingGraphMousePlugin.setSnapmode(roomsWillSnapIntoPlaces);
+        this.mapperLayout.setSnapMode(roomsWillSnapIntoPlaces);
     }
 
 }

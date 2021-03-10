@@ -80,6 +80,8 @@ public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
      */
     protected Color lensColor = Color.cyan;
 
+    private boolean snapmode = false;
+
     /**
      * create an instance with default settings
      */
@@ -132,6 +134,11 @@ public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
         public boolean useTransform() {
             return false;
         }
+    }
+
+
+    public void setSnapmode(boolean willSnapRoomsIntoNiftyLocations){
+        this.snapmode = willSnapRoomsIntoNiftyLocations;
     }
 
     /**
@@ -255,10 +262,17 @@ public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
                 Point2D graphPoint = vv.getRenderContext().getMultiLayerTransformer().inverseTransform( p );
                 Point2D graphDown = vv.getRenderContext().getMultiLayerTransformer().inverseTransform( down );
                 Layout<Room, Exit> layout = vv.getGraphLayout();
-                double dx = calcAlignedDelta(graphPoint.getX() - graphDown.getX());
-                double dy = calcAlignedDelta(graphPoint.getY() - graphDown.getY());
-                
-                if (dx != 0 || dy != 0) {
+
+                double dx,dy;
+                if(this.snapmode){
+                     dx = calcAlignedDelta(graphPoint.getX() - graphDown.getX());
+                     dy = calcAlignedDelta(graphPoint.getY() - graphDown.getY());
+                }else{
+                     dx = graphPoint.getX() - graphDown.getX();
+                     dy = graphPoint.getY() - graphDown.getY();
+                }
+
+                if ( !snapmode || dx != 0 || dy != 0) {
                     PickedState<Room> ps = vv.getPickedVertexState();
 
                     for (Room v : ps.getPicked()) {

@@ -14,15 +14,14 @@ public class DrawingUtils {
 
     public static final int ROOM_SIZE = 90;
 
-
-    public static Point2D getRelativePosition( Point2D location, Exit exit ) {
-        double x = getXByExit( exit, location.getX() );
-        double y = getYByExit( exit, location.getY() );
+    public static Point2D getRelativePosition( Point2D location, Exit exit, boolean snapMode) {
+        double x = getXByExit( exit, location.getX(), snapMode );
+        double y = getYByExit( exit, location.getY(), snapMode );
         return new Point2D.Double( x, y );
     }
 
     //y going up to down
-    private static double getYByExit( Exit exit, double y ) {
+    private static double getYByExit( Exit exit, double y, boolean snapMode ) {
         if (exit.getCompassDir() == null)
             return y - 3 * DrawingUtils.ROOM_SIZE;
         if (exit.getCompassDir().startsWith( "n" ))
@@ -31,12 +30,20 @@ public class DrawingUtils {
         if (exit.getCompassDir().startsWith( "s" ))
             return y + 2 * DrawingUtils.ROOM_SIZE;
 
+        if(snapMode && exit.getCompassDir().startsWith( "d" )){
+            return y + 15 * DrawingUtils.ROOM_SIZE;
+        }
+
+        if(snapMode && exit.getCompassDir().startsWith( "u" )){
+            return y - 16 * DrawingUtils.ROOM_SIZE;
+        }
+
         return y;
     }
 
 
     //x going left to right
-    private static double getXByExit( Exit exit, double x ) {
+    private static double getXByExit( Exit exit, double x, boolean snapMode ) {
         if (exit.getCompassDir() == null)
             return x + 3 * DrawingUtils.ROOM_SIZE;
 
@@ -45,6 +52,14 @@ public class DrawingUtils {
 
         if (exit.getCompassDir().endsWith( "w" ))
             return x - 2 * DrawingUtils.ROOM_SIZE;
+
+        if(snapMode && exit.getCompassDir().startsWith( "d" )){
+            return x - 16 * DrawingUtils.ROOM_SIZE;
+        }
+
+        if(snapMode && exit.getCompassDir().startsWith( "u" )){
+            return x + 15 * DrawingUtils.ROOM_SIZE;
+        }
 
         return x;
     }

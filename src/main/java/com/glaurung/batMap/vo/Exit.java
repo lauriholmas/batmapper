@@ -34,7 +34,10 @@ public class Exit implements Serializable {
             return "se";
         if (exit.equalsIgnoreCase( "sw" ) || exit.equalsIgnoreCase( "southwest" ))
             return "sw";
-
+        if (exit.equalsIgnoreCase( "d" ) || exit.equalsIgnoreCase( "down" ))
+            return "d";
+        if (exit.equalsIgnoreCase( "u" ) || exit.equalsIgnoreCase( "up" ))
+            return "u";
         return null;
     }
 

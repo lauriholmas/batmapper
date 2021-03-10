@@ -13,6 +13,7 @@ import java.awt.geom.Point2D;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JButton;
+import javax.swing.JToggleButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JOptionPane;
@@ -65,6 +66,8 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
     private JComboBox roomColor;
     private JButton saveButton;
     private JButton clearButton;
+    private JToggleButton snapToggleButton;
+
     MapperEngine engine;
 
 
@@ -141,21 +144,31 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
         roomColor.setRenderer( new MapperPanelCellRenderer() );
 
 
-	saveButton = new JButton( "Save" );
-	descPanel.add( saveButton );
-	saveButton.setFont( font );
-	saveButton.setBounds( 0,
-			      SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE + BUTTON_HEIGHT + BORDERLINE, BUTTON_WIDTH, BUTTON_HEIGHT );
-	saveButton.setToolTipText( "Save the map to a file." );
-	saveButton.addActionListener( this );
+        saveButton = new JButton( "Save" );
+        descPanel.add( saveButton );
+        saveButton.setFont( font );
+        saveButton.setBounds( 0,
+                      SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE + BUTTON_HEIGHT + BORDERLINE, BUTTON_WIDTH, BUTTON_HEIGHT );
+        saveButton.setToolTipText( "Save the map to a file." );
+        saveButton.addActionListener( this );
 
-	clearButton = new JButton( "Clear" );
-	descPanel.add( clearButton );
-	clearButton.setFont( font );
-	clearButton.setBounds( BUTTON_WIDTH + BORDERLINE,
-			       SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE + BUTTON_HEIGHT + BORDERLINE, BUTTON_WIDTH, BUTTON_HEIGHT );
-	clearButton.setToolTipText( "Clear the map for this area." );
-	clearButton.addActionListener( this );
+        clearButton = new JButton( "Clear" );
+        descPanel.add( clearButton );
+        clearButton.setFont( font );
+        clearButton.setBounds( BUTTON_WIDTH + BORDERLINE,
+                       SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE + BUTTON_HEIGHT + BORDERLINE, BUTTON_WIDTH, BUTTON_HEIGHT );
+        clearButton.setToolTipText( "Clear the map for this area." );
+        clearButton.addActionListener( this );
+
+        snapToggleButton = new JToggleButton("Snap");
+        descPanel.add(snapToggleButton);
+
+        snapToggleButton.setFont(font);
+        snapToggleButton.setBounds( BUTTON_WIDTH + BORDERLINE+BUTTON_WIDTH + BORDERLINE,
+            SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE + BUTTON_HEIGHT + BORDERLINE, BUTTON_WIDTH, BUTTON_HEIGHT );
+        snapToggleButton.setToolTipText( "Toggle room location snapping" );
+        snapToggleButton.addActionListener( this );
+
 
 
 //		roomNotes.setBounds(0, BORDERLINE+SHORT_DESC_HEIGHT+BORDERLINE+LONG_DESC_HEIGHT+BORDERLINE+EXITS_HEIGHT+BORDERLINE+BUTTON_HEIGHT+BORDERLINE, DESC_WIDTH, NOTES_HEIGHT);
@@ -271,16 +284,16 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
         if (e.getSource().equals( roomColor )) {
             this.engine.changeRoomColor( RoomColors.getColors()[roomColor.getSelectedIndex()] );
         } else if (e.getSource().equals( saveButton )) {
-	    System.out.println("pressed save.");
-	    engine.save();
-	} else if (e.getSource().equals( clearButton )) {
-	    System.out.println("pressed clear.");
-	    int input = JOptionPane.showConfirmDialog(null, "This will clear ALL data and notes associated with this area. Are you sure?");
-	    if (input == JOptionPane.OK_OPTION) {
-		engine.clearCurrentArea();
-	    }
-	}
-    }
+            engine.save();
+        } else if (e.getSource().equals( clearButton )) {
+            int input = JOptionPane.showConfirmDialog(null, "This will clear ALL data and notes associated with this area. Are you sure?");
+            if (input == JOptionPane.OK_OPTION) {
+                engine.clearCurrentArea();
+            }
+        }else if (e.getSource().equals(snapToggleButton)){
+                engine.setRoomSnapping(snapToggleButton.isSelected());
+            }
+        }
 
 
 }
