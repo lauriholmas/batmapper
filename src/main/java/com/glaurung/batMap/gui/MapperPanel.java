@@ -136,6 +136,23 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
         descPanel.add( roomExits );
         roomExits.setToolTipText( "This lists room exits" );
 
+        zoomInButton= new JButton( "+" );
+        descPanel.add(zoomInButton);
+        zoomInButton.setFont( font );
+        zoomInButton.setBounds(  0,
+                SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE, BUTTON_WIDTH/2, BUTTON_HEIGHT );
+        zoomInButton.setToolTipText( "Zoom in" );
+        zoomInButton.addActionListener( this );
+
+        zoomOutButton= new JButton( "-" );
+        descPanel.add(zoomOutButton);
+        zoomOutButton.setFont( font );
+        zoomOutButton.setBounds( BUTTON_WIDTH/2,
+                SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE, BUTTON_WIDTH/2, BUTTON_HEIGHT );
+        zoomOutButton.setToolTipText( "Zoom in" );
+        zoomOutButton.addActionListener( this );
+
+
         roomColor = new JComboBox( RoomColors.getColorNames() );
         descPanel.add( roomColor );
         roomColor.setFont( font );
@@ -161,6 +178,7 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
                        SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE + BUTTON_HEIGHT + BORDERLINE, BUTTON_WIDTH, BUTTON_HEIGHT );
         clearButton.setToolTipText( "Clear the map for this area." );
         clearButton.addActionListener( this );
+
 
         snapToggleButton = new JToggleButton("Snap");
         descPanel.add(snapToggleButton);
