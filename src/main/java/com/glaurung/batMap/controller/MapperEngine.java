@@ -514,4 +514,12 @@ public class MapperEngine implements ItemListener, ComponentListener {
         this.mapperLayout.setSnapMode(roomsWillSnapIntoPlaces);
     }
 
+    public void zoomIn(Point2d zoomlocation){
+        this.scaler.getScaler().scale(this.vv, 1.1f, zoomlocation );
+    }
+
+    public void zoomOut(Point2d zoomlocation){
+        this.scaler.getScaler().scale(this.vv, 1/1.1f, zoomlocation );
+    }
+
 }

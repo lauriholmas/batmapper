@@ -66,6 +66,8 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
     private JComboBox roomColor;
     private JButton saveButton;
     private JButton clearButton;
+    private JButton zoomInButton;
+    private JButton zoomOutButton;
     private JToggleButton snapToggleButton;
 
     MapperEngine engine;
@@ -293,8 +295,13 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
             }
         }else if (e.getSource().equals(snapToggleButton)){
                 engine.setRoomSnapping(snapToggleButton.isSelected());
-            }
+        }else if (e.getSource().equals(zoomInButton)){
+            engine.zoomIn();
+        }else if (e.getSource().equals(zoomOutButton)){
+            engine.zoomOut();
         }
+
+    }
 
 
 }
