@@ -413,12 +413,15 @@ public class MapperEngine implements ItemListener, ComponentListener {
      */
     protected void moveMapToStayWithCurrentRoom() {
 
+
         Point2D currentRoomPoint = this.mapperLayout.transform( currentRoom );
 
         Point2D mapViewCenterPoint = this.panel.getMapperCentralPoint();
         Point2D viewPoint = vv.getRenderContext().getMultiLayerTransformer().transform( currentRoomPoint );
         if (needToRelocate( viewPoint, mapViewCenterPoint )) {
             MutableTransformer modelTransformer = vv.getRenderContext().getMultiLayerTransformer().getTransformer( Layer.LAYOUT );
+            viewPoint = vv.getRenderContext().getMultiLayerTransformer().inverseTransform(viewPoint);
+            mapViewCenterPoint = vv.getRenderContext().getMultiLayerTransformer().inverseTransform(mapViewCenterPoint);
             float dx = (float) ( mapViewCenterPoint.getX() - viewPoint.getX() );
             float dy = (float) ( mapViewCenterPoint.getY() - viewPoint.getY() );
             modelTransformer.translate( dx, dy );
@@ -427,11 +430,11 @@ public class MapperEngine implements ItemListener, ComponentListener {
     }
 
     private boolean needToRelocate( Point2D currentRoomPoint, Point2D mapViewCenterPoint ) {
-        if (mapViewCenterPoint.getX() * 1.5 < currentRoomPoint.getX() || mapViewCenterPoint.getX() * 0.5 > currentRoomPoint.getX()) {
+        if (currentRoomPoint.getX() < 0.6 * mapViewCenterPoint.getX() || currentRoomPoint.getX() > 1.3 * currentRoomPoint.getX() ){
             return true;
         }
 
-        if (mapViewCenterPoint.getY() * 1.5 < currentRoomPoint.getY() || mapViewCenterPoint.getY() * 0.5 > currentRoomPoint.getY()) {
+        if (currentRoomPoint.getY() < 0.6 * mapViewCenterPoint.getY() || currentRoomPoint.getY() > 1.3 * mapViewCenterPoint.getY()) {
             return true;
         }
 
