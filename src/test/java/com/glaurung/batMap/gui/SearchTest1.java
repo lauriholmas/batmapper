@@ -22,7 +22,7 @@ public class SearchTest1 {
         SparseMultigraph<Room, Exit> graph = new SparseMultigraph<Room, Exit>();
 
 
-        SearchEngine engine = new SearchEngine( graph );
+        SearchEngine engine = new SearchEngine( graph, null );
         engine.setBaseDir( "C:\\Users\\lauri/batclient" );
         frame.getContentPane().add( new SearchPanel( engine ) );
         frame.setSize( 1200, 800 );

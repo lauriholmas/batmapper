@@ -146,7 +146,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
     private JButton del = new JButton( "del" );
     private JTextField lootItem = new JTextField();
 
-    private String getDelim() {
+    public String getDelim() {
         return model.getDelim();
     }
 
@@ -733,6 +733,5 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
         saveToModel();
         plugin.saveRipAction( makeRipString() );
     }
-
 
 }

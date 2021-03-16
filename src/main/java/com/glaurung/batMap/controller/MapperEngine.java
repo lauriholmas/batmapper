@@ -21,6 +21,7 @@ import com.glaurung.batMap.gui.MapperPanel;
 import com.glaurung.batMap.gui.MapperPickingGraphMousePlugin;
 import com.glaurung.batMap.gui.RoomIconTransformer;
 import com.glaurung.batMap.gui.RoomShape;
+import com.glaurung.batMap.gui.corpses.CorpsePanel;
 import com.glaurung.batMap.io.AreaDataPersister;
 import com.glaurung.batMap.io.GuiDataPersister;
 import com.glaurung.batMap.vo.Area;
@@ -29,6 +30,7 @@ import com.glaurung.batMap.vo.Exit;
 import com.glaurung.batMap.vo.Room;
 import com.mythicscape.batclient.interfaces.BatWindow;
 
+import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.graph.util.Pair;
@@ -60,15 +62,18 @@ public class MapperEngine implements ItemListener, ComponentListener {
     ScalingGraphMousePlugin scaler;
     MapperPickingGraphMousePlugin mapperPickingGraphMousePlugin;
     boolean snapMode = true;
+    CorpsePanel corpsePanel;
+    MapperPlugin plugin;
 
-    public MapperEngine( SparseMultigraph<Room, Exit> graph ) {
-        this();
+    public MapperEngine( SparseMultigraph<Room, Exit> graph, MapperPlugin plugin ) {
+        this(plugin);
         this.graph = graph;
         this.mapperLayout.setGraph( graph );
     }
 
 
-    public MapperEngine() {
+    public MapperEngine(MapperPlugin plugin) {
+        this.plugin = plugin;
         graph = new SparseMultigraph<Room, Exit>();
         mapperLayout = new MapperLayout( graph );
         mapperLayout.setSize( new Dimension( 500, 500 ) ); //????
@@ -91,6 +96,7 @@ public class MapperEngine implements ItemListener, ComponentListener {
 
         PluggableGraphMouse pgm = new PluggableGraphMouse();
         mapperPickingGraphMousePlugin = new MapperPickingGraphMousePlugin( MouseEvent.BUTTON1_MASK, MouseEvent.BUTTON3_MASK );
+        mapperPickingGraphMousePlugin.setEngine( this );
         pgm.add( mapperPickingGraphMousePlugin);
         pgm.add( new TranslatingGraphMousePlugin( MouseEvent.BUTTON1_MASK ) );
         scaler = new ScalingGraphMousePlugin( new CrossoverScalingControl(), 0, 1 / 1.1f, 1.1f );
@@ -525,4 +531,27 @@ public class MapperEngine implements ItemListener, ComponentListener {
         this.scaler.getScaler().scale(this.vv, 1/1.1f, this.vv.getCenter());
     }
 
+    public String checkDirsFromCurrentToomTo(Room targetroom){
+        DijkstraShortestPath<Room, Exit> algorithm = new DijkstraShortestPath<Room, Exit>( this.getGraph() );
+        String returnvalue="";
+        String delim = this.corpsePanel.getDelim();
+        for( Exit exit: algorithm.getPath( currentRoom, targetroom )){
+            returnvalue += exit.getExit()+delim;
+        }
+        return returnvalue;
+
+    }
+
+
+    public void setCorpsePanel( CorpsePanel corpsePanel){
+        this.corpsePanel = corpsePanel;
+    }
+
+    public void sendToMud(String command){
+        this.plugin.doCommand( command );
+    }
+
+    public void sendToParty(String message){
+        this.plugin.doCommand( "party say "+message.replace( this.corpsePanel.getDelim(), "," ) );
+    }
 }

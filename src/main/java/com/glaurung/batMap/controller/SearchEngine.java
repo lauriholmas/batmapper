@@ -18,14 +18,14 @@ public class SearchEngine extends MapperEngine implements ItemListener {
     private String mapperArea;
     private boolean savingAlreadyDisabled = false;
 
-    public SearchEngine( SparseMultigraph<Room, Exit> graph ) {
-        this();
+    public SearchEngine( SparseMultigraph<Room, Exit> graph, MapperPlugin plugin ) {
+        this(plugin);
         this.graph = graph;
         this.mapperLayout.setGraph( graph );
     }
 
-    public SearchEngine() {
-        super();
+    public SearchEngine(MapperPlugin plugin) {
+        super(plugin);
         panel = new SearchPanel( this );
     }
 

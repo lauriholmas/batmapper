@@ -26,7 +26,7 @@ public class MapperTest1 implements ActionListener {
         SparseMultigraph<Room, Exit> graph = new SparseMultigraph<Room, Exit>();
 
 
-        MapperEngine engine = new MapperEngine( graph );
+        MapperEngine engine = new MapperEngine( graph, null );
 
         JFrame frame = new JFrame( "Simple Graph View" );
         frame.setLayout( new FlowLayout() );

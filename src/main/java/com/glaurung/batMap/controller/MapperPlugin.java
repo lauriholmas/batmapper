@@ -54,13 +54,15 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
             clientWin = this.getClientGUI().createBatWindow( "Mapper", 300, 300, 820, 550 );
         }
 
-        engine = new MapperEngine();
-        searchEngine = new SearchEngine();
+        engine = new MapperEngine(this);
+        searchEngine = new SearchEngine(this);
         engine.setBatWindow( clientWin );
         searchEngine.setBatWindow( clientWin );
         clientWin.removeTabAt( 0 );
         clientWin.newTab( "batMap", engine.getPanel() );
-        clientWin.newTab( "Corpses", new CorpsePanel( BASEDIR, this ) );
+        CorpsePanel corpses = new CorpsePanel( BASEDIR, this );
+        engine.setCorpsePanel( corpses );
+        clientWin.newTab( "Corpses", corpses);
         clientWin.newTab( "manual", new ManualPanel() );
         clientWin.newTab( "map search", new SearchPanel( searchEngine ) );
         clientWin.setVisible( true );

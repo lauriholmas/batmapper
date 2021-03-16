@@ -1,16 +1,14 @@
 package com.glaurung.batMap.gui;
 
 import java.awt.*;
-import java.awt.event.InputEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 
 import javax.swing.*;
 
+import com.glaurung.batMap.controller.MapperEngine;
 import com.glaurung.batMap.vo.Exit;
 import com.glaurung.batMap.vo.Room;
 import edu.uci.ics.jung.algorithms.layout.GraphElementAccessor;
@@ -82,6 +80,9 @@ public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
 
     private boolean snapmode = true;
 
+    private boolean shiftDown = false;
+    MapperEngine engine;
+
     /**
      * create an instance with default settings
      */
@@ -115,6 +116,7 @@ public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
     public void setLensColor( Color lensColor ) {
         this.lensColor = lensColor;
     }
+
 
     /**
      * a Paintable to draw the rectangle used to pick multiple
@@ -354,6 +356,27 @@ public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
         PickedState<Room> pickedState = vv.getPickedVertexState();
         Room clickedRoom = vv.getPickSupport().getVertex(vv.getGraphLayout(), e.getX(), e.getY());
 
+        if( clickedRoom != null && e.isControlDown()){
+           String dirs = this.engine.checkDirsFromCurrentToomTo(clickedRoom);
+            Object[] options = {"Ok",
+                    "Send to mud",
+                    "Send to party"};
+            int selection = JOptionPane.showOptionDialog(vv,
+                    dirs,
+                    "Dirs to "+clickedRoom.getShortDesc(),
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[0]);
+            if( selection == 1){
+                this.engine.sendToMud( dirs );
+            }else if(selection == 2){
+                this.engine.sendToParty( dirs);
+            }
+            return;
+        }
+
         Exit clickedExit = vv.getPickSupport().getEdge(vv.getGraphLayout(),e.getX(), e.getY());
 
         if (e.getClickCount() == 2 && ! e.isConsumed() && clickedExit != null && clickedRoom == null) {
@@ -456,5 +479,10 @@ public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
      */
     public double calcAlignedDelta(double delta) {
         return Math.round(delta / (2 * DrawingUtils.ROOM_SIZE)) * 2 * DrawingUtils.ROOM_SIZE;
+    }
+
+    public void setEngine( MapperEngine engine ){
+        this.engine = engine;
+
     }
 }
