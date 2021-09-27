@@ -26,7 +26,7 @@ public class CorpseModel implements Serializable {
     public boolean lootCorpse = false;
     public boolean lootGround = false;
 
-    //corpse = 12
+    //corpse = 13
     public boolean eatCorpse = false;
     public boolean barbarianBurn = false;
     public boolean feedCorpseTo = false;
@@ -39,6 +39,7 @@ public class CorpseModel implements Serializable {
     public boolean aelenaFam = false;
     public boolean dissect = false;
     public boolean tin = false;
+    public boolean extractEther = false;
 
     //fucking undead wakes = 8
     public boolean wakeFollow = false;
@@ -55,6 +56,7 @@ public class CorpseModel implements Serializable {
     private List<String> lootList = new LinkedList<String>();
     private String organ1 = "antenna";
     private String organ2 = "antenna";
+    private String etherType = "no_focus";
 
 
     public String getDelim() {
@@ -112,12 +114,14 @@ public class CorpseModel implements Serializable {
         aelenaFam = false;
         aelenaOrgan = false;
         tin = false;
+        extractEther = false;
 
         delim = "";
         mountHandle = "";
         lootList = new LinkedList<String>();
         organ1 = "antenna";
         organ2 = "antenna";
+        etherType = "no_focus";
 
     }
 
@@ -136,6 +140,12 @@ public class CorpseModel implements Serializable {
     public void setOrgan2( String organ ) {
         this.organ2 = organ;
 
+    }
+    public String getEtherType() {
+    	return etherType;
+    }
+    public void setEtherType( String etherType ) {
+    	this.etherType = etherType;
     }
 
 }

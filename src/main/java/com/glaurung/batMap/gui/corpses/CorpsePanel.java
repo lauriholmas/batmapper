@@ -47,7 +47,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
     private final int LABEL_WIDTH = 100;
     private final int CB_HEIGHT = 25;
     private final String[] organs = { "antenna", "arm", "beak", "bladder", "brain", "ear", "eye", "foot", "gill", "heart", "horn", "kidney", "leg", "liver", "lung", "nose", "paw", "snout", "spleen", "stomach", "tail", "tendril", "wing" };
-
+    private final String[] etherTypes = { "no_focus", "blue", "cyan", "gray", "green", "magenta", "purple", "red", "white", "yellow" };
 
     public CorpsePanel( String BASEDIR, MapperPlugin plugin ) {
         this.BASEDIR = BASEDIR;
@@ -75,6 +75,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
         lootLists.addKeyListener( this );
         organ1.addActionListener( this );
         organ2.addActionListener( this );
+        etherFocus.addActionListener( this );
         doIt.addActionListener( this );
         delim.addActionListener( this );
         delim.getDocument().addDocumentListener( this );
@@ -115,6 +116,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
     private CorpseCheckBox aelenaFam = new CorpseCheckBox( "aelena fam consume corpse", false, "familiar consume corpse", this, font );
     private CorpseCheckBox dissect = new CorpseCheckBox( "dissection", false, "use dissection at corpse try ", this, font );
     private CorpseCheckBox tin = new CorpseCheckBox( "tin corpse", false, "tin corpse", this, font );
+    private CorpseCheckBox extractEther = new CorpseCheckBox( "extract ether", false, "use extract ether at corpse ", this, font );
 
 
     private static final long serialVersionUID = 1L;
@@ -141,6 +143,8 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
     private JComboBox organ2 = new JComboBox( organs );
     private JLabel organ1Label = new JLabel( "first organ:" );
     private JLabel organ2Label = new JLabel( "second organ:" );
+    private JComboBox etherFocus = new JComboBox( etherTypes );
+    private JLabel etherLabel = new JLabel( "ether focus:" );
 
     private JButton add = new JButton( "add" );
     private JButton del = new JButton( "del" );
@@ -211,6 +215,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
         this.model.aelenaOrgan = aelenaOrgan.isSelected();
         this.model.dissect = dissect.isSelected();
         this.model.tin = tin.isSelected();
+        this.model.extractEther = extractEther.isSelected();
         CorpseHandlerDataPersister.save( BASEDIR, this.model );
 
     }
@@ -255,12 +260,14 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
         aelenaFam.setSelected( this.model.aelenaFam );
         aelenaOrgan.setSelected( this.model.aelenaOrgan );
         dissect.setSelected( this.model.dissect );
-        tin.setSelected( this.model.dissect );
+        tin.setSelected( this.model.tin );
+        extractEther.setSelected( this.model.extractEther );
 
         mount.setText( this.model.getMountHandle() );
         delim.setText( this.model.getDelim() );
         organ1.setSelectedItem( this.model.getOrgan1() );
         organ2.setSelectedItem( this.model.getOrgan2() );
+        etherFocus.setSelectedItem( this.model.getEtherType() );
         listModel.clear();
         for (String item : this.model.getLootList()) {
             listModel.addElement( item );
@@ -288,37 +295,39 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
             turnOff( lichdrain, kharimsoul, tsaraksoul, arkemile );
         } else if (source == arkemile) {
             turnOff( tin, lichdrain, kharimsoul, tsaraksoul, ripSoulToKatana, eatCorpse, barbarianBurn, feedCorpseTo,
-                    beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan, dig, dissect );
+                    beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan, dig, dissect, extractEther );
         } else if (source == eatCorpse) {
-            turnOff( tin, arkemile, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan );
+            turnOff( tin, arkemile, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan, extractEther );
         } else if (source == barbarianBurn) {
-            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan );
+            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan, extractEther );
         } else if (source == feedCorpseTo) {
-            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan );
+            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan, extractEther );
         } else if (source == beheading) {
-            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan );
+            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan, extractEther );
         } else if (source == desecrateGround) {
-            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, burialCere, lichWake, skeletonWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan );
+            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, burialCere, lichWake, skeletonWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan, extractEther );
         } else if (source == burialCere) {
-            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, lichWake, skeletonWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan );
+            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, lichWake, skeletonWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan, extractEther );
         } else if (source == lichWake) {
-            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, skeletonWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan );
+            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, skeletonWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan, extractEther );
         } else if (source == vampireWake) {
-            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, zombieWake, aelenaFam, aelenaOrgan );
+            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, zombieWake, aelenaFam, aelenaOrgan, extractEther );
         } else if (source == skeletonWake) {
-            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan );
+            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, vampireWake, zombieWake, aelenaFam, aelenaOrgan, extractEther );
         } else if (source == zombieWake) {
-            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, aelenaFam, aelenaOrgan );
+            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, aelenaFam, aelenaOrgan, extractEther );
         } else if (source == aelenaFam) {
-            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, aelenaOrgan );
+            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, aelenaOrgan, extractEther );
         } else if (source == aelenaOrgan) {
-            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, aelenaFam );
+            turnOff( tin, arkemile, eatCorpse, dig, dissect, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, aelenaFam, extractEther );
         } else if (source == dig) {
-            turnOff( tin, arkemile, eatCorpse, dissect, aelenaOrgan, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, aelenaFam );
+            turnOff( tin, arkemile, eatCorpse, dissect, aelenaOrgan, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, aelenaFam, extractEther );
         } else if (source == dissect) {
-            turnOff( tin, arkemile, eatCorpse, dig, aelenaOrgan, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, aelenaFam );
+            turnOff( tin, arkemile, eatCorpse, dig, aelenaOrgan, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, aelenaFam, extractEther );
         } else if (source == tin) {
-            turnOff( dissect, arkemile, eatCorpse, dig, aelenaOrgan, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, aelenaFam );
+            turnOff( dissect, arkemile, eatCorpse, dig, aelenaOrgan, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, aelenaFam, extractEther );
+        } else if (source == extractEther) {
+            turnOff( tin, arkemile, eatCorpse, dig, dissect, aelenaOrgan, ripSoulToKatana, barbarianBurn, feedCorpseTo, beheading, desecrateGround, burialCere, lichWake, skeletonWake, vampireWake, aelenaFam );
         } else if (source == wakeFollow) {
             turnOff( wakeAgro, wakeTalk, wakeStatic );
         } else if (source == wakeAgro) {
@@ -334,6 +343,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
                 this.model.clear();
                 organ1.setSelectedIndex( 0 );
                 organ2.setSelectedIndex( 0 );
+                etherFocus.setSelectedIndex( 0 );
                 this.loadFromModel();
             }
 
@@ -352,7 +362,10 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
             updateOrganAffected();
         } else if (source == organ2) {
             updateOrganAffected();
+        } else if (source == etherFocus) {
+        	updateEther();
         }
+        
 
         if (source == doIt) {
             plugin.doCommand( makeRipString() );
@@ -375,7 +388,14 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
         dissect.setEffect( "use dissection at corpse try " + organ1.getSelectedItem() + " " + organ2.getSelectedItem() );
         aelenaOrgan.setEffect( "familiar harvest " + organ1.getSelectedItem() + " " + organ2.getSelectedItem() );
     }
-
+    
+    private void updateEther() {
+    	if ( etherFocus.getSelectedItem().equals( "no_focus" ) ) {
+        	extractEther.setEffect( "use extract ether at corpse" );
+    	} else {
+        	extractEther.setEffect( "use extract ether at corpse focus on " + etherFocus.getSelectedItem() );
+    	}
+    }
 
     private void updateLoots() {
         if (getLootString().equals( "" )) {
@@ -470,6 +490,9 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
         }
         if (tin.isSelected()) {
             rip += tin.getEffect() + this.model.getDelim();
+        }
+        if (extractEther.isSelected()) {
+        	rip += extractEther.getEffect() + this.model.getDelim();
         }
         if (ga.isSelected()) {
             rip += ga.getEffect() + this.model.getDelim();
@@ -568,6 +591,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
         eatCorpse.setBounds( BORDERLINE, ( CB_HEIGHT * 4 ) + TOP_BORDER, CB_WIDTH, CB_HEIGHT );
         dissect.setBounds( CB_WIDTH + BORDERLINE, ( CB_HEIGHT * 4 ) + TOP_BORDER, CB_WIDTH, CB_HEIGHT );
         tin.setBounds( BORDERLINE, ( CB_HEIGHT * 5 ) + TOP_BORDER, CB_WIDTH, CB_HEIGHT );
+        extractEther.setBounds( CB_WIDTH + BORDERLINE, ( CB_HEIGHT * 5 ) + TOP_BORDER, CB_WIDTH, CB_HEIGHT );
         corpsePanel.add( tin );
         corpsePanel.add( barbarianBurn );
         corpsePanel.add( feedCorpseTo );
@@ -579,6 +603,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
         corpsePanel.add( aelenaFam );
         corpsePanel.add( dissect );
         corpsePanel.add( eatCorpse );
+        corpsePanel.add( extractEther );
 
         this.add( corpsePanel );
 
@@ -639,6 +664,9 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
         organ2Label.setBounds( BORDERLINE, ( CB_HEIGHT * 6 ) + TOP_BORDER, LABEL_WIDTH, CB_HEIGHT );
         organ2Label.setForeground( TEXT_COLOR );
         organ2.setBounds( LABEL_WIDTH + BORDERLINE, ( CB_HEIGHT * 6 ) + TOP_BORDER, LABEL_WIDTH, CB_HEIGHT );
+        etherLabel.setBounds( BORDERLINE, ( CB_HEIGHT * 7 ) + TOP_BORDER, LABEL_WIDTH, CB_HEIGHT );
+        etherLabel.setForeground( TEXT_COLOR );
+        etherFocus.setBounds( LABEL_WIDTH + BORDERLINE, ( CB_HEIGHT * 7 ) + TOP_BORDER, LABEL_WIDTH, CB_HEIGHT );
         clear.setBounds( ( 5 * BORDERLINE ) + LABEL_WIDTH, TOP_BORDER, BUTTON_WIDTH, CB_HEIGHT );
         doIt.setBounds( ( 5 * BORDERLINE ) + LABEL_WIDTH, TOP_BORDER + CB_HEIGHT, BUTTON_WIDTH, CB_HEIGHT );
         controlPanel.add( doIt );
@@ -653,6 +681,8 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
         controlPanel.add( mountLabel );
         controlPanel.add( organ1Label );
         controlPanel.add( organ2Label );
+        controlPanel.add( etherFocus );
+        controlPanel.add( etherLabel );
         controlPanel.add( clear );
         this.add( controlPanel );
 
