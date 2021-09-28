@@ -47,7 +47,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
     private final int LABEL_WIDTH = 100;
     private final int CB_HEIGHT = 25;
     private final String[] organs = { "antenna", "arm", "beak", "bladder", "brain", "ear", "eye", "foot", "gill", "heart", "horn", "kidney", "leg", "liver", "lung", "nose", "paw", "snout", "spleen", "stomach", "tail", "tendril", "wing" };
-    private final String[] etherTypes = { "no_focus", "blue", "cyan", "gray", "green", "magenta", "purple", "red", "white", "yellow" };
+    private final String[] etherTypes = { "no_focus", "blue", "green", "red", "yellow" };
 
     public CorpsePanel( String BASEDIR, MapperPlugin plugin ) {
         this.BASEDIR = BASEDIR;
@@ -185,6 +185,7 @@ public class CorpsePanel extends JPanel implements ActionListener, ComponentList
         this.model.setLootList( createStringLootList() );
         this.model.setOrgan1( (String) organ1.getSelectedItem() );
         this.model.setOrgan2( (String) organ2.getSelectedItem() );
+        this.model.setEtherType( (String) etherFocus.getSelectedItem() );
         this.model.lichdrain = lichdrain.isSelected();
         this.model.kharimsoul = kharimsoul.isSelected();
         this.model.kharimSoulCorpse = kharimSoulCorpse.isSelected();
