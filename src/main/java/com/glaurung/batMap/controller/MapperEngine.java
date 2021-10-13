@@ -436,7 +436,7 @@ public class MapperEngine implements ItemListener, ComponentListener {
     }
 
     private boolean needToRelocate( Point2D currentRoomPoint, Point2D mapViewCenterPoint ) {
-        if (currentRoomPoint.getX() < 0.6 * mapViewCenterPoint.getX() || currentRoomPoint.getX() > 1.3 * currentRoomPoint.getX() ){
+        if (currentRoomPoint.getX() < 0.6 * mapViewCenterPoint.getX() || currentRoomPoint.getX() > 1.3 * mapViewCenterPoint.getX() ){
             return true;
         }
 
