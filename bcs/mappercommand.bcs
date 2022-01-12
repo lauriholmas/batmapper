@@ -1,0 +1,16 @@
+SCRIPT_NAME="mappercommand";
+SCRIPT_DESC = "Can be used to send commands to batmapper";
+import com.mythicscape.batclient.interfaces.BatClientPlugin;
+
+//try typing $mappercommand in general window to control mapper
+//recommendation is to add some alias to simplify usage, ie: /alias mapp=$mappercommand
+//then you only need to type mapp ( mapp list etc)
+
+void run(){
+    for(BatClientPlugin plugin : pluginManager.getPlugins()){
+        if(plugin.getName().equals("batMap")){
+            plugin.process(argument);
+        }
+    }
+}
+

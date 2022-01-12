@@ -23,6 +23,10 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
     protected static final String MAKERIPACTION = "rip_action set ";
     protected static final String RIPACTION_OFF = "rip_action off";
     protected static final String RIPACTION_ON = "rip_action on";
+    protected static final String COMMAND_ADD_LABEL = "add";
+    protected static final String COMMAND_REMOVE_LABEL = "del";
+    protected static final String COMMAND_RUN_TO_LABEL = "run";
+    protected static final String COMMAND_LIST_LABELS = "list";
     private MapperEngine engine;
     private SearchEngine searchEngine;
     private final String CHANNEL_PREFIX = "BAT_MAPPER";
@@ -156,4 +160,61 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
 
     }
 
+    @Override
+    public void process(Object input){
+        if ( input == null){
+            printConsoleMessage("Mapper has following commands:");
+            printConsoleMessage(String.format("\t%s <label> - to add label to current room",COMMAND_ADD_LABEL));
+            printConsoleMessage(String.format("\t%s <label> - to run to room with that label ( need to set delim in corpsepanel)", COMMAND_RUN_TO_LABEL));
+            printConsoleMessage(String.format("\t%s         - to remove label from current room",COMMAND_REMOVE_LABEL));
+            printConsoleMessage(String.format("\t%s        - to list labels and rooms",COMMAND_LIST_LABELS));
+        }
+        if(input instanceof String){
+            String[] params = ((String)input).split(" ");
+            if(params.length == 1){
+                String command = params[0];
+                if(command.equalsIgnoreCase(COMMAND_REMOVE_LABEL)){
+                    this.engine.removeLabelFromCurrent();
+                }else if(command.equalsIgnoreCase(COMMAND_LIST_LABELS)){
+                    for(String entry : this.engine.getLabels()){
+                        printConsoleMessage(entry);
+                    }
+                }else{
+                    printConsoleError(String.format("unknown command: [%s]", command));
+                }
+            }else if(params.length== 2){
+                String command = params[0];
+                String label = params[1];
+                if(command.equalsIgnoreCase(COMMAND_ADD_LABEL)){
+                    if( ! this.engine.roomLabelExists(label)){
+                        this.engine.setLabelToCurrentRoom(label);
+                        printConsoleMessage(String.format("added label [%s] to this room", label));
+                    }else{
+                        printConsoleError(String.format("label [%s] already exists, must be unique per area", label));
+                    }
+                }else if(command.equalsIgnoreCase(COMMAND_RUN_TO_LABEL)){
+                    printConsoleMessage(String.format("running to room [%s]", label));
+                    if(this.engine.roomLabelExists(label)){
+                        this.engine.runtoLabel(label);
+                    }else{
+                        printConsoleError(String.format("label [%s] not found", label));
+                    }
+                }else{
+                    printConsoleError(String.format("unknown command: [%s]", command));
+                }
+
+            }else{
+                printConsoleError("only 1 or 2 params accepted");
+            }
+        }
+    }
+
+    private void printConsoleError(String msg){
+        this.getClientGUI().printText("general","[Mapper error] "+msg+"\n", "F7856D");
+    }
+    private void printConsoleMessage(String msg){
+        this.getClientGUI().printText("general","[Mapper] "+msg+"\n", "6AFA63");
+    }
 }
+
+

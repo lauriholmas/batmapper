@@ -554,4 +554,40 @@ public class MapperEngine implements ItemListener, ComponentListener {
     public void sendToParty(String message){
         this.plugin.doCommand( "party say "+message.replace( this.corpsePanel.getDelim(), "," ) );
     }
+
+    public void removeLabelFromCurrent(){
+        this.currentRoom.setLabel(null);
+    }
+    public void setLabelToCurrentRoom(String label){
+        this.currentRoom.setLabel(label);
+    }
+
+    public boolean roomLabelExists(String label){
+        for( Room room: this.graph.getVertices()){
+            if(room.getLabel() != null && room.getLabel().equalsIgnoreCase(label)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void runtoLabel(String label){
+        Room targetroom = null;
+        for( Room room: this.graph.getVertices()){
+            if(room.getLabel() != null && room.getLabel().equalsIgnoreCase(label)){
+                targetroom = room;
+            }
+        }
+        String dirs = checkDirsFromCurrentToomTo(targetroom);
+        sendToMud(dirs);
+    }
+    public List<String> getLabels(){
+        List<String> labels = new LinkedList<>();
+        for( Room room: this.graph.getVertices()){
+            if(room.getLabel() != null){
+                labels.add(String.format("%-10s %s", room.getLabel(), room.getShortDesc()));
+            }
+        }
+        return labels;
+    }
 }

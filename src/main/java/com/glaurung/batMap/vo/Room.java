@@ -22,6 +22,7 @@ public class Room implements Serializable {
     private boolean indoors;
     private String notes;
     private Color color = null;
+    private String label;
 
 
     public Room( String shortDesc, String id ) {
@@ -167,6 +168,14 @@ public class Room implements Serializable {
 
     public void setNotes( String notes ) {
         this.notes = notes;
+    }
+
+    public void setLabel(String label){
+        this.label = label;
+    }
+
+    public String getLabel(){
+        return this.label;
     }
 
 
