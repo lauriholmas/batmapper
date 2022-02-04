@@ -23,6 +23,7 @@ public class Room implements Serializable {
     private String notes;
     private Color color = null;
     private String label;
+    private Set<String> usedExits = new HashSet<>();
 
 
     public Room( String shortDesc, String id ) {
@@ -178,5 +179,22 @@ public class Room implements Serializable {
         return this.label;
     }
 
-
+    public void useExit(String exit){
+        if(usedExits == null){
+            usedExits = new HashSet<>();
+        }
+        this.usedExits.add(exit);
+    }
+    public boolean allExitsHaveBeenUSed(){
+        if(usedExits == null){
+            usedExits = new HashSet<>();
+        }
+        if(exits.containsAll(usedExits) && usedExits.containsAll(exits)){
+            return true;
+        }
+        return false;
+    }
+    public void resetExitUsage(){
+        this.usedExits = new HashSet<>();
+    }
 }

@@ -10,13 +10,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.geom.Point2D;
 
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.JToggleButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -69,6 +63,7 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
     private JButton zoomInButton;
     private JButton zoomOutButton;
     private JToggleButton snapToggleButton;
+    private JToggleButton mazeButton;
 
     MapperEngine engine;
 
@@ -190,6 +185,15 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
         snapToggleButton.setSelected(true);
         snapToggleButton.addActionListener( this );
 
+        mazeButton = new JToggleButton("Maze");
+        descPanel.add(mazeButton);
+        mazeButton.setFont(font);
+        mazeButton.setBounds( BUTTON_WIDTH + BORDERLINE+BUTTON_WIDTH + BORDERLINE,
+                SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE, BUTTON_WIDTH, BUTTON_HEIGHT );
+        mazeButton.setToolTipText("Toggle maze helper on and off");
+        mazeButton.setSelected(false);
+        mazeButton.addActionListener(this);
+
 
 
 //		roomNotes.setBounds(0, BORDERLINE+SHORT_DESC_HEIGHT+BORDERLINE+LONG_DESC_HEIGHT+BORDERLINE+EXITS_HEIGHT+BORDERLINE+BUTTON_HEIGHT+BORDERLINE, DESC_WIDTH, NOTES_HEIGHT);
@@ -206,7 +210,6 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
         roomNotes.setToolTipText( "Feel free to write your own notes here." );
         scrollableNotes.setBounds( 514, SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE + BUTTON_HEIGHT + BORDERLINE + BUTTON_HEIGHT + BORDERLINE, DESC_WIDTH, descPanel.getHeight() - ( 4 * BORDERLINE + LONG_DESC_HEIGHT + EXITS_HEIGHT + SHORT_DESC_HEIGHT + BUTTON_HEIGHT + BUTTON_HEIGHT) );
         //this.add( scrollableNotes );
-
 
         this.setLayout( null );
         this.setBorder( new LineBorder( BORDER_COLOR ) );
@@ -317,8 +320,9 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
             engine.zoomIn();
         }else if (e.getSource().equals(zoomOutButton)){
             engine.zoomOut();
+        }else if(e.getSource().equals(mazeButton)){
+            engine.setMazeMode(mazeButton.isSelected());
         }
-
     }
 
 

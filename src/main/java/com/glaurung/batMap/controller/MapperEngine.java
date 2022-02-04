@@ -12,15 +12,7 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.*;
 
-import com.glaurung.batMap.gui.DrawingUtils;
-import com.glaurung.batMap.gui.ExitLabelRenderer;
-import com.glaurung.batMap.gui.ExitPaintTransformer;
-import com.glaurung.batMap.gui.GraphUtils;
-import com.glaurung.batMap.gui.MapperLayout;
-import com.glaurung.batMap.gui.MapperPanel;
-import com.glaurung.batMap.gui.MapperPickingGraphMousePlugin;
-import com.glaurung.batMap.gui.RoomIconTransformer;
-import com.glaurung.batMap.gui.RoomShape;
+import com.glaurung.batMap.gui.*;
 import com.glaurung.batMap.gui.corpses.CorpsePanel;
 import com.glaurung.batMap.io.AreaDataPersister;
 import com.glaurung.batMap.io.GuiDataPersister;
@@ -64,6 +56,7 @@ public class MapperEngine implements ItemListener, ComponentListener {
     boolean snapMode = true;
     CorpsePanel corpsePanel;
     MapperPlugin plugin;
+    boolean mazemode = false;
 
     public MapperEngine( SparseMultigraph<Room, Exit> graph, MapperPlugin plugin ) {
         this(plugin);
@@ -154,6 +147,7 @@ public class MapperEngine implements ItemListener, ComponentListener {
         } else {
             if (GraphUtils.canAddExit( graph.getOutEdges( currentRoom ), exitUsed )) { // parallel exits can exist, but not with same name
                 currentRoom.addExit( exit.getExit() );
+
                 graph.addEdge( exit, new Pair<Room>( currentRoom, newRoom ), EdgeType.DIRECTED );
             }
 
@@ -175,6 +169,9 @@ public class MapperEngine implements ItemListener, ComponentListener {
                 vv.getGraphLayout().setLocation( newRoom, possibleLocation );
             }
 
+        }
+        if(mazemode){
+            currentRoom.useExit(exitUsed);
         }
 
         refreshRoomGraphicsAndSetAsCurrent( newRoom, longDesc, shortDesc, indoors, exits );
@@ -589,5 +586,13 @@ public class MapperEngine implements ItemListener, ComponentListener {
             }
         }
         return labels;
+    }
+
+    public void setMazeMode(boolean enabled){
+        this.mazemode = enabled;
+        for(Room room: this.graph.getVertices()){
+                room.resetExitUsage();
+        }
+            repaint();
     }
 }
