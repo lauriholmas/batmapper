@@ -305,7 +305,7 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 
     @Override
     public void actionPerformed( ActionEvent e ) {
-        if (e.getSource().equals( roomColor )) {
+        if (e.getSource().equals( roomColor ) && e.getModifiers() != 0) {
             this.engine.changeRoomColor( RoomColors.getColors()[roomColor.getSelectedIndex()] );
         } else if (e.getSource().equals( saveButton )) {
             engine.save();
