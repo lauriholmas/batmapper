@@ -78,15 +78,20 @@ public class RoomIconTransformer implements Transformer<Room, Icon> {
         if(room.isIndoors()){
             g.setColor(RoomColors.INDOOR);
         }
+        Color exitColor = RoomColors.EXIT;
         if(room.getColor() != null){
             g.setColor(room.getColor());
+            if(room.getColor().equals(RoomColors.BLUE) || room.getColor().equals(RoomColors.BROWN) ||
+                    room.getColor().equals(RoomColors.RED) || room.getColor().equals(RoomColors.PURPLE)){
+                exitColor = RoomColors.LIGHT_EXIT;
+            }
         }
 
         g.fillRect(newgfx.getMinX(), newgfx.getMinY(), newgfx.getWidth(), newgfx.getHeight());
 
         HashMap<String, Boolean> exitsMap = getExitsMap(room.getExits());
         g.setStroke(new BasicStroke(5));
-        g.setColor(RoomColors.EXIT);
+        g.setColor(exitColor);
 
         drawNorth(g, exitsMap.get("n"));
         drawNE(g, exitsMap.get("ne"));
