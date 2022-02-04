@@ -378,6 +378,9 @@ public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
         }
 
         Exit clickedExit = vv.getPickSupport().getEdge(vv.getGraphLayout(),e.getX(), e.getY());
+        if(e.getClickCount() == 2 && clickedExit == null){
+            this.engine.toggleDescs();
+        }
 
         if (e.getClickCount() == 2 && ! e.isConsumed() && clickedExit != null && clickedRoom == null) {
             //double click on exit, invoke edit option

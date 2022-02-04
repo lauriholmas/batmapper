@@ -236,13 +236,15 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
             vv.setBounds( 7, BORDERLINE, this.getWidth() - ( DESC_WIDTH + 21 ), this.getHeight() - ( BORDERLINE + 7 ) );
             descPanel.setBounds( this.getWidth() - ( 7 + DESC_WIDTH ), BORDERLINE, DESC_WIDTH, SHORT_DESC_HEIGHT + LONG_DESC_HEIGHT + EXITS_HEIGHT + BUTTON_HEIGHT*2 + 4 * 7 );
             scrollableNotes.setBounds( this.getWidth() - ( 7 + DESC_WIDTH ), BORDERLINE + descPanel.getHeight() + 7, DESC_WIDTH, this.getHeight() - ( descPanel.getHeight() + 14 + BORDERLINE ) );
-
+            scrollableNotes.setVisible(true);
         } else {
             vv.setBounds( 7, BORDERLINE, this.getWidth() - ( 2 * 7 ), this.getHeight() - ( BORDERLINE + 7 ) );
             descPanel.setBounds( 0, 0, 0, 0 );
             scrollableNotes.setBounds( 0, 0, 0, 0 );
+            scrollableNotes.setVisible(false);
         }
 
+        repaint();
     }
 
     @Override
