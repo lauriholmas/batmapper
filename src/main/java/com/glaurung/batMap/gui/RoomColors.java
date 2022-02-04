@@ -3,7 +3,11 @@ package com.glaurung.batMap.gui;
 import java.awt.Color;
 
 public class RoomColors {
-
+    public static final Color PICKED = Color.CYAN;
+    public static final Color CURRENT = Color.RED;
+    public static final Color EXIT = Color.DARK_GRAY;
+    public static Color INDOOR = new Color(50, 150, 50);
+    public static Color OUTDOOR = new Color(165, 165, 165);
     public static Color NORMAL = null;
     public static Color RED = new Color( 255, 0, 0 );
     public static Color YELLOW = new Color( 255, 255, 0 );

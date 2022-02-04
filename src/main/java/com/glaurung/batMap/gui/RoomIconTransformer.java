@@ -1,14 +1,10 @@
 package com.glaurung.batMap.gui;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
 import java.util.Set;
+import java.util.HashMap;
 
-import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
@@ -18,439 +14,265 @@ import com.glaurung.batMap.vo.Room;
 
 public class RoomIconTransformer implements Transformer<Room, Icon> {
 
-    private final Color PICKED = Color.CYAN;
-    private final Color CURRENT = Color.RED;
-
-
-    private Image nExitIn;
-    private Image neExitIn;
-    private Image eExitIn;
-    private Image seExitIn;
-    private Image sExitIn;
-    private Image swExitIn;
-    private Image wExitIn;
-    private Image nwExitIn;
-
-    private Image nWallIn;
-    private Image neWallIn;
-    private Image eWallIn;
-    private Image seWallIn;
-    private Image sWallIn;
-    private Image swWallIn;
-    private Image wWallIn;
-    private Image nwWallIn;
-
-    private Image middleIn;
-    private Image middleSpecialIn;
-
-    private Image nExitOut;
-    private Image neExitOut;
-    private Image eExitOut;
-    private Image seExitOut;
-    private Image sExitOut;
-    private Image swExitOut;
-    private Image wExitOut;
-    private Image nwExitOut;
-
-    private Image nWallOut;
-    private Image neWallOut;
-    private Image eWallOut;
-    private Image seWallOut;
-    private Image sWallOut;
-    private Image swWallOut;
-    private Image wWallOut;
-    private Image nwWallOut;
-
-    private Image middleOut;
-    private Image middleSpecialOut;
-
-
-    private final String PATH = "/images/";
-
-    private Image[][] indoorsWalls = new Image[3][3];
-    private Image[][] indoorsExits = new Image[3][3];
-
-    private Image[][] outdoorsWalls = new Image[3][3];
-    private Image[][] outdoorsExits = new Image[3][3];
-
-    private Image[][] redWalls = new Image[3][3];
-    private Image[][] redExits = new Image[3][3];
-
-    private Image[][] yellowWalls = new Image[3][3];
-    private Image[][] yellowExits = new Image[3][3];
-
-    private Image[][] blueWalls = new Image[3][3];
-    private Image[][] blueExits = new Image[3][3];
-
-    private Image[][] pinkWalls = new Image[3][3];
-    private Image[][] pinkExits = new Image[3][3];
-
-    private Image[][] purpleWalls = new Image[3][3];
-    private Image[][] purpleExits = new Image[3][3];
-
-    private Image[][] orangeWalls = new Image[3][3];
-    private Image[][] orangeExits = new Image[3][3];
-
-    private Image[][] brownWalls = new Image[3][3];
-    private Image[][] brownExits = new Image[3][3];
-
-    private Image[][] turquoiseWalls = new Image[3][3];
-    private Image[][] turquoiseExits = new Image[3][3];
-
-    private Image[][] ivoryWalls = new Image[3][3];
-    private Image[][] ivoryExits = new Image[3][3];
+    private final int WIDTH= 90;
+    private final int HEIGHT = 90;
 
     public RoomIconTransformer() {
-        nExitIn = loadAndRotateImage( "nIn.gif", null, null );
-        wExitIn = loadAndRotateImage( "nIn.gif", 270d, null );
-        sExitIn = loadAndRotateImage( "nIn.gif", 180d, null );
-        eExitIn = loadAndRotateImage( "nIn.gif", 90d, null );
-        neExitIn = loadAndRotateImage( "neIn.gif", null, null );
-        nwExitIn = loadAndRotateImage( "neIn.gif", 270d, null );
-        swExitIn = loadAndRotateImage( "neIn.gif", 180d, null );
-        seExitIn = loadAndRotateImage( "neIn.gif", 90d, null );
-
-        nWallIn = loadAndRotateImage( "nwallIn.gif", null, null );
-        wWallIn = loadAndRotateImage( "nwallIn.gif", 270d, null );
-        sWallIn = loadAndRotateImage( "nwallIn.gif", 180d, null );
-        eWallIn = loadAndRotateImage( "nwallIn.gif", 90d, null );
-
-        neWallIn = loadAndRotateImage( "newallIn.gif", null, null );
-        nwWallIn = loadAndRotateImage( "newallIn.gif", 270d, null );
-        swWallIn = loadAndRotateImage( "newallIn.gif", 180d, null );
-        seWallIn = loadAndRotateImage( "newallIn.gif", 90d, null );
-
-
-        middleIn = loadAndRotateImage( "middleIn.gif", null, null );
-        middleSpecialIn = loadAndRotateImage( "middlespecialIn.gif", null, null );
-
-        nExitOut = loadAndRotateImage( "nOut.gif", null, null );
-        wExitOut = loadAndRotateImage( "nOut.gif", 270d, null );
-        sExitOut = loadAndRotateImage( "nOut.gif", 180d, null );
-        eExitOut = loadAndRotateImage( "nOut.gif", 90d, null );
-        neExitOut = loadAndRotateImage( "neOut.gif", null, null );
-        nwExitOut = loadAndRotateImage( "neOut.gif", 270d, null );
-        swExitOut = loadAndRotateImage( "neOut.gif", 180d, null );
-        seExitOut = loadAndRotateImage( "neOut.gif", 90d, null );
-
-        nWallOut = loadAndRotateImage( "nwallOut.gif", null, null );
-        wWallOut = loadAndRotateImage( "nwallOut.gif", 270d, null );
-        sWallOut = loadAndRotateImage( "nwallOut.gif", 180d, null );
-        eWallOut = loadAndRotateImage( "nwallOut.gif", 90d, null );
-
-        neWallOut = loadAndRotateImage( "newallOut.gif", null, null );
-        nwWallOut = loadAndRotateImage( "newallOut.gif", 270d, null );
-        swWallOut = loadAndRotateImage( "newallOut.gif", 180d, null );
-        seWallOut = loadAndRotateImage( "newallOut.gif", 90d, null );
-
-
-        middleOut = loadImage( "middleOut.gif" );
-        middleSpecialOut = loadImage( "middlespecialOut.gif" );
-
-//		"normal","red","yellow","blue", "pink","purple","orange","brown","turquoise","ivory"
-        loadIndoors();
-        loadOutdoors();
-        loadRed();
-        loadColoredIcons( yellowWalls, yellowExits, RoomColors.YELLOW );
-        loadColoredIcons( blueWalls, blueExits, RoomColors.BLUE );
-        loadColoredIcons( pinkWalls, pinkExits, RoomColors.PINK );
-        loadColoredIcons( purpleWalls, purpleExits, RoomColors.PURPLE );
-        loadColoredIcons( orangeWalls, orangeExits, RoomColors.ORANGE );
-        loadColoredIcons( brownWalls, brownExits, RoomColors.BROWN );
-        loadColoredIcons( turquoiseWalls, turquoiseExits, RoomColors.TURQUOISE );
-        loadColoredIcons( ivoryWalls, ivoryExits, RoomColors.IVORY );
-
-
     }
 
 
     @Override
     public Icon transform( Room room ) {
-        return new ImageIcon( assembleImageBasedOn( room ) );
-    }
-
-    private BufferedImage loadAndRotateImage( String filename, Double rotation, Color color ) {
-        BufferedImage newImage = null;
-        BufferedImage originalImage = null;
-
-        if (color != null) {
-            newImage = loadImage( filename );
-            newImage = changeColor( newImage, color );
-        } else {
-            newImage = loadImage( filename );
-        }
-
-        if (rotation != null) {
-            originalImage = newImage;
-            newImage = new BufferedImage( originalImage.getWidth(), originalImage.getHeight(), originalImage.getType() );
-
-            Graphics2D graphics = newImage.createGraphics();
-
-            graphics.rotate( Math.toRadians( rotation ), originalImage.getWidth() / 2, originalImage.getHeight() / 2 );
-            graphics.drawImage( originalImage, 0, 0, originalImage.getWidth(), originalImage.getHeight(), 0, 0, originalImage.getWidth(), originalImage.getHeight(), null );
-            graphics.dispose();
-        }
-        return newImage;
+        return new ImageIcon(drawRoom(room));
     }
 
 
-    private BufferedImage loadImage( String filename ) {
-        BufferedImage image;
-        try {
-            URL imgURL = getClass().getResource( PATH + filename );
-            image = ImageIO.read( imgURL );
-            return image;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+    private HashMap<String, Boolean> getExitsMap( Set<String> exits ) {
+        HashMap<String, Boolean> exitsmap = new HashMap<>();
+        exitsmap.put("n", false);
+        exitsmap.put("ne", false);
+        exitsmap.put("e", false);
+        exitsmap.put("se", false);
+        exitsmap.put("s", false);
+        exitsmap.put("sw", false);
+        exitsmap.put("w", false);
+        exitsmap.put("nw", false);
+        exitsmap.put("u", false);
+        exitsmap.put("d", false);
+        exitsmap.put("special", false);
 
-    private BufferedImage assembleImageBasedOn( Room room ) {
-        Image[][] walls = null;
-        Image[][] exits = null;
-        boolean[][] sectionHasExit = getExitGrid( room.getExits() );// x,y going left to right, up to down
-        if (room.getColor() != null) {
-            if (room.getColor().equals( RoomColors.RED )) {
-                walls = redWalls;
-                exits = redExits;
-            } else if (room.getColor().equals( RoomColors.YELLOW )) {
-                walls = yellowWalls;
-                exits = yellowExits;
-            } else if (room.getColor().equals( RoomColors.BLUE )) {
-                walls = blueWalls;
-                exits = blueExits;
-            } else if (room.getColor().equals( RoomColors.PINK )) {
-                walls = pinkWalls;
-                exits = pinkExits;
-            } else if (room.getColor().equals( RoomColors.PURPLE )) {
-                walls = purpleWalls;
-                exits = purpleExits;
-            } else if (room.getColor().equals( RoomColors.ORANGE )) {
-                walls = orangeWalls;
-                exits = orangeExits;
-            } else if (room.getColor().equals( RoomColors.BROWN )) {
-                walls = brownWalls;
-                exits = brownExits;
-            } else if (room.getColor().equals( RoomColors.TURQUOISE )) {
-                walls = turquoiseWalls;
-                exits = turquoiseExits;
-            } else if (room.getColor().equals( RoomColors.IVORY )) {
-                walls = ivoryWalls;
-                exits = ivoryExits;
-            }
-
-        } else {
-            if (! room.isIndoors()) {
-                walls = indoorsWalls;
-                exits = indoorsExits;
-
-            } else if (room.isIndoors()) {
-                walls = outdoorsWalls;
-                exits = outdoorsExits;
-            }
-        }
-
-
-        BufferedImage roomImage = new BufferedImage( 90, 90, BufferedImage.TYPE_4BYTE_ABGR );
-        Graphics2D paint = roomImage.createGraphics();
-        paint.setBackground( Color.WHITE );
-        for (int i = 0; i < 3; ++ i) {
-            for (int j = 0; j < 3; ++ j) {
-                if (sectionHasExit[i][j]) {
-                    paint.drawImage( exits[i][j], i * 30, j * 30, null );
-                } else {
-                    paint.drawImage( walls[i][j], i * 30, j * 30, null );
-                }
-            }
-        }
-        paint.dispose();
-
-        if (room.isPicked()) {
-            BufferedImage tempImage = new BufferedImage( 96, 96, BufferedImage.TYPE_4BYTE_ABGR );
-            Graphics2D gfx = tempImage.createGraphics();
-            gfx.setColor( PICKED );
-            gfx.fillRect( 0, 0, 96, 96 );
-            gfx.drawImage( roomImage, 3, 3, null );
-            gfx.dispose();
-            roomImage = tempImage;
-        }
-
-        if (room.isCurrent()) {
-            BufferedImage tempImage = new BufferedImage( 102, 102, BufferedImage.TYPE_4BYTE_ABGR );
-            Graphics2D gfx = tempImage.createGraphics();
-            gfx.setColor( CURRENT );
-            gfx.fillRect( 0, 0, 102, 102 );
-            if (room.isPicked()) {
-                gfx.drawImage( roomImage, 3, 3, null );
-            } else {
-                gfx.drawImage( roomImage, 6, 6, null );
-            }
-            gfx.dispose();
-            roomImage = tempImage;
-        }
-        return roomImage;
-
-    }
-
-
-    private boolean[][] getExitGrid( Set<String> exits ) {
-        boolean[][] grid = new boolean[3][3];
-        for (int i = 0; i < 3; ++ i) {
-            for (int j = 0; j < 3; ++ j) {
-                grid[i][j] = false;
-            }
-        }
 
         for (String exit : exits) {
             if (exit.equalsIgnoreCase( "n" ) || exit.equalsIgnoreCase( "north" )) {
-                grid[1][0] = true;
+                exitsmap.put("n", true);
             } else if (exit.equalsIgnoreCase( "e" ) || exit.equalsIgnoreCase( "east" )) {
-                grid[2][1] = true;
+                exitsmap.put("e", true);
             } else if (exit.equalsIgnoreCase( "s" ) || exit.equalsIgnoreCase( "south" )) {
-                grid[1][2] = true;
+                exitsmap.put("s", true);
             } else if (exit.equalsIgnoreCase( "w" ) || exit.equalsIgnoreCase( "west" )) {
-                grid[0][1] = true;
+                exitsmap.put("w", true);
             } else if (exit.equalsIgnoreCase( "ne" ) || exit.equalsIgnoreCase( "northeast" )) {
-                grid[2][0] = true;
+                exitsmap.put("ne", true);
             } else if (exit.equalsIgnoreCase( "nw" ) || exit.equalsIgnoreCase( "northwest" )) {
-                grid[0][0] = true;
+                exitsmap.put("nw", true);
             } else if (exit.equalsIgnoreCase( "se" ) || exit.equalsIgnoreCase( "southeast" )) {
-                grid[2][2] = true;
+                exitsmap.put("se", true);
             } else if (exit.equalsIgnoreCase( "sw" ) || exit.equalsIgnoreCase( "southwest" )) {
-                grid[0][2] = true;
+                exitsmap.put("sw", true);
+            } else if (exit.equalsIgnoreCase( "u" ) || exit.equalsIgnoreCase( "up" )) {
+                exitsmap.put("u", true);
+            } else if (exit.equalsIgnoreCase( "d" ) || exit.equalsIgnoreCase( "down" )) {
+                exitsmap.put("d", true);
             } else {
-                grid[1][1] = true;
+                exitsmap.put("special", true);
             }
         }
-        return grid;
+        return exitsmap;
     }
 
 
-    private void loadOutdoors() {
-        outdoorsWalls[0][0] = nwWallOut;
-        outdoorsWalls[1][0] = nWallOut;
-        outdoorsWalls[2][0] = neWallOut;
-
-        outdoorsWalls[0][1] = wWallOut;
-        outdoorsWalls[1][1] = middleOut;
-        outdoorsWalls[2][1] = eWallOut;
-
-        outdoorsWalls[0][2] = swWallOut;
-        outdoorsWalls[1][2] = sWallOut;
-        outdoorsWalls[2][2] = seWallOut;
-
-        outdoorsExits[0][0] = nwExitOut;
-        outdoorsExits[1][0] = nExitOut;
-        outdoorsExits[2][0] = neExitOut;
-
-        outdoorsExits[0][1] = wExitOut;
-        outdoorsExits[1][1] = middleSpecialOut;
-        outdoorsExits[2][1] = eExitOut;
-
-        outdoorsExits[0][2] = swExitOut;
-        outdoorsExits[1][2] = sExitOut;
-        outdoorsExits[2][2] = seExitOut;
-
-    }
-
-
-    private void loadIndoors() {
-        indoorsWalls[0][0] = nwWallIn;
-        indoorsWalls[1][0] = nWallIn;
-        indoorsWalls[2][0] = neWallIn;
-
-        indoorsWalls[0][1] = wWallIn;
-        indoorsWalls[1][1] = middleIn;
-        indoorsWalls[2][1] = eWallIn;
-
-        indoorsWalls[0][2] = swWallIn;
-        indoorsWalls[1][2] = sWallIn;
-        indoorsWalls[2][2] = seWallIn;
-
-        indoorsExits[0][0] = nwExitIn;
-        indoorsExits[1][0] = nExitIn;
-        indoorsExits[2][0] = neExitIn;
-
-        indoorsExits[0][1] = wExitIn;
-        indoorsExits[1][1] = middleSpecialIn;
-        indoorsExits[2][1] = eExitIn;
-
-        indoorsExits[0][2] = swExitIn;
-        indoorsExits[1][2] = sExitIn;
-        indoorsExits[2][2] = seExitIn;
-
-    }
-
-    private void loadColoredIcons( Image[][] walls, Image[][] exits, Color color ) {
-        if (walls == null) {
-            walls = new Image[3][3];
+    private BufferedImage drawRoom(Room room ){
+        BufferedImage newgfx = new BufferedImage(90, 90, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = newgfx.createGraphics();
+        g.setColor(RoomColors.OUTDOOR);
+        if(room.isIndoors()){
+            g.setColor(RoomColors.INDOOR);
         }
-        if (exits == null) {
-            exits = new Image[3][3];
+        if(room.getColor() != null){
+            g.setColor(room.getColor());
         }
-        walls[0][0] = loadAndRotateImage( "newall.gif", 270d, color );
-        walls[1][0] = loadAndRotateImage( "nwall.gif", null, color );
-        walls[2][0] = loadAndRotateImage( "newall.gif", null, color );
 
-        walls[0][1] = loadAndRotateImage( "nwall.gif", 270d, color );
-        walls[1][1] = loadAndRotateImage( "middle.gif", null, color );
-        walls[2][1] = loadAndRotateImage( "nwall.gif", 90d, color );
+        g.fillRect(newgfx.getMinX(), newgfx.getMinY(), newgfx.getWidth(), newgfx.getHeight());
 
-        walls[0][2] = loadAndRotateImage( "newall.gif", 180d, color );
-        walls[1][2] = loadAndRotateImage( "nwall.gif", 180d, color );
-        walls[2][2] = loadAndRotateImage( "newall.gif", 90d, color );
+        HashMap<String, Boolean> exitsMap = getExitsMap(room.getExits());
+        g.setStroke(new BasicStroke(5));
+        g.setColor(RoomColors.EXIT);
 
-        exits[0][0] = loadAndRotateImage( "ne.gif", 270d, color );
-        exits[1][0] = loadAndRotateImage( "n.gif", null, color );
-        exits[2][0] = loadAndRotateImage( "ne.gif", null, color );
+        drawNorth(g, exitsMap.get("n"));
+        drawNE(g, exitsMap.get("ne"));
+        drawEast(g, exitsMap.get("e"));
+        drawSE(g, exitsMap.get("se"));
+        drawSouth(g, exitsMap.get("s"));
+        drawSW(g, exitsMap.get("sw"));
+        drawWest(g, exitsMap.get("w"));
+        drawNW(g, exitsMap.get("nw"));
+        if(exitsMap.get("u")){
+            drawU(g);
+        }
+        if(exitsMap.get("d")){
+            drawD(g);
+        }
+        if(exitsMap.get("special")){
+            drawSpecial(g);
+        }
 
-        exits[0][1] = loadAndRotateImage( "n.gif", 270d, color );
-        exits[1][1] = loadAndRotateImage( "special.gif", null, color );
-        exits[2][1] = loadAndRotateImage( "n.gif", 90d, color );
+        g.dispose();
+        if(room.isPicked()){
+            BufferedImage pickedRoom = new BufferedImage(96, 96, BufferedImage.TYPE_INT_RGB);
+            g = pickedRoom.createGraphics();
+            g.setColor(RoomColors.PICKED);
+            g.fillRect(0,0,96,96);
+            g.drawImage(newgfx, 3, 3, 90, 90, null);
+            g.dispose();
+            newgfx = pickedRoom;
+        }
 
-        exits[0][2] = loadAndRotateImage( "ne.gif", 180d, color );
-        exits[1][2] = loadAndRotateImage( "n.gif", 180d, color );
-        exits[2][2] = loadAndRotateImage( "ne.gif", 90d, color );
-    }
-
-    private void loadRed() {
-
-        redWalls[0][0] = loadAndRotateImage( "newall.gif", 270d, RoomColors.RED );
-        redWalls[1][0] = loadAndRotateImage( "nwall.gif", null, RoomColors.RED );
-        redWalls[2][0] = loadAndRotateImage( "newall.gif", null, RoomColors.RED );
-
-        redWalls[0][1] = loadAndRotateImage( "nwall.gif", 270d, RoomColors.RED );
-        redWalls[1][1] = loadAndRotateImage( "middle.gif", null, RoomColors.RED );
-        redWalls[2][1] = loadAndRotateImage( "nwall.gif", 90d, RoomColors.RED );
-
-        redWalls[0][2] = loadAndRotateImage( "newall.gif", 180d, RoomColors.RED );
-        redWalls[1][2] = loadAndRotateImage( "nwall.gif", 180d, RoomColors.RED );
-        redWalls[2][2] = loadAndRotateImage( "newall.gif", 90d, RoomColors.RED );
-
-        redExits[0][0] = loadAndRotateImage( "ne.gif", 270d, RoomColors.RED );
-        redExits[1][0] = loadAndRotateImage( "n.gif", null, RoomColors.RED );
-        redExits[2][0] = loadAndRotateImage( "ne.gif", null, RoomColors.RED );
-
-        redExits[0][1] = loadAndRotateImage( "n.gif", 270d, RoomColors.RED );
-        redExits[1][1] = loadAndRotateImage( "special.gif", null, RoomColors.RED );
-        redExits[2][1] = loadAndRotateImage( "n.gif", 90d, RoomColors.RED );
-
-        redExits[0][2] = loadAndRotateImage( "ne.gif", 180d, RoomColors.RED );
-        redExits[1][2] = loadAndRotateImage( "n.gif", 180d, RoomColors.RED );
-        redExits[2][2] = loadAndRotateImage( "ne.gif", 90d, RoomColors.RED );
-    }
-
-    private BufferedImage changeColor( BufferedImage image, Color color ) {
-        for (int i = 0; i < image.getWidth(); ++ i) {
-            for (int j = 0; j < image.getHeight(); ++ j) {
-                if (image.getRGB( i, j ) == Color.WHITE.getRGB()) {
-                    image.setRGB( i, j, color.getRGB() );
-                }
+        if(room.isCurrent()){
+            BufferedImage currentRoom = new BufferedImage(102, 102, BufferedImage.TYPE_INT_RGB);
+            g = currentRoom.createGraphics();
+            g.setColor(RoomColors.CURRENT);
+            g.fillRect(0,0,102,102);
+            if(room.isPicked()){
+                g.drawImage(newgfx,3,3,96,96, null);
+            }else {
+                g.drawImage(newgfx,6,6,90,90, null);
             }
+            g.dispose();
+            newgfx = currentRoom;
         }
-        return image;
+
+        return newgfx;
     }
 
+    private void drawNorth(Graphics2D g, boolean exists){
+        if(exists){
+            Polygon exit = new Polygon();
+            exit.addPoint(WIDTH/2,2);
+            exit.addPoint(WIDTH/2+6, 12+2);
+            exit.addPoint(WIDTH/2-6, 12+2);
+            g.fill(exit);
+        }else{
+            g.fillRect(30,2,30,5);
+
+        }
+
+    }
+    private void drawSouth(Graphics2D g, boolean exists){
+        if(exists){
+            Polygon exit = new Polygon();
+            exit.addPoint(WIDTH/2,HEIGHT-2);
+            exit.addPoint(WIDTH/2+6, HEIGHT-(12+2));
+            exit.addPoint(WIDTH/2-6, HEIGHT-(12+2));
+            g.fill(exit);
+        }else{
+            g.fillRect(30, HEIGHT-7, 30, 5);
+        }
+
+    }
+    private void drawEast(Graphics2D g, boolean exists){
+        if(exists){
+            Polygon exit = new Polygon();
+            exit.addPoint(WIDTH-2,HEIGHT/2);
+            exit.addPoint(WIDTH-(2+12), HEIGHT/2-6);
+            exit.addPoint(WIDTH-(2+12), HEIGHT/2+6);
+            g.fill(exit);
+        }else{
+            g.fillRect(WIDTH-7, 30, 5, 30);
+        }
+
+    }
+    private void drawWest(Graphics2D g, boolean exists){
+        if(exists){
+            Polygon exit = new Polygon();
+            exit.addPoint(2,HEIGHT/2);
+            exit.addPoint(2+12, HEIGHT/2-6);
+            exit.addPoint(2+12, HEIGHT/2+6);
+            g.fill(exit);
+        }else{
+            g.fillRect(2, 30, 5, 30);
+        }
+
+    }
+
+    private void drawNW(Graphics2D g, boolean exists){
+        if(exists){
+            Polygon exit = new Polygon();
+            exit.addPoint(4,4);
+            exit.addPoint(4+12, 4+3);
+            exit.addPoint(4+3, 4+12);
+            g.fill(exit);
+        }else{
+            g.fillRect(2, 2, 28,5);
+            g.fillRect(2, 2, 5,28);
+        }
+
+    }
+
+    private void drawNE(Graphics2D g, boolean exists){
+        if(exists){
+            Polygon exit = new Polygon();
+            exit.addPoint(WIDTH-4,4);
+            exit.addPoint(WIDTH-(4+12), 4+3);
+            exit.addPoint(WIDTH-(4+3), 4+12);
+            g.fill(exit);
+        }else{
+            g.fillRect(WIDTH-(2+28), 2, 28,5);
+            g.fillRect(WIDTH-(2+5), 2, 5,28);
+        }
+
+    }
+    private void drawSE(Graphics2D g, boolean exists){
+        if(exists){
+            Polygon exit = new Polygon();
+            exit.addPoint(WIDTH-4,HEIGHT-4);
+            exit.addPoint(WIDTH-(4+12), HEIGHT-(4+3));
+            exit.addPoint(WIDTH-(4+3), HEIGHT-(4+12));
+            g.fill(exit);
+        }else{
+            g.fillRect(WIDTH-(2+5), HEIGHT-(2+28), 5,28);
+            g.fillRect(WIDTH-(2+28), HEIGHT-(2+5), 28,5);
+        }
+
+    }
+    private void drawSW(Graphics2D g, boolean exists){
+        if(exists){
+            Polygon exit = new Polygon();
+            exit.addPoint(4,HEIGHT-4);
+            exit.addPoint(4+12, HEIGHT-(4+3));
+            exit.addPoint(4+3, HEIGHT-(4+12));
+            g.fill(exit);
+        }else{
+            g.fillRect(2, HEIGHT-(2+5), 28,5);
+            g.fillRect(2, HEIGHT-(2+28), 5,28);
+        }
+
+    }
+    private void drawSpecial(Graphics2D g){
+        g.setStroke(new BasicStroke(1));
+        g.setColor(RoomColors.EXIT);
+        g.fillOval(WIDTH/2-9, HEIGHT/2-6, 18, 12 );
+    }
+    private void drawU(Graphics2D g){
+        g.setStroke(new BasicStroke(1));
+        g.setColor(RoomColors.EXIT);
+        Polygon exit = new Polygon();
+        Point startpoint = new Point(WIDTH/2-9, HEIGHT/2-6);
+        exit.addPoint(startpoint.x, startpoint.y);
+        startpoint.translate(9, -15);
+        exit.addPoint(startpoint.x, startpoint.y);
+        startpoint.translate(9, 15);
+        exit.addPoint(startpoint.x, startpoint.y);
+        startpoint.translate(-9, -6);
+        exit.addPoint(startpoint.x, startpoint.y);
+        startpoint.translate(-9, 6);
+        exit.addPoint(startpoint.x, startpoint.y);
+        g.fill(exit);
+    }
+    private void drawD(Graphics2D g){
+        g.setStroke(new BasicStroke(1));
+        g.setColor(RoomColors.EXIT);
+        Polygon exit = new Polygon();
+        Point startpoint = new Point(WIDTH/2+9, HEIGHT/2+6);
+        exit.addPoint(startpoint.x, startpoint.y);
+        startpoint.translate(-9, 15);
+        exit.addPoint(startpoint.x, startpoint.y);
+        startpoint.translate(-9, -15);
+        exit.addPoint(startpoint.x, startpoint.y);
+        startpoint.translate(9, 6);
+        exit.addPoint(startpoint.x, startpoint.y);
+        startpoint.translate(9, -6);
+        exit.addPoint(startpoint.x, startpoint.y);
+        g.fill(exit);
+    }
 
 }

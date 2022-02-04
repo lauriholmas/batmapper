@@ -76,6 +76,17 @@ public class MapperTest1 implements ActionListener {
         exits.add( "sw" );
         exits.add( "se" );
         engine.moveToRoom( "testArea", "7", "s", true, "seventhRoom", "jshgfskgyfhsgfjhtsgdfhgsdfsygfsgdyfuysgdfjkhsgdfskuygfsuygfusygfuysd", exits );
+        exits.clear();
+        engine.moveToRoom( "testArea", "0982098", "u", true, "noexitsRoom", "jshgfskgyfhsgfjhtsgdfhgsdfsygfsgdyfuysgdfjkhsgdfskuygfsuygfusygfuysd", exits );
+
+        for(int i = 0;i<3;++i){
+            exits.clear();
+            exits.add("ne");
+            exits.add("n");
+            exits.add("s");
+            exits.add("w");
+            engine.moveToRoom( "testArea", "7"+i, "w", true, i+"nthRoom", "jshgfskgyfhsgfjhtsgdfhgsdfsygfsgdyfuysgdfjkhsgdfskuygfsuygfusygfuysd", exits );
+        }
 //    	exits.clear(); exits.add("ne"); exits.add("nw");exits.add("sw"); exits.add("se");
 //    	engine.moveToRoom("testArea", "1", "jump to start", false, "areaFirstRoom", "jshgfskgyfhsgfjhtsgdfhgsdfsygfsgdyfuysgdfjkhsgdfskuygfsuygfusygfuysd", exits);
 
