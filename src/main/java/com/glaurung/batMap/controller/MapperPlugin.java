@@ -27,6 +27,7 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
     protected static final String COMMAND_REMOVE_LABEL = "del";
     protected static final String COMMAND_RUN_TO_LABEL = "run";
     protected static final String COMMAND_LIST_LABELS = "list";
+    protected static final String COMMAND_APPEND_TO_NOTES = "append";
     private MapperEngine engine;
     private SearchEngine searchEngine;
     private final String CHANNEL_PREFIX = "BAT_MAPPER";
@@ -168,6 +169,7 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
             printConsoleMessage(String.format("\t%s <label> - to run to room with that label ( need to set delim in corpsepanel)", COMMAND_RUN_TO_LABEL));
             printConsoleMessage(String.format("\t%s         - to remove label from current room",COMMAND_REMOVE_LABEL));
             printConsoleMessage(String.format("\t%s        - to list labels and rooms",COMMAND_LIST_LABELS));
+            printConsoleMessage(String.format("\t%s        - to append a line to roomnotes",COMMAND_APPEND_TO_NOTES));
         }
         if(input instanceof String){
             String[] params = ((String)input).split(" ");
@@ -199,12 +201,25 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
                     }else{
                         printConsoleError(String.format("label [%s] not found", label));
                     }
+                }else if(command.equalsIgnoreCase( COMMAND_APPEND_TO_NOTES )){
+                    printConsoleMessage(String.format("Appending to notes [%s]", label));
+                    this.engine.getPanel().appentToNotes( label );
                 }else{
                     printConsoleError(String.format("unknown command: [%s]", command));
                 }
 
-            }else{
-                printConsoleError("only 1 or 2 params accepted");
+            }else if(params.length > 2){
+                String command = params[0];
+                if( ! command.equalsIgnoreCase( COMMAND_APPEND_TO_NOTES )){
+                    printConsoleError(String.format("unknown command: [%s] or too many params, slow down!", command));
+                }else{
+                    String notes = ( (String) input ).substring( COMMAND_APPEND_TO_NOTES.length() );
+                    this.engine.getPanel().appentToNotes( notes );
+                }
+
+            }
+            else{
+                printConsoleError("only 1 or 2 or KAZILLION params accepted");
             }
         }
     }

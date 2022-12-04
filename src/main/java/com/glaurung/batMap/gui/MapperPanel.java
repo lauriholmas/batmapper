@@ -340,4 +340,9 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
     }
 
 
+    public void appentToNotes(String text){
+        this.roomNotes.append( "\n"+text );
+    }
+
+
 }
