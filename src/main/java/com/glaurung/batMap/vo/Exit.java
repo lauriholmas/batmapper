@@ -44,25 +44,25 @@ public class Exit implements Serializable {
     public String getOpposite(){
         switch( this.compassDir ){
         case "n":
-            return "s";
+            return "south";
         case "ne":
-            return "sw";
+            return "southwest";
         case "e":
-            return "w";
+            return "west";
         case "se":
-            return "nw";
+            return "northwest";
         case "s":
-            return "n";
+            return "north";
         case "sw":
-            return "ne";
+            return "northeast";
         case "w":
-            return "e";
+            return "east";
         case "nw":
-            return "se";
+            return "southeast";
         case "u":
-            return "d";
+            return "down";
         case "d":
-            return "u";
+            return "up";
         default:
             return null;
         }

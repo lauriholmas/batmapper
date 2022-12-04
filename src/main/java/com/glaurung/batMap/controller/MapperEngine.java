@@ -220,9 +220,10 @@ public class MapperEngine implements ItemListener, ComponentListener {
         if (currentRoom != null) {
             currentRoom.setCurrent( false );
             if (currentRoom.isPicked()) {
+                newRoom.setPicked( true );
+                currentRoom.setPicked( false );
                 setRoomDescsForRoom( newRoom, longDesc, shortDesc, indoors, exits );
                 singleRoomPicked( newRoom );
-
             }
         }
         newRoom.setCurrent( true );
