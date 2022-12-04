@@ -14,10 +14,10 @@ public class Exit implements Serializable {
 
     public Exit( String exit ) {
         this.exit = exit;
-        this.compassDir = this.checkWhatExitIs( exit );
+        this.compassDir = checkWhatExitIs( exit );
     }
 
-    private String checkWhatExitIs( String exit ) {
+    public static String checkWhatExitIs( String exit ) {
         if (exit.equalsIgnoreCase( "n" ) || exit.equalsIgnoreCase( "north" ))
             return "n";
         if (exit.equalsIgnoreCase( "e" ) || exit.equalsIgnoreCase( "east" ))
@@ -39,6 +39,34 @@ public class Exit implements Serializable {
         if (exit.equalsIgnoreCase( "u" ) || exit.equalsIgnoreCase( "up" ))
             return "u";
         return null;
+    }
+
+    public String getOpposite(){
+        switch( this.compassDir ){
+        case "n":
+            return "s";
+        case "ne":
+            return "sw";
+        case "e":
+            return "w";
+        case "se":
+            return "nw";
+        case "s":
+            return "n";
+        case "sw":
+            return "ne";
+        case "w":
+            return "e";
+        case "nw":
+            return "se";
+        case "u":
+            return "d";
+        case "d":
+            return "u";
+        default:
+            return null;
+        }
+
     }
 
     public String getExit() {

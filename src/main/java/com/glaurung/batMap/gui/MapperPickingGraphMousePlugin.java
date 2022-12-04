@@ -357,7 +357,7 @@ public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
         Room clickedRoom = vv.getPickSupport().getVertex(vv.getGraphLayout(), e.getX(), e.getY());
 
         if( clickedRoom != null && e.isControlDown()){
-           String dirs = this.engine.checkDirsFromCurrentToomTo(clickedRoom);
+           String dirs = this.engine.checkDirsFromCurrentRoomTo(clickedRoom, false);
             Object[] options = {"Ok",
                     "Send to mud",
                     "Send to party"};
@@ -372,7 +372,7 @@ public class MapperPickingGraphMousePlugin extends AbstractGraphMousePlugin
             if( selection == 1){
                 this.engine.sendToMud( dirs );
             }else if(selection == 2){
-                this.engine.sendToParty( dirs);
+                this.engine.sendToParty( this.engine.checkDirsFromCurrentRoomTo( clickedRoom, true ));
             }
             return;
         }

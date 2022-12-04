@@ -54,6 +54,7 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
     JPanel descPanel = new JPanel();
     private Room room = new Room( "", "" );
     private Font font = new Font( "Consolas", Font.PLAIN, 14 );
+    private Font buttonFont = new Font("Consolas",Font.PLAIN, 10 );
 
     private boolean visibleDescs = true;
 
@@ -64,6 +65,7 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
     private JButton zoomOutButton;
     private JToggleButton snapToggleButton;
     private JToggleButton mazeButton;
+    private JToggleButton reverseExitsButton;
 
     MapperEngine engine;
 
@@ -133,7 +135,7 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 
         zoomInButton= new JButton( "+" );
         descPanel.add(zoomInButton);
-        zoomInButton.setFont( font );
+        zoomInButton.setFont( buttonFont );
         zoomInButton.setBounds(  0,
                 SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE, BUTTON_WIDTH/2, BUTTON_HEIGHT );
         zoomInButton.setToolTipText( "Zoom in" );
@@ -141,7 +143,7 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 
         zoomOutButton= new JButton( "-" );
         descPanel.add(zoomOutButton);
-        zoomOutButton.setFont( font );
+        zoomOutButton.setFont( buttonFont );
         zoomOutButton.setBounds( BUTTON_WIDTH/2,
                 SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE, BUTTON_WIDTH/2, BUTTON_HEIGHT );
         zoomOutButton.setToolTipText( "Zoom in" );
@@ -160,17 +162,17 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
 
         saveButton = new JButton( "Save" );
         descPanel.add( saveButton );
-        saveButton.setFont( font );
+        saveButton.setFont( buttonFont );
         saveButton.setBounds( 0,
-                      SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE + BUTTON_HEIGHT + BORDERLINE, BUTTON_WIDTH, BUTTON_HEIGHT );
+                      SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE + BUTTON_HEIGHT + BORDERLINE, (int)(BUTTON_WIDTH*0.7), BUTTON_HEIGHT );
         saveButton.setToolTipText( "Save the map to a file." );
         saveButton.addActionListener( this );
 
         clearButton = new JButton( "Clear" );
         descPanel.add( clearButton );
-        clearButton.setFont( font );
-        clearButton.setBounds( BUTTON_WIDTH + BORDERLINE,
-                       SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE + BUTTON_HEIGHT + BORDERLINE, BUTTON_WIDTH, BUTTON_HEIGHT );
+        clearButton.setFont( buttonFont );
+        clearButton.setBounds( (int)(BUTTON_WIDTH*0.7)+BORDERLINE/2,
+                       SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE + BUTTON_HEIGHT + BORDERLINE, (int)(BUTTON_WIDTH*0.7), BUTTON_HEIGHT );
         clearButton.setToolTipText( "Clear the map for this area." );
         clearButton.addActionListener( this );
 
@@ -178,22 +180,30 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
         snapToggleButton = new JToggleButton("Snap");
         descPanel.add(snapToggleButton);
 
-        snapToggleButton.setFont(font);
-        snapToggleButton.setBounds( BUTTON_WIDTH + BORDERLINE+BUTTON_WIDTH + BORDERLINE,
-            SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE + BUTTON_HEIGHT + BORDERLINE, BUTTON_WIDTH, BUTTON_HEIGHT );
+        snapToggleButton.setFont(buttonFont);
+        snapToggleButton.setBounds( (int)(BUTTON_WIDTH*0.7)*2 + BORDERLINE,
+            SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE + BUTTON_HEIGHT + BORDERLINE, (int)(BUTTON_WIDTH*0.7), BUTTON_HEIGHT );
         snapToggleButton.setToolTipText( "Toggle room location snapping" );
         snapToggleButton.setSelected(true);
         snapToggleButton.addActionListener( this );
 
         mazeButton = new JToggleButton("Maze");
         descPanel.add(mazeButton);
-        mazeButton.setFont(font);
+        mazeButton.setFont(buttonFont);
         mazeButton.setBounds( BUTTON_WIDTH + BORDERLINE+BUTTON_WIDTH + BORDERLINE,
-                SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE, BUTTON_WIDTH, BUTTON_HEIGHT );
+                SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE, (int)(BUTTON_WIDTH*0.7), BUTTON_HEIGHT );
         mazeButton.setToolTipText("Toggle maze helper on and off");
         mazeButton.setSelected(false);
         mazeButton.addActionListener(this);
 
+        reverseExitsButton = new JToggleButton("Revs");
+        descPanel.add(reverseExitsButton);
+        reverseExitsButton.setFont(buttonFont);
+        reverseExitsButton.setBounds( (int)(BUTTON_WIDTH*0.7)*3 + (int)(BORDERLINE*1.5),
+                SHORT_DESC_HEIGHT + BORDERLINE + LONG_DESC_HEIGHT + BORDERLINE + EXITS_HEIGHT + BORDERLINE + BUTTON_HEIGHT + BORDERLINE, (int)(BUTTON_WIDTH*0.7), BUTTON_HEIGHT );
+        reverseExitsButton.setToolTipText("When adding an exit to new room, also add backwards exit automatically if reversable");
+        reverseExitsButton.setSelected(false);
+        reverseExitsButton.addActionListener(this);
 
 
 //		roomNotes.setBounds(0, BORDERLINE+SHORT_DESC_HEIGHT+BORDERLINE+LONG_DESC_HEIGHT+BORDERLINE+EXITS_HEIGHT+BORDERLINE+BUTTON_HEIGHT+BORDERLINE, DESC_WIDTH, NOTES_HEIGHT);
@@ -324,6 +334,8 @@ public class MapperPanel extends JPanel implements ComponentListener, DocumentLi
             engine.zoomOut();
         }else if(e.getSource().equals(mazeButton)){
             engine.setMazeMode(mazeButton.isSelected());
+        }else if(e.getSource().equals( reverseExitsButton )){
+            engine.setReversableDirsMode( reverseExitsButton.isSelected() );
         }
     }
 

@@ -57,6 +57,7 @@ public class MapperEngine implements ItemListener, ComponentListener {
     CorpsePanel corpsePanel;
     MapperPlugin plugin;
     boolean mazemode = false;
+    boolean reversableDirsMode = false;
 
     public MapperEngine( SparseMultigraph<Room, Exit> graph, MapperPlugin plugin ) {
         this(plugin);
@@ -147,8 +148,15 @@ public class MapperEngine implements ItemListener, ComponentListener {
         } else {
             if (GraphUtils.canAddExit( graph.getOutEdges( currentRoom ), exitUsed )) { // parallel exits can exist, but not with same name
                 currentRoom.addExit( exit.getExit() );
-
                 graph.addEdge( exit, new Pair<Room>( currentRoom, newRoom ), EdgeType.DIRECTED );
+
+                if(reversableDirsMode && exit.getOpposite() != null){
+                    Exit reverseExit = new Exit( exit.getOpposite() );
+                    if(GraphUtils.canAddExit( graph.getOutEdges( newRoom ), reverseExit.getExit() )){
+                        newRoom.addExit( reverseExit.getExit() );
+                        graph.addEdge( reverseExit, new Pair<Room>( newRoom, currentRoom ), EdgeType.DIRECTED );
+                    }
+                }
             }
 
         }
@@ -528,15 +536,48 @@ public class MapperEngine implements ItemListener, ComponentListener {
         this.scaler.getScaler().scale(this.vv, 1/1.1f, this.vv.getCenter());
     }
 
-    public String checkDirsFromCurrentToomTo(Room targetroom){
+    public String checkDirsFromCurrentRoomTo(Room targetroom, boolean shortDirs){
         DijkstraShortestPath<Room, Exit> algorithm = new DijkstraShortestPath<Room, Exit>( this.getGraph() );
-        String returnvalue="";
+        StringBuilder returnvalue= new StringBuilder();
         String delim = this.corpsePanel.getDelim();
-        for( Exit exit: algorithm.getPath( currentRoom, targetroom )){
-            returnvalue += exit.getExit()+delim;
-        }
-        return returnvalue;
+        List<Exit> path = algorithm.getPath( currentRoom, targetroom );
+        if(shortDirs){
+            //plan is to transform "north, north, north, south, east, tunnel" into
+            // 3 n;s;e;tunnel
+            int count_repeated_dirs=1;
+            String previous = null;
+            Iterator<Exit> pathIterator= path.iterator();
 
+            while( pathIterator.hasNext() ){
+                String shortExit = Exit.checkWhatExitIs(  pathIterator.next().getExit());
+                if(previous == null){
+                    previous = shortExit;
+                }else{
+                    if(previous.equalsIgnoreCase( shortExit )){
+                        count_repeated_dirs++;
+                    }else{
+                        if(count_repeated_dirs == 1){
+                            returnvalue.append( previous ).append( delim );
+                        }else{
+                            returnvalue.append( count_repeated_dirs).append( " " ).append( previous ).append( delim );
+                        }
+                        previous = shortExit;
+                        count_repeated_dirs=1;
+                    }
+                }
+            }
+
+            if(count_repeated_dirs == 1){
+                returnvalue.append( previous ).append( delim );
+            }else{
+                returnvalue.append( count_repeated_dirs).append( " " ).append( previous ).append( delim );
+            }
+        }else{
+            for(Exit exit: path){
+                returnvalue.append( exit.getExit() ).append( delim );
+            }
+        }
+        return returnvalue.toString();
     }
 
 
@@ -575,7 +616,7 @@ public class MapperEngine implements ItemListener, ComponentListener {
                 targetroom = room;
             }
         }
-        String dirs = checkDirsFromCurrentToomTo(targetroom);
+        String dirs = checkDirsFromCurrentRoomTo(targetroom, false);
         sendToMud(dirs);
     }
     public List<String> getLabels(){
@@ -595,4 +636,9 @@ public class MapperEngine implements ItemListener, ComponentListener {
         }
             repaint();
     }
+
+    public void setReversableDirsMode(boolean enabled){
+        this.reversableDirsMode = enabled;
+    }
+
 }
