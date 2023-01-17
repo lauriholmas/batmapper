@@ -175,7 +175,7 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
             printConsoleMessage(String.format("\t%s         - to remove label from current room",COMMAND_REMOVE_LABEL));
             printConsoleMessage(String.format("\t%s        - to list labels and rooms",COMMAND_LIST_LABELS));
             printConsoleMessage(String.format("\t%s        - to append a line to roomnotes",COMMAND_APPEND_TO_NOTES));
-            printConsoleMessage(String.format("\t%s <desc> - to search find room desc",COMMAND_FIND_DESC));
+            printConsoleMessage(String.format("\t%s <desc> - to find rooms by long desc",COMMAND_FIND_DESC));
         }
         if(input instanceof String){
             String[] params = ((String)input).split(" ");
