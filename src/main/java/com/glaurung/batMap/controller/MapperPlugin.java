@@ -220,7 +220,7 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
                     String notes = ( (String) input ).substring( COMMAND_APPEND_TO_NOTES.length() );
                     this.engine.getPanel().appentToNotes( notes );
                 }else if(command.equalsIgnoreCase( COMMAND_FIND_DESC )){
-                    String findSring = ( (String) input ).substring( COMMAND_FIND_DESC.length() );
+                    String findSring = ( (String) input ).substring( COMMAND_FIND_DESC.length() ).trim();
                     searchPanel.setSearchText(findSring);
                     List<String> rooms = searchPanel.searchForRoomsWith(findSring);
                     for(String room:  rooms) {
