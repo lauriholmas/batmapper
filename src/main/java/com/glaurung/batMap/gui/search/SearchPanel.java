@@ -6,6 +6,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
@@ -76,11 +77,17 @@ public class SearchPanel extends MapperPanel implements ItemListener {
     }
 
 
-    private void searchForRoomsWith( String text ) {
+    public void setSearchText( String text ) {
+        searchText.setText(text);
+    }
+
+    public List<String> searchForRoomsWith( String text ) {
+        List<String> foundRooms = new LinkedList<String>();
+
         model.removeAllElements();
         model.addElement( new SearchResultItem( new Room( "results", "first slot placeholder", new Area( "Search" ) ) ) );
         if (text.equals( "" )) {
-            return;
+            return foundRooms;
         }
         //iterate through all areafiles, iterate through all rooms and look for texts, if matches, add to list
         List<String> areas = AreaDataPersister.listAreaNames( this.engine.getBaseDir() );
@@ -92,6 +99,11 @@ public class SearchPanel extends MapperPanel implements ItemListener {
                     if (room.getLongDesc().toLowerCase().contains( text.toLowerCase() ) ||
                             room.getShortDesc().toLowerCase().contains( text.toLowerCase() )) {
                         model.addElement( new SearchResultItem( room ) );
+                        
+                        String roomString = room.getArea().getName() + ": " + room.getShortDesc();
+                        if (!foundRooms.contains(roomString)) {
+                            foundRooms.add(roomString);
+                        }
                     }
                 }
             }
@@ -100,6 +112,8 @@ public class SearchPanel extends MapperPanel implements ItemListener {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+
+        return foundRooms;
     }
 
     private void populateAreaList() {

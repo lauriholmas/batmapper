@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 import com.glaurung.batMap.gui.corpses.CorpsePanel;
 import com.glaurung.batMap.gui.manual.ManualPanel;
@@ -28,8 +29,11 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
     protected static final String COMMAND_RUN_TO_LABEL = "run";
     protected static final String COMMAND_LIST_LABELS = "list";
     protected static final String COMMAND_APPEND_TO_NOTES = "append";
+    protected static final String COMMAND_FIND_DESC = "find";
+    
     private MapperEngine engine;
     private SearchEngine searchEngine;
+    private SearchPanel searchPanel;
     private final String CHANNEL_PREFIX = "BAT_MAPPER";
     //batMap;areaname;roomUID;exitUsed;indoor boolean;shortDesc;longDesc;exits
     private final int PREFIX = 0;
@@ -69,7 +73,8 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
         engine.setCorpsePanel( corpses );
         clientWin.newTab( "Corpses", corpses);
         clientWin.newTab( "manual", new ManualPanel() );
-        clientWin.newTab( "map search", new SearchPanel( searchEngine ) );
+        searchPanel = new SearchPanel(searchEngine);
+        clientWin.newTab( "map search", searchPanel);
         clientWin.setVisible( true );
         this.getPluginManager().addProtocolListener( this );
         AreaDataPersister.migrateFilesToNewLocation( BASEDIR );
@@ -170,6 +175,7 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
             printConsoleMessage(String.format("\t%s         - to remove label from current room",COMMAND_REMOVE_LABEL));
             printConsoleMessage(String.format("\t%s        - to list labels and rooms",COMMAND_LIST_LABELS));
             printConsoleMessage(String.format("\t%s        - to append a line to roomnotes",COMMAND_APPEND_TO_NOTES));
+            printConsoleMessage(String.format("\t%s <desc> - to find rooms by long desc",COMMAND_FIND_DESC));
         }
         if(input instanceof String){
             String[] params = ((String)input).split(" ");
@@ -210,11 +216,19 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
 
             }else if(params.length > 2){
                 String command = params[0];
-                if( ! command.equalsIgnoreCase( COMMAND_APPEND_TO_NOTES )){
-                    printConsoleError(String.format("unknown command: [%s] or too many params, slow down!", command));
-                }else{
+                if(command.equalsIgnoreCase( COMMAND_APPEND_TO_NOTES )){
                     String notes = ( (String) input ).substring( COMMAND_APPEND_TO_NOTES.length() );
                     this.engine.getPanel().appentToNotes( notes );
+                }else if(command.equalsIgnoreCase( COMMAND_FIND_DESC )){
+                    String findSring = ( (String) input ).substring( COMMAND_FIND_DESC.length() ).trim();
+                    searchPanel.setSearchText(findSring);
+                    List<String> rooms = searchPanel.searchForRoomsWith(findSring);
+                    for(String room:  rooms) {
+                        printConsoleMessage(room);
+                    }
+                }
+                else{
+                    printConsoleError(String.format("unknown command: [%s] or too many params, slow down!", command));
                 }
 
             }
