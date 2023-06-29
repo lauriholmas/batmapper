@@ -55,12 +55,11 @@ public class AreaDataPersister {
 	    System.out.println("Renaming " + baseFile + " to " + target);
 	    baseFile.renameTo(target);
 	}
-	
-        FileOutputStream fileOutputStream = new FileOutputStream( new File( saveObject.getFileName() ) );
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream( fileOutputStream );
-        objectOutputStream.writeObject( saveObject );
-        fileOutputStream.close();
 
+        try (FileOutputStream fileOutputStream = new FileOutputStream(new File(saveObject.getFileName()));
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
+            objectOutputStream.writeObject(saveObject);
+        }
     }
 
 
@@ -68,10 +67,10 @@ public class AreaDataPersister {
 
         File dataFile = new File( getFileNameFrom( basedir, areaName ) );
 //		System.out.println("\n\n+ndataFileForLoading\n\n\n"+dataFile);
-        FileInputStream fileInputStream = new FileInputStream( dataFile );
-        ObjectInputStream objectInputStream = new ObjectInputStream( fileInputStream );
-        AreaSaveObject saveObject = (AreaSaveObject) objectInputStream.readObject();
-        return saveObject;
+        try (FileInputStream fileInputStream = new FileInputStream(dataFile);
+             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
+            return (AreaSaveObject) objectInputStream.readObject();
+        }
     }
 
     public static List<String> listAreaNames( String basedir ) {
@@ -80,10 +79,12 @@ public class AreaDataPersister {
         File folder = newDir;
         File[] files = folder.listFiles();
         LinkedList<String> names = new LinkedList<String>();
-        for (File file : files) {
-            if (FilenameUtils.getExtension( file.getName() ).equals( "batmap" )) {
+        if (files != null) {
+            for (File file : files) {
+                if (FilenameUtils.getExtension(file.getName()).equals("batmap")) {
 //				System.out.println(FilenameUtils.getBaseName(file.getName()));
-                names.add( FilenameUtils.getBaseName( file.getName() ) );
+                    names.add(FilenameUtils.getBaseName(file.getName()));
+                }
             }
         }
         return names;
