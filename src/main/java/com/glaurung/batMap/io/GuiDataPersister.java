@@ -33,9 +33,8 @@ public class GuiDataPersister {
     }
 
     public static GuiData load( String basedir ) {
-        try {
-            FileInputStream fileInputStream = new FileInputStream( getFile( basedir ) );
-            ObjectInputStream objectInputStream = new ObjectInputStream( fileInputStream );
+        try (FileInputStream fileInputStream = new FileInputStream( getFile( basedir ) );
+             ObjectInputStream objectInputStream = new ObjectInputStream( fileInputStream )) {
             GuiData data = (GuiData) objectInputStream.readObject();
             return data;
         } catch (IOException e) {

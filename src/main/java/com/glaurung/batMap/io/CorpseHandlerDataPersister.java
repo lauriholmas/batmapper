@@ -30,9 +30,8 @@ public class CorpseHandlerDataPersister {
     }
 
     public static CorpseModel load( String basedir ) {
-        try {
-            FileInputStream fileInputStream = new FileInputStream( getFile( basedir ) );
-            ObjectInputStream objectInputStream = new ObjectInputStream( fileInputStream );
+        try (FileInputStream fileInputStream = new FileInputStream( getFile( basedir ) );
+             ObjectInputStream objectInputStream = new ObjectInputStream( fileInputStream )) {
             CorpseModel model = (CorpseModel) objectInputStream.readObject();
             return model;
         } catch (IOException e) {
