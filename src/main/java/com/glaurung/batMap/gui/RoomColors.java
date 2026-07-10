@@ -55,7 +55,7 @@ public class RoomColors {
         } else if (color.equals( IVORY )) {
             return 9;
         } else {
-            return 1000;
+            return 0; // Unsupported color, default to 0 (instead of previously value 1000 which caused out of bounds exception in rare occasions). 
         }
 
     }

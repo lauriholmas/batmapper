@@ -6,6 +6,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -124,6 +125,7 @@ public class SearchPanel extends MapperPanel implements ItemListener {
         listAllModel.removeAllElements();
         listAllModel.addElement( new AreaListItem( new Room( "Area", "first slot placeholder", new Area( "Areas list" ) ) ) );
         List<String> areas = AreaDataPersister.listAreaNames( this.engine.getBaseDir() );
+        Collections.sort( areas, String.CASE_INSENSITIVE_ORDER );
         try {
             for (String areaName : areas) {
                 AreaSaveObject aso = AreaDataPersister.loadData( this.engine.getBaseDir(), areaName );
