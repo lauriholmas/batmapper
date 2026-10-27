@@ -63,7 +63,7 @@ Sometimes rooms will be placed ontop of eachother, the program notices, and plac
 
 In some area ( arelium, skeep, tyr farwyn) everything ends up getting messed up. This is a feature, I'm sorry about this. Once a proper fix is figured out, something will probably be done about it.
 
-Aww damn I messed up my map, its a messy garble, I'd rather start from scratch! - Its fine, just move away from the area, find the mapfile in your filesystem, and delete it. The .batmap files are placed in a directory called batMapArea, they are named by some ingame name for the area. The directory is created under plugins directory under batclient installation.
+Aww damn I messed up my map, its a messy garble, I'd rather start from scratch! - Its fine, just move away from the area, find the mapfile in your filesystem, and delete it. The .json map files (older versions used .batmap) are placed in a directory called batMapArea, they are named by some ingame name for the area. The directory is created under plugins directory under batclient installation.
 
 Hey man, why you update so rarely? come on! - I'm currently very limited in my time with 3 young kids, I also wanna play the game too.
 

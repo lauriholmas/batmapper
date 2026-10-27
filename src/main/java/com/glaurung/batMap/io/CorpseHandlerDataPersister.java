@@ -1,27 +1,20 @@
 package com.glaurung.batMap.io;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
 import com.glaurung.batMap.gui.corpses.CorpseModel;
 
 public class CorpseHandlerDataPersister {
 
-    private final static String FILENAME = "corpseHandler.conf";
+    private final static String FILENAME = "corpseHandler.json";
+    private final static String LEGACY_FILENAME = "corpseHandler.conf";
     private final static String DIRNAME = "conf";
 
 
     public static void save( String baseDir, CorpseModel model ) {
-        FileOutputStream fileOutputStream;
         try {
-            fileOutputStream = new FileOutputStream( getFile( baseDir ) );
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream( fileOutputStream );
-            objectOutputStream.writeObject( model );
-            fileOutputStream.close();
+            JsonFiles.write( getFile( baseDir, FILENAME ), model );
         } catch (IOException e) {
             System.out.println( e );
         }
@@ -30,10 +23,12 @@ public class CorpseHandlerDataPersister {
     }
 
     public static CorpseModel load( String basedir ) {
-        try (FileInputStream fileInputStream = new FileInputStream( getFile( basedir ) );
-             ObjectInputStream objectInputStream = new ObjectInputStream( fileInputStream )) {
-            CorpseModel model = (CorpseModel) objectInputStream.readObject();
-            return model;
+        try {
+            File file = getFile( basedir, FILENAME );
+            if (file.exists()) {
+                return JsonFiles.read( file, CorpseModel.class );
+            }
+            return (CorpseModel) JsonFiles.readLegacy( getFile( basedir, LEGACY_FILENAME ) );
         } catch (IOException e) {
             System.out.println( e );
         } catch (ClassNotFoundException e) {
@@ -43,9 +38,9 @@ public class CorpseHandlerDataPersister {
 
     }
 
-    private static File getFile( String basedir ) {
+    private static File getFile( String basedir, String fileName ) {
         File dirFile = new File( basedir, DIRNAME );
-        File saveFile = new File( dirFile, FILENAME );
+        File saveFile = new File( dirFile, fileName );
         return saveFile;
     }
 }

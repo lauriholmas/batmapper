@@ -194,6 +194,15 @@ public class Room implements Serializable {
         }
         return false;
     }
+    public Set<String> getUsedExits(){
+        if(usedExits == null){
+            usedExits = new HashSet<>();
+        }
+        return usedExits;
+    }
+    public void setUsedExits(Set<String> usedExits){
+        this.usedExits = usedExits;
+    }
     public void resetExitUsage(){
         this.usedExits = new HashSet<>();
     }
