@@ -9,8 +9,28 @@
   var DRAG_THRESHOLD = 4;
   var NOTES_SAVE_DELAY = 400;
   var COMPASS_DIRS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+  // exits whose names are obvious from the direction of the line, their labels only show on hover
+  var COMPASS_EXIT_NAMES = new Set(['n', 'north', 'ne', 'northeast', 'e', 'east', 'se', 'southeast', 's', 'south',
+    'sw', 'southwest', 'w', 'west', 'nw', 'northwest', 'u', 'up', 'd', 'down']);
+  // softer versions of the room highlight colors the mapper saves
+  var PRETTY_COLORS = {
+    '#ff0000': '#d9534f',
+    '#ffff00': '#e6c84a',
+    '#0000ff': '#3f6fd9',
+    '#ff00ff': '#cf5fb8',
+    '#a020f0': '#8b5cf6',
+    '#ff9100': '#ef8a35',
+    '#8b4513': '#8a5a36',
+    '#40e0d0': '#3cbfae',
+    '#fffff0': '#ece6d6'
+  };
+  var NAMES_MIN_SCALE = 0.75;
+  var GRID_MIN_SIZE = 24;
+  // exits going both ways between two rooms are drawn as two lanes this far apart from the middle
+  var EDGE_LANE_OFFSET = 4;
 
   var statusEl = document.getElementById('status');
+  var statusTextEl = statusEl.querySelector('.status-text');
   var areaNameEl = document.getElementById('area-name');
   var views = {};
   var activeView = null;
@@ -40,16 +60,32 @@
 
   function showError(error) {
     console.error(error);
-    statusEl.textContent = 'error: ' + error.message;
+    statusTextEl.textContent = 'error: ' + error.message;
     statusEl.classList.remove('connected');
+    statusEl.classList.add('error');
     clearTimeout(statusTimer);
     statusTimer = setTimeout(updateStatus, 4000);
   }
 
   function updateStatus() {
     var connected = Object.keys(views).every(function (name) { return views[name].connected; });
-    statusEl.textContent = connected ? 'connected' : 'disconnected, is batclient running?';
+    statusTextEl.textContent = connected ? 'connected' : 'disconnected, is batclient running?';
     statusEl.classList.toggle('connected', connected);
+    statusEl.classList.remove('error');
+  }
+
+  function prettyColor(color) {
+    return color ? PRETTY_COLORS[color.toLowerCase()] || color : null;
+  }
+
+  function isLightColor(color) {
+    var match = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(color || '');
+    if (!match) return false;
+    var channels = match.slice(1).map(function (hex) {
+      var c = parseInt(hex, 16) / 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2] > 0.4;
   }
 
   function el(tag, className, text) {
@@ -153,11 +189,12 @@
     this.roomLayer = q('.rooms');
     this.selectRect = q('.select-rect');
     this.emptyNote = q('.empty-note');
+    this.roomCard = q('.room-card');
     this.shortDesc = q('.short-desc');
     this.longDesc = q('.long-desc');
     this.roomExits = q('.room-exits');
     this.notes = q('.notes');
-    this.colorSelect = q('.room-color');
+    this.swatches = q('.swatches');
     this.saveButton = q('.save');
     this.clearButton = q('.clear');
     this.toggles = { snap: q('.snap'), maze: q('.maze'), revs: q('.revs') };
@@ -172,6 +209,7 @@
     this.edgeEls = new Map();
     this.labelEls = new Map();
     this.pickedExit = null;
+    this.hoverExit = null;
     this.drag = null;
     this.pendingState = null;
     this.positionOverrides = null;
@@ -258,6 +296,13 @@
 
   MapView.prototype.applyTransform = function () {
     this.world.style.transform = 'translate(' + this.tx + 'px,' + this.ty + 'px) scale(' + this.scale + ')';
+    // one grid dot in the gap between every four room cells, rooms sit on multiples of the grid
+    var size = ROOM_GRID * this.scale;
+    var vs = this.viewport.style;
+    vs.backgroundImage = size < GRID_MIN_SIZE ? 'none' : '';
+    vs.backgroundSize = size + 'px ' + size + 'px';
+    vs.backgroundPosition = this.tx + 'px ' + this.ty + 'px';
+    this.world.classList.toggle('show-names', this.scale >= NAMES_MIN_SCALE);
   };
 
   MapView.prototype.renderRooms = function () {
@@ -272,17 +317,24 @@
         self.roomLayer.append(element);
         self.roomEls.set(room.id, element);
       }
+      var fill = room.explored ? null : prettyColor(room.color);
       var classes = 'room';
       if (room.indoors) classes += ' indoor';
       if (room.picked) classes += ' picked';
       if (room.current) classes += ' current';
-      if (room.lightExits) classes += ' light-exits';
+      if (fill && isLightColor(fill)) classes += ' on-light';
       element.className = classes;
       element.style.left = room.x + 'px';
       element.style.top = room.y + 'px';
-      element.style.background = room.color || '';
+      if (room.explored) {
+        element.style.setProperty('--fill', 'var(--room-explored)');
+      } else if (fill) {
+        element.style.setProperty('--fill', fill);
+      } else {
+        element.style.removeProperty('--fill');
+      }
       element.title = room.shortDesc || '';
-      var markersKey = room.exits.join(',') + '|' + (room.label || '');
+      var markersKey = room.exits.join(',') + '|' + (room.label || '') + '|' + (room.shortDesc || '');
       if (element.markersKey !== markersKey) {
         element.markersKey = markersKey;
         element.replaceChildren.apply(element, self.roomMarkers(room));
@@ -298,12 +350,17 @@
 
   MapView.prototype.roomMarkers = function (room) {
     var exits = new Set(room.exits);
-    var markers = COMPASS_DIRS.map(function (dir) {
-      return el('i', 'm ' + (exits.has(dir) ? 'open-' : 'wall-') + dir);
+    var markers = COMPASS_DIRS.filter(function (dir) { return exits.has(dir); }).map(function (dir) {
+      return el('i', 'm chev-' + dir);
     });
-    if (exits.has('u')) markers.push(el('i', 'm up'));
-    if (exits.has('d')) markers.push(el('i', 'm down'));
-    if (exits.has('special')) markers.push(el('i', 'm special'));
+    var name = el('div', 'name');
+    name.append(el('span', '', room.shortDesc || ''));
+    markers.push(name);
+    var badges = el('div', 'badges');
+    if (exits.has('u')) badges.append(el('span', 'badge', '▲'));
+    if (exits.has('d')) badges.append(el('span', 'badge', '▼'));
+    if (exits.has('special')) badges.append(el('span', 'badge', '◆'));
+    if (badges.childElementCount) markers.push(badges);
     if (room.label) markers.push(el('span', 'label', room.label));
     return markers;
   };
@@ -326,6 +383,8 @@
   MapView.prototype.renderEdges = function () {
     var self = this;
     var seen = new Set();
+    var directions = new Set();
+    this.state.exits.forEach(function (exit) { directions.add(exit.from + '\u0000' + exit.to); });
     this.state.exits.forEach(function (exit) {
       var from = self.roomById.get(exit.from);
       var to = self.roomById.get(exit.to);
@@ -350,27 +409,32 @@
         self.labelEls.set(exit.id, label);
       }
       var picked = self.pickedExit === exit.id;
-      edge.classList.toggle('picked', picked);
+      var hover = self.hoverExit === exit.id;
+      edge.className = kind + (picked ? ' picked' : '') + (hover ? ' hover' : '');
+      edge.style.setProperty('--c1', edgeColor(from));
+      edge.style.setProperty('--c2', edgeColor(to));
       edge.style.left = from.x + 'px';
       edge.style.top = from.y + 'px';
       var labelX, labelY;
       if (loop) {
-        edge.style.borderColor = edgeColor(from);
-        labelX = from.x - 56;
-        labelY = from.y - 86;
+        labelX = from.x - 52;
+        labelY = from.y - 92;
       } else {
         var dx = to.x - from.x;
         var dy = to.y - from.y;
-        edge.style.width = Math.hypot(dx, dy) + 'px';
-        edge.style.transform = 'rotate(' + Math.atan2(dy, dx) + 'rad)';
-        edge.style.background = 'linear-gradient(to right, ' + edgeColor(from) + ', ' + edgeColor(to) + ')';
-        // a bit closer to the start so labels of exits going both ways don't overlap
-        labelX = from.x + dx * 0.4;
-        labelY = from.y + dy * 0.4;
+        var length = Math.hypot(dx, dy) || 1;
+        var lane = directions.has(exit.to + '\u0000' + exit.from) ? EDGE_LANE_OFFSET : 0;
+        edge.style.width = length + 'px';
+        // positive y in the rotated line is the right hand side of the way the exit goes
+        edge.style.transform = 'rotate(' + Math.atan2(dy, dx) + 'rad) translateY(' + lane + 'px)';
+        // between the room and the arrow, so labels of exits going both ways don't overlap
+        labelX = from.x + dx * 0.36 - dy / length * lane * 3;
+        labelY = from.y + dy * 0.36 + dx / length * lane * 3;
       }
       label.textContent = exit.name;
       label.title = exit.name;
-      label.className = 'exit-label' + (exit.current ? ' current' : '') + (picked ? ' picked' : '');
+      label.className = 'exit-label' + (COMPASS_EXIT_NAMES.has(exit.name.toLowerCase()) ? ' minor' : '') +
+        (exit.current ? ' current' : '') + (picked ? ' picked' : '') + (hover ? ' hover' : '');
       label.style.left = labelX + 'px';
       label.style.top = labelY + 'px';
     });
@@ -384,12 +448,30 @@
     });
   };
 
+  MapView.prototype.setHoverExit = function (id) {
+    if (this.hoverExit === id) return;
+    var self = this;
+    [this.hoverExit, id].forEach(function (exitId) {
+      if (exitId === null) return;
+      var on = exitId === id;
+      var edge = self.edgeEls.get(exitId);
+      var label = self.labelEls.get(exitId);
+      if (edge) edge.classList.toggle('hover', on);
+      if (label) label.classList.toggle('hover', on);
+    });
+    this.hoverExit = id;
+  };
+
   MapView.prototype.renderSide = function () {
     var state = this.state;
     var selected = state.selected;
-    this.shortDesc.textContent = selected ? selected.shortDesc || '' : '';
+    this.roomCard.classList.toggle('has-room', !!selected);
+    this.shortDesc.textContent = selected ? selected.shortDesc || 'Unknown room' : '';
     this.longDesc.textContent = selected ? selected.longDesc || '' : '';
-    this.roomExits.textContent = selected ? selected.exits || '' : '';
+    var exitChips = selected && selected.exits ? selected.exits.split(', ').filter(Boolean).map(function (exit) {
+      return el('span', 'chip', exit);
+    }) : [];
+    this.roomExits.replaceChildren.apply(this.roomExits, exitChips);
 
     var selectedId = selected ? selected.id : null;
     if (selectedId !== this.notesRoom) {
@@ -404,24 +486,22 @@
     var colorsKey = JSON.stringify(state.colors);
     if (colorsKey !== this.colorsKey) {
       this.colorsKey = colorsKey;
-      var options = [el('option', '', '—')];
-      options[0].value = '';
-      options[0].hidden = true;
-      state.colors.forEach(function (color, index) {
-        var option = el('option', '', color.name);
-        option.value = String(index);
-        if (color.color) {
-          option.style.background = color.color;
-          option.style.color = '#000';
-        }
-        options.push(option);
+      var swatches = state.colors.map(function (color, index) {
+        var swatch = el('button', 'swatch' + (color.color ? '' : ' normal'));
+        swatch.type = 'button';
+        swatch.dataset.index = String(index);
+        swatch.title = color.name;
+        swatch.setAttribute('aria-label', color.name);
+        if (color.color) swatch.style.setProperty('--swatch', prettyColor(color.color));
+        return swatch;
       });
-      this.colorSelect.replaceChildren.apply(this.colorSelect, options);
+      this.swatches.replaceChildren.apply(this.swatches, swatches);
     }
-    var colorIndex = selected && selected.colorIndex < state.colors.length ? String(selected.colorIndex) : '';
-    this.colorSelect.value = colorIndex;
     var pickedCount = state.rooms.filter(function (room) { return room.picked; }).length;
-    this.colorSelect.disabled = pickedCount === 0;
+    Array.prototype.forEach.call(this.swatches.children, function (swatch) {
+      swatch.setAttribute('aria-pressed', String(!!selected && Number(swatch.dataset.index) === selected.colorIndex));
+      swatch.disabled = pickedCount === 0;
+    });
 
     this.toggles.snap.setAttribute('aria-pressed', String(state.snap));
     this.toggles.maze.setAttribute('aria-pressed', String(state.maze));
@@ -857,10 +937,29 @@
       if (e.key === '-') self.zoomAtCenter(1 / ZOOM_STEP);
     });
 
+    vp.addEventListener('pointerover', function (e) {
+      var exitEl = e.target.closest('[data-exit]');
+      self.setHoverExit(exitEl ? Number(exitEl.dataset.exit) : null);
+    });
+    vp.addEventListener('pointerleave', function () { self.setHoverExit(null); });
+    // the buttons floating on the map shouldn't start drags or clear the selection
+    this.root.querySelector('.map-controls').addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+    this.root.querySelector('.map-controls').addEventListener('dblclick', function (e) { e.stopPropagation(); });
+
     this.root.querySelector('.zoom-in').addEventListener('click', function () { self.zoomAtCenter(ZOOM_STEP); });
     this.root.querySelector('.zoom-out').addEventListener('click', function () { self.zoomAtCenter(1 / ZOOM_STEP); });
-    this.colorSelect.addEventListener('change', function () {
-      if (self.colorSelect.value !== '') self.act('color', { index: Number(self.colorSelect.value) });
+    this.root.querySelector('.center-me').addEventListener('click', function () {
+      if (!self.state) return;
+      var current = self.state.rooms.find(function (room) { return room.current; });
+      if (current) {
+        self.centerOn(current.x, current.y);
+      } else {
+        self.centerOnAllRooms();
+      }
+    });
+    this.swatches.addEventListener('click', function (e) {
+      var swatch = e.target.closest('.swatch');
+      if (swatch && !swatch.disabled) self.act('color', { index: Number(swatch.dataset.index) });
     });
     this.saveButton.addEventListener('click', function () { self.act('save'); });
     this.clearButton.addEventListener('click', function () {

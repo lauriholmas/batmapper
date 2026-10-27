@@ -8,13 +8,14 @@
 </head>
 <body>
 <header class="topbar">
+  <div class="brand"><span class="brand-mark" aria-hidden="true"></span>batMap</div>
   <nav class="tabs" role="tablist">
     <button type="button" class="tab" role="tab" data-view="map">Map</button>
     <button type="button" class="tab" role="tab" data-view="search">Search</button>
   </nav>
   <div class="area-name" id="area-name"></div>
-  <div class="status" id="status" title="Connection to batclient">connecting…</div>
-  <button type="button" class="help-button" id="help-button" title="Controls">?</button>
+  <div class="status" id="status" title="Connection to batclient"><span class="status-dot"></span><span class="status-text">connecting…</span></div>
+  <button type="button" class="icon-button" id="help-button" title="Controls" aria-label="Controls">?</button>
 </header>
 
 <main id="views"></main>
@@ -22,7 +23,7 @@
 <template id="view-template">
   <section class="view">
     <div class="searchbar" hidden>
-      <input type="search" class="search-text" placeholder="Search descs…" title="Input desc to search here, press enter to search">
+      <input type="search" class="search-text" placeholder="Search room descs…" title="Input desc to search here, press enter to search">
       <select class="search-results" title="Click on a result to see map"></select>
       <select class="area-list" title="Select area from list to view map"></select>
     </div>
@@ -30,31 +31,46 @@
       <div class="viewport" tabindex="0">
         <div class="world">
           <div class="edges"></div>
-          <div class="exit-labels"></div>
           <div class="rooms"></div>
+          <div class="exit-labels"></div>
         </div>
         <div class="select-rect" hidden></div>
         <div class="empty-note" hidden></div>
+        <div class="map-controls">
+          <button type="button" class="map-button zoom-in" title="Zoom in" aria-label="Zoom in">+</button>
+          <button type="button" class="map-button zoom-out" title="Zoom out" aria-label="Zoom out">−</button>
+          <button type="button" class="map-button center-me" title="Center on the room you are in" aria-label="Center on current room"><span class="center-icon" aria-hidden="true"></span></button>
+        </div>
       </div>
       <aside class="side">
-        <div class="box short-desc" title="This is room short description"></div>
-        <div class="box long-desc" title="This is room long description"></div>
-        <div class="box room-exits" title="This lists room exits"></div>
-        <div class="tools">
-          <div class="tool-row">
-            <button type="button" class="zoom-in" title="Zoom in">+</button>
-            <button type="button" class="zoom-out" title="Zoom out">−</button>
-            <select class="room-color" title="Use this to change room color to highlight it"></select>
-            <button type="button" class="toggle maze" title="Toggle maze helper on and off">Maze</button>
-          </div>
-          <div class="tool-row">
-            <button type="button" class="save" title="Save the map to a file.">Save</button>
-            <button type="button" class="clear" title="Clear the map for this area.">Clear</button>
+        <div class="card room-card">
+          <h2 class="short-desc" title="This is room short description"></h2>
+          <div class="room-exits chips" title="This lists room exits"></div>
+          <p class="placeholder">Click a room to see its details.</p>
+        </div>
+        <div class="card desc-card">
+          <h3>Description</h3>
+          <div class="long-desc" title="This is room long description"></div>
+        </div>
+        <div class="card notes-card">
+          <h3>Notes</h3>
+          <textarea class="notes" placeholder="Select a room to write notes for it" title="Feel free to write your own notes here." disabled></textarea>
+        </div>
+        <div class="card">
+          <h3>Room color</h3>
+          <div class="swatches" role="group" aria-label="Room color" title="Use these to change selected rooms' color to highlight them"></div>
+        </div>
+        <div class="card tools">
+          <div class="segmented" role="group" aria-label="Mapping modes">
             <button type="button" class="toggle snap" title="Toggle room location snapping">Snap</button>
+            <button type="button" class="toggle maze" title="Toggle maze helper on and off">Maze</button>
             <button type="button" class="toggle revs" title="When adding an exit to new room, also add backwards exit automatically if reversable">Revs</button>
           </div>
+          <div class="actions">
+            <button type="button" class="save" title="Save the map to a file.">Save</button>
+            <button type="button" class="clear danger" title="Clear the map for this area.">Clear</button>
+          </div>
         </div>
-        <textarea class="notes" placeholder="Select a room to write notes for it" title="Feel free to write your own notes here." disabled></textarea>
       </aside>
     </div>
   </section>
@@ -80,8 +96,8 @@
       <li><b>Ctrl-click</b> (or ⌘-click) a room to get directions to it from where you are.</li>
       <li><b>Right-click</b> a selected room to delete the selected rooms, right-click an exit to delete it.</li>
       <li><b>Double-click</b> an exit to rename it, double-click the background to hide or show the room panel.</li>
-      <li>Red rim is the room you are in, cyan rim is selected. If the room you are in is selected, the selection moves with you.</li>
-      <li>Green rooms are outdoors, grey rooms indoors. Arrows show up/down exits, the oval means some other exit.</li>
+      <li>The pulsing red ring is the room you are in, the blue ring marks selected rooms. If the room you are in is selected, the selection moves with you.</li>
+      <li>Green rooms are outdoors, grey rooms indoors. Chevrons show exits, ▲ ▼ mark up and down exits and ◆ some other exit.</li>
     </ul>
     <div class="modal-buttons"><button type="button" class="primary" id="help-close">Close</button></div>
   </div>
