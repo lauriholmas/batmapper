@@ -2,16 +2,18 @@ package com.glaurung.batMap.controller;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import com.glaurung.batMap.gui.WebMapPanel;
 import com.glaurung.batMap.gui.corpses.CorpsePanel;
 import com.glaurung.batMap.gui.manual.ManualPanel;
-import com.glaurung.batMap.gui.search.SearchPanel;
 import com.glaurung.batMap.io.AreaDataPersister;
 import com.glaurung.batMap.io.GuiDataPersister;
 import com.glaurung.batMap.vo.GuiData;
+import com.glaurung.batMap.web.MapWebServer;
 import com.mythicscape.batclient.interfaces.BatClientPlugin;
 import com.mythicscape.batclient.interfaces.BatClientPluginTrigger;
 import com.mythicscape.batclient.interfaces.BatClientPluginUtil;
@@ -30,10 +32,12 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
     protected static final String COMMAND_LIST_LABELS = "list";
     protected static final String COMMAND_APPEND_TO_NOTES = "append";
     protected static final String COMMAND_FIND_DESC = "find";
-    
+    protected static final String COMMAND_OPEN_MAP = "open";
+
+    // static so that reloading the plugin can stop the server the previous load started
+    private static MapWebServer webServer;
     private MapperEngine engine;
     private SearchEngine searchEngine;
-    private SearchPanel searchPanel;
     private final String CHANNEL_PREFIX = "BAT_MAPPER";
     //batMap;areaname;roomUID;exitUsed;indoor boolean;shortDesc;longDesc;exits
     private final int PREFIX = 0;
@@ -67,22 +71,49 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
         searchEngine = new SearchEngine(this);
         engine.setBatWindow( clientWin );
         searchEngine.setBatWindow( clientWin );
-        clientWin.removeTabAt( 0 );
-        clientWin.newTab( "batMap", engine.getPanel() );
-        CorpsePanel corpses = new CorpsePanel( BASEDIR, this );
-        engine.setCorpsePanel( corpses );
-        clientWin.newTab( "Corpses", corpses);
-        clientWin.newTab( "manual", new ManualPanel() );
-        searchPanel = new SearchPanel(searchEngine);
-        clientWin.newTab( "map search", searchPanel);
-        clientWin.setVisible( true );
-        this.getPluginManager().addProtocolListener( this );
         AreaDataPersister.migrateFilesToNewLocation( BASEDIR );
         AreaDataPersister.convertLegacyFilesToJson( BASEDIR );
         engine.setBaseDir( BASEDIR );
         searchEngine.setBaseDir( BASEDIR );
-        clientWin.addComponentListener( engine );
 
+        String startError = startWebServer();
+        clientWin.removeTabAt( 0 );
+        clientWin.newTab( "batMap", new WebMapPanel( getMapUrl(), startError ) );
+        CorpsePanel corpses = new CorpsePanel( BASEDIR, this );
+        engine.setCorpsePanel( corpses );
+        searchEngine.setCorpsePanel( corpses );
+        clientWin.newTab( "Corpses", corpses);
+        clientWin.newTab( "manual", new ManualPanel() );
+        clientWin.setVisible( true );
+        this.getPluginManager().addProtocolListener( this );
+        clientWin.addComponentListener( engine );
+        if (getMapUrl() != null) {
+            printConsoleMessage( "Map is at " + getMapUrl() + " - type '" + getName() + " " + COMMAND_OPEN_MAP + "' to open it in your browser" );
+        }
+
+    }
+
+    /**
+     * @return error message, or null if server started
+     */
+    private String startWebServer() {
+        if (webServer != null) {
+            webServer.stop();
+            webServer = null;
+        }
+        MapWebServer server = new MapWebServer( engine, searchEngine );
+        try {
+            server.start( MapWebServer.DEFAULT_PORT );
+        } catch (IOException e) {
+            System.out.println( "Unable to start map server: " + e );
+            return e.toString();
+        }
+        webServer = server;
+        return null;
+    }
+
+    private String getMapUrl() {
+        return webServer == null ? null : webServer.getUrl();
     }
 
     @Override
@@ -147,6 +178,10 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
     @Override
     public void clientExit() {
         this.engine.save();
+        if (webServer != null) {
+            webServer.stop();
+            webServer = null;
+        }
 
     }
 
@@ -177,6 +212,7 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
             printConsoleMessage(String.format("\t%s        - to list labels and rooms",COMMAND_LIST_LABELS));
             printConsoleMessage(String.format("\t%s        - to append a line to roomnotes",COMMAND_APPEND_TO_NOTES));
             printConsoleMessage(String.format("\t%s <desc> - to find rooms by long desc",COMMAND_FIND_DESC));
+            printConsoleMessage(String.format("\t%s        - to open the map in your browser",COMMAND_OPEN_MAP));
         }
         if(input instanceof String){
             String[] params = ((String)input).split(" ");
@@ -184,6 +220,10 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
                 String command = params[0];
                 if(command.equalsIgnoreCase(COMMAND_REMOVE_LABEL)){
                     this.engine.removeLabelFromCurrent();
+                }else if(command.equalsIgnoreCase(COMMAND_OPEN_MAP)){
+                    if (getMapUrl() == null || ! WebMapPanel.openInBrowser( getMapUrl() )) {
+                        printConsoleError( "unable to open the map in a browser" + ( getMapUrl() == null ? "" : ", open " + getMapUrl() + " yourself" ) );
+                    }
                 }else if(command.equalsIgnoreCase(COMMAND_LIST_LABELS)){
                     for(String entry : this.engine.getLabels()){
                         printConsoleMessage(entry);
@@ -196,8 +236,11 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
                 String label = params[1];
                 if(command.equalsIgnoreCase(COMMAND_ADD_LABEL)){
                     if( ! this.engine.roomLabelExists(label)){
-                        this.engine.setLabelToCurrentRoom(label);
-                        printConsoleMessage(String.format("added label [%s] to this room", label));
+                        if (this.engine.setLabelToCurrentRoom(label)) {
+                            printConsoleMessage(String.format("added label [%s] to this room", label));
+                        } else {
+                            printConsoleError("not in a mapped room");
+                        }
                     }else{
                         printConsoleError(String.format("label [%s] already exists, must be unique per area", label));
                     }
@@ -209,8 +252,7 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
                         printConsoleError(String.format("label [%s] not found", label));
                     }
                 }else if(command.equalsIgnoreCase( COMMAND_APPEND_TO_NOTES )){
-                    printConsoleMessage(String.format("Appending to notes [%s]", label));
-                    this.engine.getPanel().appentToNotes( label );
+                    appendToNotes( label );
                 }else{
                     printConsoleError(String.format("unknown command: [%s]", command));
                 }
@@ -219,11 +261,10 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
                 String command = params[0];
                 if(command.equalsIgnoreCase( COMMAND_APPEND_TO_NOTES )){
                     String notes = ( (String) input ).substring( COMMAND_APPEND_TO_NOTES.length() );
-                    this.engine.getPanel().appentToNotes( notes );
+                    appendToNotes( notes );
                 }else if(command.equalsIgnoreCase( COMMAND_FIND_DESC )){
                     String findSring = ( (String) input ).substring( COMMAND_FIND_DESC.length() ).trim();
-                    searchPanel.setSearchText(findSring);
-                    List<String> rooms = searchPanel.searchForRoomsWith(findSring);
+                    List<String> rooms = searchEngine.searchForRoomsWith(findSring);
                     for(String room:  rooms) {
                         printConsoleMessage(room);
                     }
@@ -236,6 +277,14 @@ public class MapperPlugin extends BatClientPlugin implements BatClientPluginTrig
             else{
                 printConsoleError("only 1 or 2 or KAZILLION params accepted");
             }
+        }
+    }
+
+    private void appendToNotes( String notes ) {
+        if (this.engine.appendToNotes( notes )) {
+            printConsoleMessage( String.format( "Appending to notes [%s]", notes ) );
+        } else {
+            printConsoleError( "no room to add notes to" );
         }
     }
 

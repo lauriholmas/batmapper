@@ -23,7 +23,6 @@ import com.glaurung.batMap.vo.AreaSaveObject;
 import com.glaurung.batMap.vo.Exit;
 import com.glaurung.batMap.vo.Room;
 
-import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 
@@ -70,8 +69,8 @@ public class AreaDataPersister {
     }
 
 
-    public static void save( String basedir, SparseMultigraph<Room, Exit> graph, Layout<Room, Exit> layout ) throws IOException {
-        AreaSaveObject saveObject = makeSaveObject( basedir, graph, layout );
+    public static void save( String basedir, SparseMultigraph<Room, Exit> graph, Map<Room, Point2D> roomLocations ) throws IOException {
+        AreaSaveObject saveObject = makeSaveObject( basedir, graph, roomLocations );
         saveData( saveObject );
 
     }
@@ -229,13 +228,12 @@ public class AreaDataPersister {
         return new LinkedList<String>( names );
     }
 
-    private static AreaSaveObject makeSaveObject( String basedir, SparseMultigraph<Room, Exit> graph, Layout<Room, Exit> layout ) throws IOException {
+    private static AreaSaveObject makeSaveObject( String basedir, SparseMultigraph<Room, Exit> graph, Map<Room, Point2D> roomLocations ) throws IOException {
         AreaSaveObject saveObject = new AreaSaveObject();
         saveObject.setGraph( graph );
         Map<Room, Point2D> locations = saveObject.getLocations();
         for (Room room : graph.getVertices()) {
-            Point2D coord = layout.transform( room );
-            locations.put( room, coord );
+            locations.put( room, roomLocations.get( room ) );
         }
         saveObject.setFileName( getFileNameFrom( basedir, graph.getVertices().iterator().next().getArea().getName() ) );
 //		System.out.println("\n\n+nsaveobjectdone\n\n\n"+saveObject.getFileName());

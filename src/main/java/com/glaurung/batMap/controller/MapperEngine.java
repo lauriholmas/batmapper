@@ -5,12 +5,12 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.swing.SwingUtilities;
 
 import com.glaurung.batMap.gui.*;
 import com.glaurung.batMap.gui.corpses.CorpsePanel;
@@ -20,100 +20,80 @@ import com.glaurung.batMap.vo.Area;
 import com.glaurung.batMap.vo.AreaSaveObject;
 import com.glaurung.batMap.vo.Exit;
 import com.glaurung.batMap.vo.Room;
+import com.glaurung.batMap.web.MapState;
 import com.mythicscape.batclient.interfaces.BatWindow;
 
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.graph.util.Pair;
-import edu.uci.ics.jung.visualization.Layer;
-import edu.uci.ics.jung.visualization.RenderContext;
-import edu.uci.ics.jung.visualization.VisualizationViewer;
-import edu.uci.ics.jung.visualization.control.CrossoverScalingControl;
-import edu.uci.ics.jung.visualization.control.PluggableGraphMouse;
-import edu.uci.ics.jung.visualization.control.ScalingGraphMousePlugin;
-import edu.uci.ics.jung.visualization.control.TranslatingGraphMousePlugin;
-import edu.uci.ics.jung.visualization.decorators.EdgeShape;
-import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
-import edu.uci.ics.jung.visualization.picking.PickedState;
-import edu.uci.ics.jung.visualization.transform.MutableTransformer;
 
-public class MapperEngine implements ItemListener, ComponentListener {
+/**
+ * Holds the map of the current area and all operations on it. The map itself is drawn by the web map,
+ * which gets the map contents through getState() and is notified of changes through change listeners.
+ * Public methods are synchronized since they are called both from batclient and from the web server threads.
+ */
+public class MapperEngine implements ComponentListener {
 
+    private static final double ROOM_OVERLAP_DISTANCE = 60;
+    private static final String DEFAULT_DELIM = ";";
 
     SparseMultigraph<Room, Exit> graph;
-    VisualizationViewer<Room, Exit> vv;
-    MapperLayout mapperLayout;
+    Map<Room, Point2D> locations = new HashMap<Room, Point2D>();
     Room currentRoom = null;
     Area area = null;
-    MapperPanel panel;
 
-    PickedState<Room> pickedState;
     String baseDir;
     BatWindow batWindow;
-    ScalingGraphMousePlugin scaler;
-    MapperPickingGraphMousePlugin mapperPickingGraphMousePlugin;
     boolean snapMode = true;
     CorpsePanel corpsePanel;
     MapperPlugin plugin;
     boolean mazemode = false;
     boolean reversableDirsMode = false;
+    private final List<Runnable> changeListeners = new CopyOnWriteArrayList<Runnable>();
+    private long version = 0;
 
     public MapperEngine( SparseMultigraph<Room, Exit> graph, MapperPlugin plugin ) {
         this(plugin);
         this.graph = graph;
-        this.mapperLayout.setGraph( graph );
     }
 
 
     public MapperEngine(MapperPlugin plugin) {
         this.plugin = plugin;
         graph = new SparseMultigraph<Room, Exit>();
-        mapperLayout = new MapperLayout( graph );
-        mapperLayout.setSize( new Dimension( 500, 500 ) ); //????
-        vv = new VisualizationViewer<Room, Exit>( mapperLayout );
-        pickedState = vv.getPickedVertexState();
-        pickedState.addItemListener( this );
-        vv.setPreferredSize( new Dimension( 500, 500 ) ); //????
-        RenderContext<Room, Exit> rc = vv.getRenderContext();
-
-        rc.setEdgeLabelTransformer( new ToStringLabeller<Exit>() );
-        rc.setEdgeLabelRenderer( new ExitLabelRenderer() );
-        rc.setEdgeShapeTransformer( new EdgeShape.QuadCurve<Room, Exit>() );
-        rc.setEdgeShapeTransformer( new EdgeShape.Wedge<Room, Exit>( 30 ) );
-        rc.setEdgeFillPaintTransformer( new ExitPaintTransformer( vv ) );
-
-        rc.setVertexShapeTransformer( new RoomShape( graph ) );
-        rc.setVertexIconTransformer( new RoomIconTransformer() );
-
-        vv.getRenderContext().setLabelOffset( 5 );
-
-        PluggableGraphMouse pgm = new PluggableGraphMouse();
-        mapperPickingGraphMousePlugin = new MapperPickingGraphMousePlugin( MouseEvent.BUTTON1_MASK, MouseEvent.BUTTON3_MASK );
-        mapperPickingGraphMousePlugin.setEngine( this );
-        pgm.add( mapperPickingGraphMousePlugin);
-        pgm.add( new TranslatingGraphMousePlugin( MouseEvent.BUTTON1_MASK ) );
-        scaler = new ScalingGraphMousePlugin( new CrossoverScalingControl(), 0, 1 / 1.1f, 1.1f );
-        pgm.add( scaler );
-        vv.setGraphMouse( pgm );
-        panel = new MapperPanel( this );
     }
 
+    /**
+     * name the web map uses for this map view
+     */
+    public String getViewName() {
+        return "map";
+    }
 
-    public void setSize( Dimension dimension ) {
-        mapperLayout.setSize( dimension );
-        vv.setPreferredSize( dimension );
+    public void addChangeListener( Runnable listener ) {
+        changeListeners.add( listener );
+    }
+
+    /**
+     * Tells the web map to redraw
+     */
+    protected void fireChanged() {
+        version++;
+        for (Runnable listener : changeListeners) {
+            listener.run();
+        }
     }
 
     //areaname;roomUID;exitUsed;indoor boolean;shortDesc;longDesc;exits
-    public void moveToRoom( String areaName, String roomUID, String exitUsed, boolean indoors, String shortDesc, String longDesc, Set<String> exits ) {
+    public synchronized void moveToRoom( String areaName, String roomUID, String exitUsed, boolean indoors, String shortDesc, String longDesc, Set<String> exits ) {
         if (this.area == null || ! this.area.getName().equalsIgnoreCase( areaName )) {
             moveToArea( areaName );
         }
 
         moveToRoom( roomUID, exitUsed, longDesc, shortDesc, indoors, exits );
         setRoomDescsForRoom( currentRoom, longDesc, shortDesc, indoors, exits );
-
+        fireChanged();
     }
 
 
@@ -129,7 +109,7 @@ public class MapperEngine implements ItemListener, ComponentListener {
      * @param longDesc
      * @return true if room created was new, false if it already existed
      */
-    public boolean moveToRoom( String roomUID, String exitUsed, String longDesc, String shortDesc, boolean indoors, Set<String> exits ) {
+    public synchronized boolean moveToRoom( String roomUID, String exitUsed, String longDesc, String shortDesc, boolean indoors, Set<String> exits ) {
 //		System.out.println(roomUID);
         Room newRoom = getRoomFromGraph( roomUID );
         boolean newRoomAddedToGraph = false;
@@ -162,40 +142,47 @@ public class MapperEngine implements ItemListener, ComponentListener {
         }
 
         if (newRoomAddedToGraph) {
-
-            if (currentRoom != null) {
-                Point2D oldroomLocation = mapperLayout.transform( currentRoom );
-                Point2D relativeLocation = DrawingUtils.getRelativePosition( oldroomLocation, exit, this.snapMode );
-//				relativeLocation = getValidLocation(relativeLocation);
-                relativeLocation = mapperLayout.getValidLocation( relativeLocation );
-                vv.getGraphLayout().setLocation( newRoom, relativeLocation );
+            Point2D location;
+            if (currentRoom != null && locations.get( currentRoom ) != null) {
+                location = DrawingUtils.getRelativePosition( locations.get( currentRoom ), exit, this.snapMode );
             } else {
                 //either first room in new area, or new room in old area, no connection anywhere, either way lets draw into middle
-                Point2D possibleLocation = new Point2D.Double( panel.getWidth() / 2, panel.getHeight() / 2 );
-//				possibleLocation = getValidLocation(possibleLocation);
-                possibleLocation = mapperLayout.getValidLocation( possibleLocation );
-                vv.getGraphLayout().setLocation( newRoom, possibleLocation );
+                location = new Point2D.Double( 0, 0 );
             }
-
+            locations.put( newRoom, getValidLocation( location ) );
         }
         if (currentRoom != null && mazemode) {
             currentRoom.useExit(exitUsed);
         }
 
         refreshRoomGraphicsAndSetAsCurrent( newRoom, longDesc, shortDesc, indoors, exits );
-        repaint();
-        moveMapToStayWithCurrentRoom();
+        fireChanged();
         return newRoomAddedToGraph;
-    }
-
-
-    public void repaint() {
-        vv.repaint();
     }
 
 
     private boolean didTeleportIn( String exitUsed ) {
         return exitUsed.equalsIgnoreCase( new Exit( "" ).TELEPORT );
+    }
+
+    /**
+     * Moves the location away from other rooms until it doesn't overlap any of them
+     */
+    protected Point2D getValidLocation( Point2D checkThisLocation ) {
+        while (getRoomNear( checkThisLocation ) != null) {
+            checkThisLocation.setLocation( checkThisLocation.getX() - 20, checkThisLocation.getY() - 20 );
+        }
+        return checkThisLocation;
+    }
+
+    private Room getRoomNear( Point2D point ) {
+        for (Room room : graph.getVertices()) {
+            Point2D location = locations.get( room );
+            if (location != null && location.distance( point ) <= ROOM_OVERLAP_DISTANCE) {
+                return room;
+            }
+        }
+        return null;
     }
 
 
@@ -216,14 +203,12 @@ public class MapperEngine implements ItemListener, ComponentListener {
     }
 
     protected void refreshRoomGraphicsAndSetAsCurrent( Room newRoom, String longDesc, String shortDesc, boolean indoors, Set<String> exits ) {
-//System.out.println("newroom: "+newRoom+"\n\tcurrentroom: "+currentRoom+"\n\tpickedRoom: "+pickedRoom);
         if (currentRoom != null) {
             currentRoom.setCurrent( false );
+            // selection follows the player if the room player was in was selected
             if (currentRoom.isPicked()) {
-                newRoom.setPicked( true );
                 currentRoom.setPicked( false );
-                setRoomDescsForRoom( newRoom, longDesc, shortDesc, indoors, exits );
-                singleRoomPicked( newRoom );
+                newRoom.setPicked( true );
             }
         }
         newRoom.setCurrent( true );
@@ -236,19 +221,15 @@ public class MapperEngine implements ItemListener, ComponentListener {
      *
      * @param areaName name for area, or pass null if leaving area into outerworld or such.
      */
-    protected void moveToArea( String areaName ) {
+    protected synchronized void moveToArea( String areaName ) {
 
         if (areaName == null) {
             clearExtraCurrentAndChosenValuesFromRooms();
             saveCurrentArea();
             this.area = null;
             currentRoom = null;
-
-            pickedState.clear();
             this.graph = new SparseMultigraph<Room, Exit>();
-            mapperLayout.setGraph( graph );
-            Room nullRoom = null;
-            this.panel.setTextForDescs( "", "", "", nullRoom );
+            this.locations = new HashMap<Room, Point2D>();
         } else {
             saveCurrentArea();
             AreaSaveObject areaSaveObject = null;
@@ -263,30 +244,33 @@ public class MapperEngine implements ItemListener, ComponentListener {
             if (areaSaveObject == null) {//area doesn't exist so we create new saveobject which has empty graphs and maps
                 areaSaveObject = new AreaSaveObject();
             }
-            this.graph = areaSaveObject.getGraph();
-            mapperLayout.setGraph( graph );
-//			mousePlugin.setGraph(graph);
-            mapperLayout.displayLoadedData( areaSaveObject );
+            displayLoadedData( areaSaveObject );
             if (graph.getVertexCount() > 0) {
                 this.area = graph.getVertices().iterator().next().getArea();
             } else {
                 this.area = new Area( areaName );
             }
             this.currentRoom = null;
-
-
-            /**
-             *
-             * 	PluggableGraphMouse pgm = new PluggableGraphMouse();
-             pgm.add(new PickingGraphMousePlugin<Room,Exit>());
-             pgm.add(new TranslatingGraphMousePlugin(MouseEvent.BUTTON3_MASK));
-             pgm.add(new ScalingGraphMousePlugin(new CrossoverScalingControl(), 0, 1 / 1.1f, 1.1f));
-             pgm.add(new MapperEditingGraphMousePlugin(graph));
-             vv.setGraphMouse(pgm);
-             */
         }
 
-        repaint();
+        fireChanged();
+    }
+
+    protected void displayLoadedData( AreaSaveObject saveObject ) {
+        this.graph = saveObject.getGraph();
+        this.locations = new HashMap<Room, Point2D>();
+        for (Room room : graph.getVertices()) {
+            Point2D location = saveObject.getLocations().get( room );
+            if (location != null) {
+                locations.put( room, location );
+            }
+            room.setDrawn( true );
+        }
+        for (Room room : graph.getVertices()) {
+            if (! locations.containsKey( room )) {
+                locations.put( room, getValidLocation( new Point2D.Double( 0, 0 ) ) );
+            }
+        }
     }
 
 
@@ -303,7 +287,7 @@ public class MapperEngine implements ItemListener, ComponentListener {
     protected void saveCurrentArea() {
         try {
             if (this.area != null) {
-                AreaDataPersister.save( baseDir, graph, mapperLayout );
+                AreaDataPersister.save( baseDir, graph, locations );
             }
 
         } catch (IOException e) {
@@ -312,22 +296,22 @@ public class MapperEngine implements ItemListener, ComponentListener {
     }
 
 
-    public void save() {
+    public synchronized void save() {
         saveCurrentArea();
     }
 
-    public void clearCurrentArea() {
-	String areaName = area.getName();
-	AreaSaveObject areaSaveObject = new AreaSaveObject();
-	this.graph = areaSaveObject.getGraph();
-	mapperLayout.setGraph( graph );
-	mapperLayout.displayLoadedData( areaSaveObject );
-	this.area = new Area( areaName );
-	this.currentRoom = null;
-	repaint();
+    public synchronized void clearCurrentArea() {
+        if (area == null) {
+            return;
+        }
+        String areaName = area.getName();
+        displayLoadedData( new AreaSaveObject() );
+        this.area = new Area( areaName );
+        this.currentRoom = null;
+        fireChanged();
     }
 
-    private Room getRoomFromGraph( String uid ) {
+    protected Room getRoomFromGraph( String uid ) {
         for (Room room : this.graph.getVertices()) {
             if (room.getId().equals( uid )) {
                 return room;
@@ -337,138 +321,235 @@ public class MapperEngine implements ItemListener, ComponentListener {
         return null;
     }
 
-
-    @Override
-    public void itemStateChanged( ItemEvent e ) {
-        Object subject = e.getItem();
-        if (subject instanceof Room) {
-            Room tempRoom = (Room) subject;
-            if(e.getStateChange() == ItemEvent.SELECTED){
-                pickedState.pick(tempRoom, true);
-                tempRoom.setPicked(true);
-
-            }else if(e.getStateChange() == ItemEvent.DESELECTED){
-                pickedState.pick(tempRoom, false);
-                tempRoom.setPicked(false);
+    private Exit getExitFromGraph( int uid ) {
+        for (Exit exit : this.graph.getEdges()) {
+            if (exit.getUid() == uid) {
+                return exit;
             }
-            repaint();
         }
-        if(pickedState.getPicked().size() == 1){
-            singleRoomPicked(pickedState.getPicked().iterator().next());
-        }else{
-            this.panel.setTextForDescs( "", "", "", null );
-        }
-
+        return null;
     }
 
-    public void changeRoomColor( Color color ) {
-        for(Room room: pickedState.getPicked()){
-            room.setColor(color);
-        }
-        repaint();
-
-    }
-
-
-    protected void singleRoomPicked( Room room ) {
-        this.panel.setTextForDescs( room.getShortDesc(), room.getLongDesc(), makeExitsStringFromPickedRoom(room), room );
-
-
-    }
-
-    protected String makeExitsStringFromPickedRoom(Room room) {
-
-            Collection<Exit> outExits = graph.getOutEdges(room);
-            StringBuilder exitString = new StringBuilder();
-            if (outExits != null) {
-                Iterator<Exit> exitIterator = outExits.iterator();
-
-                while (exitIterator.hasNext()) {
-                    Exit exit = exitIterator.next();
-                    room.getExits().add(exit.getExit());
-                }
+    private List<Room> getPickedRooms() {
+        List<Room> picked = new ArrayList<Room>();
+        for (Room room : graph.getVertices()) {
+            if (room.isPicked()) {
+                picked.add( room );
             }
-
-            Iterator<String> roomExitIterator = room.getExits().iterator();
-            while (roomExitIterator.hasNext()) {
-                exitString.append(roomExitIterator.next());
-                if (roomExitIterator.hasNext()) {
-                    exitString.append(", ");
-                }
-            }
-
-
-            return exitString.toString();
-
+        }
+        return picked;
     }
 
-
-
-    public VisualizationViewer<Room, Exit> getVV() {
-        return this.vv;
-    }
-
-    public void setMapperSize( Dimension size ) {
-        this.mapperLayout.setSize( size );
-        this.vv.setSize( size );
-        repaint();
-    }
-
-
-    public MapperPanel getPanel() {
-        return this.panel;
+    private void clearPicked() {
+        for (Room room : graph.getVertices()) {
+            room.setPicked( false );
+        }
     }
 
     /**
-     * This method refocuses current room into middle of map,
-     * if current room is over away from center by 50% of distance to windowedge
+     * Select a room, or with toggle add/remove it from the selected rooms. Null room id clears selection.
      */
-    protected void moveMapToStayWithCurrentRoom() {
-
-
-        Point2D currentRoomPoint = this.mapperLayout.transform( currentRoom );
-
-        Point2D mapViewCenterPoint = this.panel.getMapperCentralPoint();
-        Point2D viewPoint = vv.getRenderContext().getMultiLayerTransformer().transform( currentRoomPoint );
-        if (needToRelocate( viewPoint, mapViewCenterPoint )) {
-            MutableTransformer modelTransformer = vv.getRenderContext().getMultiLayerTransformer().getTransformer( Layer.LAYOUT );
-            viewPoint = vv.getRenderContext().getMultiLayerTransformer().inverseTransform(viewPoint);
-            mapViewCenterPoint = vv.getRenderContext().getMultiLayerTransformer().inverseTransform(mapViewCenterPoint);
-            float dx = (float) ( mapViewCenterPoint.getX() - viewPoint.getX() );
-            float dy = (float) ( mapViewCenterPoint.getY() - viewPoint.getY() );
-            modelTransformer.translate( dx, dy );
-            repaint();
+    public synchronized void pickRoom( String roomId, boolean toggle ) {
+        Room room = roomId == null ? null : getRoomFromGraph( roomId );
+        if (toggle) {
+            if (room != null) {
+                room.setPicked( ! room.isPicked() );
+            }
+        } else {
+            clearPicked();
+            if (room != null) {
+                room.setPicked( true );
+            }
         }
+        fireChanged();
     }
 
-    private boolean needToRelocate( Point2D currentRoomPoint, Point2D mapViewCenterPoint ) {
-        if (currentRoomPoint.getX() < 0.6 * mapViewCenterPoint.getX() || currentRoomPoint.getX() > 1.3 * mapViewCenterPoint.getX() ){
-            return true;
+    /**
+     * Select rooms from a dragged selection rectangle
+     */
+    public synchronized void pickRooms( Collection<String> roomIds, boolean clearOthers ) {
+        if (clearOthers) {
+            clearPicked();
         }
-
-        if (currentRoomPoint.getY() < 0.6 * mapViewCenterPoint.getY() || currentRoomPoint.getY() > 1.3 * mapViewCenterPoint.getY()) {
-            return true;
+        for (String roomId : roomIds) {
+            Room room = getRoomFromGraph( roomId );
+            if (room != null) {
+                room.setPicked( true );
+            }
         }
-
-        return false;
+        fireChanged();
     }
 
+    public synchronized void moveRooms( Map<String, Point2D> newLocations ) {
+        for (Map.Entry<String, Point2D> entry : newLocations.entrySet()) {
+            Room room = getRoomFromGraph( entry.getKey() );
+            if (room != null) {
+                locations.put( room, entry.getValue() );
+            }
+        }
+        fireChanged();
+    }
 
-//    public void redraw() {
-//        this.mapperLayout.reDrawFromRoom( pickedRoom, this.mapperLayout.transform( pickedRoom ) );
-//        repaint();
-//
-//    }
+    public synchronized void changeRoomColor( Color color ) {
+        for(Room room: getPickedRooms()){
+            room.setColor(color);
+        }
+        fireChanged();
+
+    }
+
+    public synchronized void deletePickedRooms() {
+        for (Room room : getPickedRooms()) {
+            graph.removeVertex( room );
+            locations.remove( room );
+            if (room == currentRoom) {
+                currentRoom = null;
+            }
+        }
+        fireChanged();
+    }
+
+    public synchronized void deleteExit( int exitUid ) {
+        Exit exit = getExitFromGraph( exitUid );
+        if (exit != null) {
+            graph.removeEdge( exit );
+        }
+        fireChanged();
+    }
+
+    public synchronized void renameExit( int exitUid, String newName ) {
+        Exit exit = getExitFromGraph( exitUid );
+        if (exit != null && newName != null && ! newName.equals( "" )) {
+            exit.setExit( newName );
+        }
+        fireChanged();
+    }
+
+    public synchronized void setNotes( String roomId, String notes ) {
+        Room room = getRoomFromGraph( roomId );
+        if (room != null) {
+            room.setNotes( notes );
+        }
+        fireChanged();
+    }
+
+    /**
+     * Appends a line to notes of the selected room, or the current room if there isn't exactly one selected.
+     *
+     * @return false if there was no room to add notes to
+     */
+    public synchronized boolean appendToNotes( String text ) {
+        List<Room> picked = getPickedRooms();
+        Room room = picked.size() == 1 ? picked.get( 0 ) : currentRoom;
+        if (room == null) {
+            return false;
+        }
+        String notes = room.getNotes() == null ? "" : room.getNotes();
+        room.setNotes( notes + text + "\n" );
+        fireChanged();
+        return true;
+    }
+
+    /**
+     * @return number that grows every time the map changes
+     */
+    public synchronized long getVersion() {
+        return version;
+    }
+
+    /**
+     * Snapshot of the map for drawing it
+     */
+    public synchronized MapState getState() {
+        MapState state = new MapState();
+        state.view = getViewName();
+        state.version = version;
+        state.area = area == null ? null : area.getName();
+        state.snap = snapMode;
+        state.maze = mazemode;
+        state.revs = reversableDirsMode;
+
+        for (Room room : graph.getVertices()) {
+            MapState.RoomState roomState = new MapState.RoomState();
+            Point2D location = locations.get( room );
+            roomState.id = room.getId();
+            roomState.x = location == null ? 0 : location.getX();
+            roomState.y = location == null ? 0 : location.getY();
+            roomState.shortDesc = room.getShortDesc();
+            roomState.label = room.getLabel();
+            roomState.indoors = room.isIndoors();
+            roomState.current = room.isCurrent();
+            roomState.picked = room.isPicked();
+            roomState.explored = room.allExitsHaveBeenUSed();
+            if (roomState.explored) {
+                roomState.color = RoomColors.toHex( RoomColors.MAZEMODE_FULLYEXPLORED );
+                roomState.lightExits = true;
+            } else {
+                roomState.color = RoomColors.toHex( room.getColor() );
+                roomState.lightExits = RoomColors.needsLightExits( room.getColor() );
+            }
+            roomState.exits = DrawingUtils.getExitMarkers( room.getExits() );
+            state.rooms.add( roomState );
+        }
+
+        for (Exit exit : graph.getEdges()) {
+            Pair<Room> ends = graph.getEndpoints( exit );
+            MapState.ExitState exitState = new MapState.ExitState();
+            exitState.id = exit.getUid();
+            exitState.from = ends.getFirst().getId();
+            exitState.to = ends.getSecond().getId();
+            exitState.name = exit.getExit();
+            exitState.current = exit.isCurrentExit();
+            state.exits.add( exitState );
+        }
+
+        List<Room> picked = getPickedRooms();
+        if (picked.size() == 1) {
+            state.selected = makeSelectedRoom( picked.get( 0 ) );
+        }
+
+        String[] colorNames = RoomColors.getColorNames();
+        Color[] colors = RoomColors.getColors();
+        for (int i = 0; i < colorNames.length; i++) {
+            state.colors.add( new MapState.ColorOption( colorNames[i], RoomColors.toHex( colors[i] ) ) );
+        }
+        return state;
+    }
+
+    private MapState.SelectedRoom makeSelectedRoom( Room room ) {
+        MapState.SelectedRoom selected = new MapState.SelectedRoom();
+        selected.id = room.getId();
+        selected.shortDesc = room.getShortDesc();
+        selected.longDesc = room.getLongDesc();
+        selected.notes = room.getNotes();
+        selected.label = room.getLabel();
+        selected.colorIndex = RoomColors.getIndex( room.getColor() );
+        selected.exits = makeExitsStringFromPickedRoom( room );
+        return selected;
+    }
+
+    protected String makeExitsStringFromPickedRoom(Room room) {
+        Set<String> exits = new LinkedHashSet<String>( room.getExits() );
+        Collection<Exit> outExits = graph.getOutEdges(room);
+        if (outExits != null) {
+            for (Exit exit : outExits) {
+                exits.add( exit.getExit() );
+            }
+        }
+        StringBuilder exitString = new StringBuilder();
+        Iterator<String> roomExitIterator = exits.iterator();
+        while (roomExitIterator.hasNext()) {
+            exitString.append(roomExitIterator.next());
+            if (roomExitIterator.hasNext()) {
+                exitString.append(", ");
+            }
+        }
+        return exitString.toString();
+    }
 
 
     public SparseMultigraph<Room, Exit> getGraph() {
         return graph;
-    }
-
-
-    public void toggleDescs() {
-        this.panel.toggleDescs();
-
     }
 
 
@@ -518,30 +599,32 @@ public class MapperEngine implements ItemListener, ComponentListener {
 
     }
 
-
-    public ScalingGraphMousePlugin getScaler() {
-        return scaler;
-    }
-
-    public void setRoomSnapping(boolean roomsWillSnapIntoPlaces){
+    public synchronized void setRoomSnapping(boolean roomsWillSnapIntoPlaces){
         this.snapMode = roomsWillSnapIntoPlaces;
-        mapperPickingGraphMousePlugin.setSnapmode(roomsWillSnapIntoPlaces);
-        this.mapperLayout.setSnapMode(roomsWillSnapIntoPlaces);
+        fireChanged();
     }
 
-    public void zoomIn(){
-        this.scaler.getScaler().scale(this.vv, 1.1f, this.vv.getCenter());
-    }
-
-    public void zoomOut(){
-        this.scaler.getScaler().scale(this.vv, 1/1.1f, this.vv.getCenter());
+    /**
+     * Directions from current room to the given room
+     *
+     * @return the directions, or null if there is no known path
+     */
+    public synchronized String getDirsTo( String roomId, boolean shortDirs ) {
+        Room targetroom = getRoomFromGraph( roomId );
+        if (targetroom == null || currentRoom == null || ! graph.containsVertex( currentRoom )) {
+            return null;
+        }
+        return checkDirsFromCurrentRoomTo( targetroom, shortDirs );
     }
 
     public String checkDirsFromCurrentRoomTo(Room targetroom, boolean shortDirs){
         DijkstraShortestPath<Room, Exit> algorithm = new DijkstraShortestPath<Room, Exit>( this.getGraph() );
         StringBuilder returnvalue= new StringBuilder();
-        String delim = this.corpsePanel.getDelim();
+        String delim = getDelim();
         List<Exit> path = algorithm.getPath( currentRoom, targetroom );
+        if (path.isEmpty()) {
+            return null;
+        }
         if(shortDirs){
             //plan is to transform "north, north, north, south, east, tunnel" into
             // 3 n;s;e;tunnel
@@ -550,7 +633,11 @@ public class MapperEngine implements ItemListener, ComponentListener {
             Iterator<Exit> pathIterator= path.iterator();
 
             while( pathIterator.hasNext() ){
-                String shortExit = Exit.checkWhatExitIs(  pathIterator.next().getExit());
+                Exit exit = pathIterator.next();
+                String shortExit = Exit.checkWhatExitIs( exit.getExit() );
+                if (shortExit == null) {
+                    shortExit = exit.getExit();
+                }
                 if(previous == null){
                     previous = shortExit;
                 }else{
@@ -581,27 +668,50 @@ public class MapperEngine implements ItemListener, ComponentListener {
         return returnvalue.toString();
     }
 
+    private String getDelim() {
+        return this.corpsePanel != null ? this.corpsePanel.getDelim() : DEFAULT_DELIM;
+    }
+
 
     public void setCorpsePanel( CorpsePanel corpsePanel){
         this.corpsePanel = corpsePanel;
     }
 
-    public void sendToMud(String command){
-        this.plugin.doCommand( command );
+    public void sendToMud( final String command ) {
+        if (this.plugin == null) {
+            System.out.println( "would send to mud: " + command );
+            return;
+        }
+        // handed over to the gui thread so that batclient is never called while holding the map lock
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                plugin.doCommand( command );
+            }
+        } );
     }
 
     public void sendToParty(String message){
-        this.plugin.doCommand( "party say "+message.replace( this.corpsePanel.getDelim(), "," ) );
+        sendToMud( "party say "+message.replace( getDelim(), "," ) );
     }
 
-    public void removeLabelFromCurrent(){
+    public synchronized boolean removeLabelFromCurrent(){
+        if (this.currentRoom == null) {
+            return false;
+        }
         this.currentRoom.setLabel(null);
+        fireChanged();
+        return true;
     }
-    public void setLabelToCurrentRoom(String label){
+    public synchronized boolean setLabelToCurrentRoom(String label){
+        if (this.currentRoom == null) {
+            return false;
+        }
         this.currentRoom.setLabel(label);
+        fireChanged();
+        return true;
     }
 
-    public boolean roomLabelExists(String label){
+    public synchronized boolean roomLabelExists(String label){
         for( Room room: this.graph.getVertices()){
             if(room.getLabel() != null && room.getLabel().equalsIgnoreCase(label)){
                 return true;
@@ -610,17 +720,19 @@ public class MapperEngine implements ItemListener, ComponentListener {
         return false;
     }
 
-    public void runtoLabel(String label){
+    public synchronized void runtoLabel(String label){
         Room targetroom = null;
         for( Room room: this.graph.getVertices()){
             if(room.getLabel() != null && room.getLabel().equalsIgnoreCase(label)){
                 targetroom = room;
             }
         }
-        String dirs = checkDirsFromCurrentRoomTo(targetroom, false);
-        sendToMud(dirs);
+        String dirs = getDirsTo( targetroom.getId(), false );
+        if (dirs != null) {
+            sendToMud(dirs);
+        }
     }
-    public List<String> getLabels(){
+    public synchronized List<String> getLabels(){
         List<String> labels = new LinkedList<>();
         for( Room room: this.graph.getVertices()){
             if(room.getLabel() != null){
@@ -630,16 +742,17 @@ public class MapperEngine implements ItemListener, ComponentListener {
         return labels;
     }
 
-    public void setMazeMode(boolean enabled){
+    public synchronized void setMazeMode(boolean enabled){
         this.mazemode = enabled;
         for(Room room: this.graph.getVertices()){
                 room.resetExitUsage();
         }
-            repaint();
+        fireChanged();
     }
 
-    public void setReversableDirsMode(boolean enabled){
+    public synchronized void setReversableDirsMode(boolean enabled){
         this.reversableDirsMode = enabled;
+        fireChanged();
     }
 
 }

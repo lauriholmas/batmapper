@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>batMap</title>
+<link rel="stylesheet" href="map.css">
+</head>
+<body>
+<header class="topbar">
+  <nav class="tabs" role="tablist">
+    <button type="button" class="tab" role="tab" data-view="map">Map</button>
+    <button type="button" class="tab" role="tab" data-view="search">Search</button>
+  </nav>
+  <div class="area-name" id="area-name"></div>
+  <div class="status" id="status" title="Connection to batclient">connecting…</div>
+  <button type="button" class="help-button" id="help-button" title="Controls">?</button>
+</header>
+
+<main id="views"></main>
+
+<template id="view-template">
+  <section class="view">
+    <div class="searchbar" hidden>
+      <input type="search" class="search-text" placeholder="Search descs…" title="Input desc to search here, press enter to search">
+      <select class="search-results" title="Click on a result to see map"></select>
+      <select class="area-list" title="Select area from list to view map"></select>
+    </div>
+    <div class="view-body">
+      <div class="viewport" tabindex="0">
+        <div class="world">
+          <div class="edges"></div>
+          <div class="exit-labels"></div>
+          <div class="rooms"></div>
+        </div>
+        <div class="select-rect" hidden></div>
+        <div class="empty-note" hidden></div>
+      </div>
+      <aside class="side">
+        <div class="box short-desc" title="This is room short description"></div>
+        <div class="box long-desc" title="This is room long description"></div>
+        <div class="box room-exits" title="This lists room exits"></div>
+        <div class="tools">
+          <div class="tool-row">
+            <button type="button" class="zoom-in" title="Zoom in">+</button>
+            <button type="button" class="zoom-out" title="Zoom out">−</button>
+            <select class="room-color" title="Use this to change room color to highlight it"></select>
+            <button type="button" class="toggle maze" title="Toggle maze helper on and off">Maze</button>
+          </div>
+          <div class="tool-row">
+            <button type="button" class="save" title="Save the map to a file.">Save</button>
+            <button type="button" class="clear" title="Clear the map for this area.">Clear</button>
+            <button type="button" class="toggle snap" title="Toggle room location snapping">Snap</button>
+            <button type="button" class="toggle revs" title="When adding an exit to new room, also add backwards exit automatically if reversable">Revs</button>
+          </div>
+        </div>
+        <textarea class="notes" placeholder="Select a room to write notes for it" title="Feel free to write your own notes here." disabled></textarea>
+      </aside>
+    </div>
+  </section>
+</template>
+
+<div class="modal-backdrop" id="modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <h2 id="modal-title"></h2>
+    <p class="modal-body" id="modal-body"></p>
+    <input type="text" class="modal-input" id="modal-input" hidden>
+    <div class="modal-buttons" id="modal-buttons"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="help" hidden>
+  <div class="modal help">
+    <h2>Controls</h2>
+    <ul>
+      <li><b>Click</b> a room to select it, <b>shift-click</b> to add it to or remove it from the selection.</li>
+      <li><b>Drag</b> a room to move the selected rooms. <b>Drag</b> the background to move the map.</li>
+      <li><b>Shift-drag</b> or <b>right-drag</b> on the background to select rooms inside a rectangle.</li>
+      <li><b>Mouse wheel</b> zooms in and out.</li>
+      <li><b>Ctrl-click</b> (or ⌘-click) a room to get directions to it from where you are.</li>
+      <li><b>Right-click</b> a selected room to delete the selected rooms, right-click an exit to delete it.</li>
+      <li><b>Double-click</b> an exit to rename it, double-click the background to hide or show the room panel.</li>
+      <li>Red rim is the room you are in, cyan rim is selected. If the room you are in is selected, the selection moves with you.</li>
+      <li>Green rooms are outdoors, grey rooms indoors. Arrows show up/down exits, the oval means some other exit.</li>
+    </ul>
+    <div class="modal-buttons"><button type="button" class="primary" id="help-close">Close</button></div>
+  </div>
+</div>
+
+<script src="map.js"></script>
+</body>
+</html>

@@ -33,6 +33,21 @@ public class RoomColors {
     }
 
 
+    public static String toHex( Color color ) {
+        if (color == null) {
+            return null;
+        }
+        return String.format( "#%06x", color.getRGB() & 0xffffff );
+    }
+
+    /**
+     * Exits are drawn with a light color on rooms that have a dark background
+     */
+    public static boolean needsLightExits( Color roomColor ) {
+        return roomColor != null && ( roomColor.equals( BLUE ) || roomColor.equals( BROWN ) ||
+                roomColor.equals( MAZEMODE_FULLYEXPLORED ) || roomColor.equals( PURPLE ) );
+    }
+
     public static int getIndex( Color color ) {
         if (color == null) {
             return 0;

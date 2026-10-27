@@ -1,6 +1,11 @@
 package com.glaurung.batMap.gui;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import com.glaurung.batMap.vo.Exit;
 
@@ -18,6 +23,19 @@ public class DrawingUtils {
         double x = getXByExit( exit, location.getX(), snapMode );
         double y = getYByExit( exit, location.getY(), snapMode );
         return new Point2D.Double( x, y );
+    }
+
+    /**
+     * Maps room exits to the markers drawn inside a room: n, ne, e, se, s, sw, w, nw, u, d and special for
+     * anything that isn't a compass dir or up/down.
+     */
+    public static List<String> getExitMarkers( Collection<String> exits ) {
+        Set<String> markers = new LinkedHashSet<String>();
+        for (String exit : exits) {
+            String dir = Exit.checkWhatExitIs( exit );
+            markers.add( dir != null ? dir : "special" );
+        }
+        return new ArrayList<String>( markers );
     }
 
     //y going up to down

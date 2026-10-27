@@ -1,40 +1,58 @@
 package com.glaurung.batMap.controller;
 
-import java.awt.event.ItemListener;
 import java.io.IOException;
-import java.sql.Savepoint;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
-import com.glaurung.batMap.gui.search.SearchPanel;
 import com.glaurung.batMap.io.AreaDataPersister;
 import com.glaurung.batMap.vo.AreaSaveObject;
 import com.glaurung.batMap.vo.Exit;
 import com.glaurung.batMap.vo.Room;
+import com.glaurung.batMap.web.MapState;
 
 import edu.uci.ics.jung.graph.SparseMultigraph;
 
-public class SearchEngine extends MapperEngine implements ItemListener {
+/**
+ * Engine for the map search view, which shows saved maps of any area.
+ */
+public class SearchEngine extends MapperEngine {
 
     private String areaName = "";
     private String mapperArea;
     private boolean savingAlreadyDisabled = false;
+    private boolean canSave = true;
+    private String searchText = "";
+    private List<MapState.SearchResult> results = new ArrayList<MapState.SearchResult>();
 
     public SearchEngine( SparseMultigraph<Room, Exit> graph, MapperPlugin plugin ) {
         this(plugin);
         this.graph = graph;
-        this.mapperLayout.setGraph( graph );
     }
 
     public SearchEngine(MapperPlugin plugin) {
         super(plugin);
-        panel = new SearchPanel( this );
     }
 
-    public void moveToRoom( Room room, boolean highlight ) {
-        moveToArea( room.getArea().getName() );
+    @Override
+    public String getViewName() {
+        return "search";
+    }
 
+    /**
+     * Shows the map of an area, with the given room highlighted
+     *
+     * @param areaName area to show
+     * @param roomId   room to highlight, or null to not highlight any
+     */
+    public synchronized void showRoom( String areaName, String roomId ) {
+        moveToArea( areaName );
+
+        currentRoom = null;
         for (Room aRoom : graph.getVertices()) {
 
-            if (aRoom.equals( room ) && highlight) {
+            if (roomId != null && aRoom.getId().equals( roomId )) {
                 currentRoom = aRoom;
                 aRoom.setPicked( true );
                 aRoom.setCurrent( true );
@@ -43,30 +61,18 @@ public class SearchEngine extends MapperEngine implements ItemListener {
                 aRoom.setCurrent( false );
             }
         }
-
-        singleRoomPicked(room);
-//        pickedRoom = room;
-//        this.panel.setTextForDescs( pickedRoom.getShortDesc(), pickedRoom.getLongDesc(), makeExitsStringFromPickedRoom(), pickedRoom );
-        repaint();
-        moveMapToStayWithCurrentRoom();
+        fireChanged();
     }
 
-    public void save() {
-        try {
-            if (this.area != null) {
-                AreaDataPersister.save( baseDir, graph, mapperLayout );
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    @Override
+    public synchronized void save() {
+        if (canSave) {
+            saveCurrentArea();
         }
     }
 
-
-    public void setPanel( SearchPanel panel ) {
-        this.panel = panel;
-    }
-
-    public void moveToArea( String areaName ) {
+    @Override
+    protected synchronized void moveToArea( String areaName ) {
         AreaSaveObject areaSaveObject = null;
         try {
             areaSaveObject = AreaDataPersister.loadData( baseDir, areaName );
@@ -75,41 +81,92 @@ public class SearchEngine extends MapperEngine implements ItemListener {
         } catch (IOException e) {
             return;
         }
-        this.areaName = areaName;
-        this.graph = areaSaveObject.getGraph();
+        if (areaSaveObject.getGraph().getVertexCount() == 0) {
+            return;
+        }
+        displayLoadedData( areaSaveObject );
         this.area = this.graph.getVertices().iterator().next().getArea();
-        mapperLayout.displayLoadedData( areaSaveObject );
+        this.areaName = this.area.getName();
+        this.currentRoom = null;
         if (! this.areaName.equalsIgnoreCase( this.mapperArea )) {
             savingAlreadyDisabled = false;
         }
         checkIfCanSaveMap();
-    }
-
-
-    public void setBaseDir( String baseDir ) {
-        this.baseDir = baseDir;
-
-    }
-
-    public String getBaseDir() {
-        return this.baseDir;
+        fireChanged();
     }
 
     public void checkIfCanSaveMap() {
         if (this.areaName.equalsIgnoreCase( this.mapperArea ) || savingAlreadyDisabled) {
-            SearchPanel tempPanel = (SearchPanel) this.panel;
-            tempPanel.toggleSaveAbility( false );
+            canSave = false;
             savingAlreadyDisabled = true;
         } else {
-            SearchPanel tempPanel = (SearchPanel) this.panel;
-            tempPanel.toggleSaveAbility( true );
+            canSave = true;
         }
 
     }
 
-    public void setMapperArea( String areaName ) {
+    public synchronized void setMapperArea( String areaName ) {
+        boolean couldSave = canSave;
         this.mapperArea = areaName;
         checkIfCanSaveMap();
+        if (couldSave != canSave) {
+            fireChanged();
+        }
+    }
+
+    /**
+     * Searches all saved areas for rooms with the text in their short or long desc.
+     * Results are shown in the search view.
+     *
+     * @return list of "area: short desc" lines of found rooms
+     */
+    public synchronized List<String> searchForRoomsWith( String text ) {
+        List<String> foundRooms = new LinkedList<String>();
+        searchText = text;
+        results = new ArrayList<MapState.SearchResult>();
+        if (text.equals( "" )) {
+            fireChanged();
+            return foundRooms;
+        }
+        //iterate through all areafiles, iterate through all rooms and look for texts, if matches, add to list
+        for (String areaFileName : AreaDataPersister.listAreaNames( baseDir )) {
+            AreaSaveObject aso;
+            try {
+                aso = AreaDataPersister.loadData( baseDir, areaFileName );
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+                continue;
+            }
+            Collection<Room> areaRooms = aso.getGraph().getVertices();
+            for (Room room : areaRooms) {
+                if (room.getShortDesc() == null || room.getLongDesc() == null ) {
+                    // in case of bad room data, just skip it
+                    continue;
+                }
+                if (room.getLongDesc().toLowerCase().contains( text.toLowerCase() ) ||
+                        room.getShortDesc().toLowerCase().contains( text.toLowerCase() )) {
+                    results.add( new MapState.SearchResult( room.getArea().getName(), room.getId(), room.getShortDesc() ) );
+
+                    String roomString = room.getArea().getName() + ": " + room.getShortDesc();
+                    if (!foundRooms.contains(roomString)) {
+                        foundRooms.add(roomString);
+                    }
+                }
+            }
+        }
+        fireChanged();
+        return foundRooms;
+    }
+
+    @Override
+    public synchronized MapState getState() {
+        MapState state = super.getState();
+        state.canSave = canSave;
+        state.search = new MapState.SearchState();
+        state.search.text = searchText;
+        state.search.results = results;
+        state.search.areas = AreaDataPersister.listAreaNames( baseDir );
+        return state;
     }
 
 }

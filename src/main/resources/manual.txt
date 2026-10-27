@@ -33,28 +33,32 @@ The room layout is saved as well, so feel free to adjust to your liking.
 
 	The layout
 
-The big part is the mapper, the right side has the room descs and exits. The lowest part is for your notes, if you wish to add them. To add notes, just click onthe room you want to add the notes to, and write in the lowermost box. 
+The map is drawn in your web browser. The batMap tab has the address of the map ( http://127.0.0.1:8765/ unless that port is taken ) and a button to open it, you can also type 'batMap open'. Only your own computer can open the map.
+The Map tab in the browser shows the area you are in, the Search tab lets you search descs of all mapped rooms and view the map of any mapped area.
+The big part is the map, the right side has the room descs and exits of the selected room. The lowest part is for your notes, if you wish to add them. To add notes, just click on the room you want to add the notes to, and write in the lowermost box.
 The green rooms are outside rooms, the grey rooms are inside.
-A red star in a room means that there is some non-compass-dir exit, ie, up, down, enter fireplace.
+An oval in a room means that there is some non-compass-dir exit, ie, enter fireplace. Arrows in the middle of a room mean up and down exits.
 Only exits you use will be added into the map as links between rooms. Exits used and exits visible in "exits" will be drawn into the room icon.
-	
-	
+
+
 	Controls
-	
+
 Cyan rim around a room is the selected one. Shift click on a room to add/remove it to/from selected rooms.
-Right button drag can select an area of rooms.
-Right-click on room to prompt for deletion of selecteds.
+Shift drag or right button drag on the background can select an area of rooms.
+Right-click on a selected room to prompt for deletion of selecteds.
 Right click on exit to prompt for deletion.
+Ctrl-click ( cmd-click on mac ) on a room to get directions there from the room you are in, and send them to the mud or your party.
 Red rim around a room is where you currently are, move to another room to change this.
 If you have selected the room you are in ( ie, cyan and red rims) the selection will move with you.
 
 - Doubleclicking on an exit between rooms will allow you to change it, ie: from enter -> enter fireplace.
-- Clicking and dragging a room will move that room around, the exits will adjust. 
+- Doubleclicking on the background hides or shows the room descs and notes.
+- Clicking and dragging a room will move the selected rooms around, the exits will adjust.
 - Dragging the background will allow you to move the whole map around.
 - Mouse scrolling will zoom in and out
-- Click and drag ( rightclick ) on the background will allow you to make a selection of rooms, these can then be moved around together.
 - Select a room and change the coloring from the coloring dropdown ( says normal if no color) to change the color of that maproom.
-	
+- The ? button in the top right corner of the map lists these controls.
+
 	Common WTF?!?!?!?!
 	
 Only room in compassdirs can be placed sensibly, therefore exits with u,d,enter fireplace, float northwest etc are placed badly by the mapper. You should move them to a place which makes sense to you before continuing onward in the area. 

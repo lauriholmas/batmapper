@@ -1,6 +1,7 @@
 package com.glaurung.batMap.vo;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Exit implements Serializable {
 
@@ -10,6 +11,9 @@ public class Exit implements Serializable {
     private String compassDir;
     private boolean currentExit;
     public final String TELEPORT = "teleport";
+    private static final AtomicInteger NEXT_UID = new AtomicInteger();
+    // runtime only id so the web map can refer to a specific exit, never saved
+    private transient int uid;
 
 
     public Exit( String exit ) {
@@ -67,6 +71,13 @@ public class Exit implements Serializable {
             return null;
         }
 
+    }
+
+    public int getUid() {
+        if (uid == 0) {
+            uid = NEXT_UID.incrementAndGet();
+        }
+        return uid;
     }
 
     public String getExit() {
