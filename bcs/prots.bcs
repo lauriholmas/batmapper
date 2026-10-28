@@ -68,7 +68,7 @@ void bootup(){
 	start = triggerManager.newTrigger("partyProts1", "^[ ]+,[+-]+.$", "$"+SCRIPT_NAME+".start", true, false, false, null, Font.PLAIN );
 	line1 = triggerManager.newTrigger("partyProts2", "^[ ]+([A-Za-z| ])+$", "$"+SCRIPT_NAME+".line", true, false, false, null, Font.PLAIN);
 	line2 = triggerManager.newTrigger("partyProts3", "^,[+-]+$", "$"+SCRIPT_NAME+".line", true, false, false, null, Font.PLAIN);
-	line3 = triggerManager.newTrigger("partyProts4", "^\\|[A-Za-z+ ]+\\|[X: 0-9|]+\\|$", "$"+SCRIPT_NAME+".line", true, false, false, null, Font.PLAIN);
+	line3 = triggerManager.newTrigger("partyProts4", "^\\|[A-Za-z+ ]+\\|[Xh: 0-9|]+\\|$", "$"+SCRIPT_NAME+".line", true, false, false, null, Font.PLAIN);
 	end = triggerManager.newTrigger("partyProts5", "^`[+-]+'$", "$"+SCRIPT_NAME+".end", true, false, false, null, Font.PLAIN);
 		
 
